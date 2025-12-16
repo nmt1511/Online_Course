@@ -3,15 +3,15 @@
 }
 
 <!-- Hero Section -->
-<section class="relative bg-gradient-to-br from-primary/10 via-background-dark to-background-dark py-16 md:py-24">
+<section class="relative bg-gradient-to-br from-primary/10 via-white dark:via-background-dark to-white dark:to-background-dark py-16 md:py-24">
     <div class="max-w-7xl mx-auto px-4 md:px-10">
         <div class="grid md:grid-cols-2 gap-12 items-center">
             <div class="space-y-6">
-                <h1 class="text-4xl md:text-5xl font-bold leading-tight">
+                <h1 class="text-4xl md:text-5xl font-bold leading-tight text-slate-900 dark:text-white">
                     Học tập trực tuyến
                     <span class="text-primary">không giới hạn</span>
                 </h1>
-                <p class="text-lg text-text-secondary leading-relaxed">
+                <p class="text-lg text-gray-600 dark:text-text-secondary leading-relaxed">
                     Khám phá hàng nghìn khóa học chất lượng cao từ các giảng viên hàng đầu. 
                     Nâng cao kỹ năng và phát triển sự nghiệp của bạn ngay hôm nay.
                 </p>
@@ -42,45 +42,45 @@
 </section>
 
 <!-- Features Section -->
-<section class="py-16 bg-surface-dark">
+<section class="py-16 bg-gray-50 dark:bg-surface-dark">
     <div class="max-w-7xl mx-auto px-4 md:px-10">
         <div class="text-center mb-12">
-            <h2 class="text-3xl font-bold mb-4">Tại sao chọn EduTech?</h2>
-            <p class="text-text-secondary max-w-2xl mx-auto">
+            <h2 class="text-3xl font-bold mb-4 text-slate-900 dark:text-white">Tại sao chọn EduTech?</h2>
+            <p class="text-gray-600 dark:text-text-secondary max-w-2xl mx-auto">
                 Nền tảng học tập trực tuyến hàng đầu với nhiều tính năng vượt trội
             </p>
         </div>
         <div class="grid md:grid-cols-3 gap-8">
-            <div class="bg-background-dark p-6 rounded-xl border border-border-dark hover:border-primary/50 transition-colors">
+            <div class="bg-white dark:bg-background-dark p-6 rounded-xl border border-gray-200 dark:border-border-dark hover:border-primary/50 transition-colors">
                 <div class="w-14 h-14 bg-primary/20 rounded-lg flex items-center justify-center mb-4">
                     <span class="material-symbols-outlined text-primary text-[28px]">play_circle</span>
                 </div>
-                <h3 class="text-xl font-semibold mb-2">Video chất lượng cao</h3>
-                <p class="text-text-secondary">Nội dung video được sản xuất chuyên nghiệp, dễ hiểu và thực tế.</p>
+                <h3 class="text-xl font-semibold mb-2 text-slate-900 dark:text-white">Video chất lượng cao</h3>
+                <p class="text-gray-600 dark:text-text-secondary">Nội dung video được sản xuất chuyên nghiệp, dễ hiểu và thực tế.</p>
             </div>
-            <div class="bg-background-dark p-6 rounded-xl border border-border-dark hover:border-primary/50 transition-colors">
+            <div class="bg-white dark:bg-background-dark p-6 rounded-xl border border-gray-200 dark:border-border-dark hover:border-primary/50 transition-colors">
                 <div class="w-14 h-14 bg-green-500/20 rounded-lg flex items-center justify-center mb-4">
                     <span class="material-symbols-outlined text-green-500 text-[28px]">verified</span>
                 </div>
-                <h3 class="text-xl font-semibold mb-2">Giảng viên uy tín</h3>
-                <p class="text-text-secondary">Đội ngũ giảng viên giàu kinh nghiệm, chuyên môn cao trong lĩnh vực.</p>
+                <h3 class="text-xl font-semibold mb-2 text-slate-900 dark:text-white">Giảng viên uy tín</h3>
+                <p class="text-gray-600 dark:text-text-secondary">Đội ngũ giảng viên giàu kinh nghiệm, chuyên môn cao trong lĩnh vực.</p>
             </div>
-            <div class="bg-background-dark p-6 rounded-xl border border-border-dark hover:border-primary/50 transition-colors">
+            <div class="bg-white dark:bg-background-dark p-6 rounded-xl border border-gray-200 dark:border-border-dark hover:border-primary/50 transition-colors">
                 <div class="w-14 h-14 bg-orange-500/20 rounded-lg flex items-center justify-center mb-4">
                     <span class="material-symbols-outlined text-orange-500 text-[28px]">schedule</span>
                 </div>
-                <h3 class="text-xl font-semibold mb-2">Học mọi lúc mọi nơi</h3>
-                <p class="text-text-secondary">Truy cập khóa học 24/7 trên mọi thiết bị, học theo tiến độ riêng.</p>
+                <h3 class="text-xl font-semibold mb-2 text-slate-900 dark:text-white">Học mọi lúc mọi nơi</h3>
+                <p class="text-gray-600 dark:text-text-secondary">Truy cập khóa học 24/7 trên mọi thiết bị, học theo tiến độ riêng.</p>
             </div>
         </div>
     </div>
 </section>
 
 <!-- Categories Section -->
-<section class="py-16">
+<section class="py-16 bg-white dark:bg-background-dark">
     <div class="max-w-7xl mx-auto px-4 md:px-10">
         <div class="flex justify-between items-center mb-8">
-            <h2 class="text-2xl font-bold">Danh mục phổ biến</h2>
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Danh mục phổ biến</h2>
             <a asp-area="Student" asp-controller="Courses" asp-action="Index" 
                class="text-primary hover:underline flex items-center gap-1">
                 Xem tất cả
@@ -100,11 +100,11 @@
             @foreach (var (name, icon, bgColor, textColor) in categories)
             {
                 <a asp-area="Student" asp-controller="Courses" asp-action="Index" asp-route-category="@name"
-                   class="flex flex-col items-center p-4 bg-surface-dark rounded-xl border border-border-dark hover:border-primary/50 transition-all hover:-translate-y-1">
+                   class="flex flex-col items-center p-4 bg-gray-50 dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-border-dark hover:border-primary/50 transition-all hover:-translate-y-1">
                     <div class="w-12 h-12 @bgColor rounded-lg flex items-center justify-center mb-3">
                         <span class="material-symbols-outlined @textColor">@icon</span>
                     </div>
-                    <span class="text-sm font-medium text-center">@name</span>
+                    <span class="text-sm font-medium text-center text-slate-900 dark:text-white">@name</span>
                 </a>
             }
         </div>

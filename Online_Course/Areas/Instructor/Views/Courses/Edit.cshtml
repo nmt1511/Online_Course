@@ -9,15 +9,15 @@
     <!-- Breadcrumbs -->
     <nav class="flex flex-wrap gap-2 items-center text-sm">
         <a asp-area="Instructor" asp-controller="Dashboard" asp-action="Index" 
-           class="text-slate-400 hover:text-primary font-medium transition-colors flex items-center gap-1">
+           class="text-gray-500 dark:text-slate-400 hover:text-primary font-medium transition-colors flex items-center gap-1">
             <span class="material-symbols-outlined text-[18px]">dashboard</span>
             Dashboard
         </a>
-        <span class="text-slate-500">/</span>
+        <span class="text-gray-400 dark:text-slate-500">/</span>
         <a asp-area="Instructor" asp-controller="Courses" asp-action="Index" 
-           class="text-slate-400 hover:text-primary font-medium transition-colors">Khóa học của tôi</a>
-        <span class="text-slate-500">/</span>
-        <span class="text-white font-medium">Sửa khóa học #@Model.CourseId</span>
+           class="text-gray-500 dark:text-slate-400 hover:text-primary font-medium transition-colors">Khóa học của tôi</a>
+        <span class="text-gray-400 dark:text-slate-500">/</span>
+        <span class="text-slate-900 dark:text-white font-medium">Sửa khóa học #@Model.CourseId</span>
     </nav>
 
     <!-- Page Heading & Actions -->
@@ -25,13 +25,13 @@
         @Html.AntiForgeryToken()
         <input type="hidden" asp-for="CourseId" />
         
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-slate-800">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-gray-200 dark:border-slate-800">
             <div class="flex flex-col gap-2">
-                <h1 class="text-3xl md:text-4xl font-bold text-white">Sửa Thông tin Khóa học</h1>
-                <p class="text-slate-400">Cập nhật tiêu đề, mô tả và hình ảnh hiển thị của khóa học.</p>
+                <h1 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">Sửa Thông tin Khóa học</h1>
+                <p class="text-gray-500 dark:text-slate-400">Cập nhật tiêu đề, mô tả và hình ảnh hiển thị của khóa học.</p>
             </div>
             <div class="flex gap-3">
-                <a asp-action="Index" class="px-5 py-2.5 rounded-lg bg-transparent border border-slate-700 text-white font-medium hover:bg-slate-800 transition-colors flex items-center gap-2">
+                <a asp-action="Index" class="px-5 py-2.5 rounded-lg bg-transparent border border-gray-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-2">
                     <span class="material-symbols-outlined text-[20px]">close</span>
                     Hủy bỏ
                 </a>
@@ -48,12 +48,12 @@
             <div class="lg:col-span-2 flex flex-col gap-6">
                 <!-- Title Input -->
                 <div class="flex flex-col gap-2">
-                    <label asp-for="Title" class="text-white text-base font-semibold"></label>
+                    <label asp-for="Title" class="text-slate-900 dark:text-white text-base font-semibold"></label>
                     <div class="relative group">
                         <input asp-for="Title" 
-                               class="w-full h-14 px-4 rounded-lg bg-surface-dark border border-slate-700 text-white placeholder:text-slate-500 focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none"
+                               class="w-full h-14 px-4 rounded-lg bg-gray-50 dark:bg-surface-dark border border-gray-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none"
                                placeholder="Ví dụ: Nhập môn Lập trình Web với React" />
-                        <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none group-focus-within:text-primary transition-colors">
+                        <div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-400 pointer-events-none group-focus-within:text-primary transition-colors">
                             <span class="material-symbols-outlined">edit</span>
                         </div>
                     </div>
@@ -62,8 +62,8 @@
 
                 <!-- Category Select -->
                 <div class="flex flex-col gap-2">
-                    <label asp-for="Category" class="text-white text-base font-semibold"></label>
-                    <select asp-for="Category" class="w-full h-14 px-4 rounded-lg bg-surface-dark border border-slate-700 text-white focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none">
+                    <label asp-for="Category" class="text-slate-900 dark:text-white text-base font-semibold"></label>
+                    <select asp-for="Category" class="w-full h-14 px-4 rounded-lg bg-gray-50 dark:bg-surface-dark border border-gray-200 dark:border-slate-700 text-slate-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none">
                         <option value="">-- Chọn danh mục --</option>
                         @foreach (var category in categories)
                         {
@@ -75,9 +75,9 @@
 
                 <!-- Thumbnail Image -->
                 <div class="flex flex-col gap-2">
-                    <label class="text-white text-base font-semibold flex items-center justify-between">
+                    <label class="text-slate-900 dark:text-white text-base font-semibold flex items-center justify-between">
                         Ảnh bìa khóa học
-                        <span class="text-xs font-normal text-slate-400 bg-slate-800 px-2 py-1 rounded">Khuyến nghị tỉ lệ 16:9</span>
+                        <span class="text-xs font-normal text-gray-500 dark:text-slate-400 bg-gray-100 dark:bg-slate-800 px-2 py-1 rounded">Khuyến nghị tỉ lệ 16:9</span>
                     </label>
                     
                     <!-- Tab buttons -->
@@ -86,7 +86,7 @@
                             <span class="material-symbols-outlined text-sm align-middle mr-1">upload</span>
                             Upload từ máy
                         </button>
-                        <button type="button" id="tab-url" onclick="switchTab('url')" class="px-4 py-2 text-sm font-medium rounded-lg bg-slate-700 text-slate-300 hover:bg-slate-600 transition-colors">
+                        <button type="button" id="tab-url" onclick="switchTab('url')" class="px-4 py-2 text-sm font-medium rounded-lg bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors">
                             <span class="material-symbols-outlined text-sm align-middle mr-1">link</span>
                             Nhập URL
                         </button>
@@ -94,12 +94,12 @@
                     
                     <!-- Upload file -->
                     <div id="panel-upload" class="block">
-                        <div class="border-2 border-dashed border-slate-600 rounded-lg p-6 text-center hover:border-primary transition-colors">
+                        <div class="border-2 border-dashed border-gray-300 dark:border-slate-600 rounded-lg p-6 text-center hover:border-primary transition-colors">
                             <input type="file" name="thumbnailFile" id="thumbnailFile" accept="image/*" class="hidden" onchange="previewUploadedImage(this)" />
                             <label for="thumbnailFile" class="cursor-pointer">
-                                <span class="material-symbols-outlined text-4xl text-slate-500 mb-2">cloud_upload</span>
-                                <p class="text-slate-400 text-sm">Kéo thả hoặc click để chọn ảnh mới</p>
-                                <p class="text-slate-500 text-xs mt-1">PNG, JPG, GIF (tối đa 5MB)</p>
+                                <span class="material-symbols-outlined text-4xl text-gray-400 dark:text-slate-500 mb-2">cloud_upload</span>
+                                <p class="text-gray-500 dark:text-slate-400 text-sm">Kéo thả hoặc click để chọn ảnh mới</p>
+                                <p class="text-gray-400 dark:text-slate-500 text-xs mt-1">PNG, JPG, GIF (tối đa 5MB)</p>
                             </label>
                             <img id="upload-preview" class="hidden mt-4 mx-auto max-h-32 rounded-lg" />
                         </div>
@@ -108,11 +108,11 @@
                     <!-- URL input -->
                     <div id="panel-url" class="hidden">
                         <div class="relative">
-                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-400">
                                 <span class="material-symbols-outlined text-[20px]">link</span>
                             </span>
                             <input asp-for="ThumbnailUrl" 
-                                   class="w-full h-14 pl-11 pr-4 rounded-lg bg-surface-dark border border-slate-700 text-white placeholder:text-slate-500 focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none"
+                                   class="w-full h-14 pl-11 pr-4 rounded-lg bg-gray-50 dark:bg-surface-dark border border-gray-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none"
                                    placeholder="https://example.com/image.jpg" />
                         </div>
                     </div>
@@ -120,33 +120,33 @@
                     
                     @if (!string.IsNullOrEmpty(Model.ThumbnailUrl))
                     {
-                        <p class="text-sm text-slate-400">Ảnh hiện tại: <a href="@Model.ThumbnailUrl" target="_blank" class="text-primary hover:underline">@Model.ThumbnailUrl</a></p>
+                        <p class="text-sm text-gray-500 dark:text-slate-400">Ảnh hiện tại: <a href="@Model.ThumbnailUrl" target="_blank" class="text-primary hover:underline">@Model.ThumbnailUrl</a></p>
                     }
                 </div>
 
                 <!-- Description Editor -->
                 <div class="flex flex-col gap-2">
-                    <label asp-for="Description" class="text-white text-base font-semibold"></label>
-                    <div class="flex flex-col rounded-lg border border-slate-700 overflow-hidden bg-surface-dark focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all">
+                    <label asp-for="Description" class="text-slate-900 dark:text-white text-base font-semibold"></label>
+                    <div class="flex flex-col rounded-lg border border-gray-200 dark:border-slate-700 overflow-hidden bg-gray-50 dark:bg-surface-dark focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all">
                         <!-- Toolbar -->
-                        <div class="flex items-center gap-1 p-2 border-b border-slate-800 bg-slate-900/50">
-                            <button type="button" class="p-1.5 rounded hover:bg-slate-700 text-slate-400 transition-colors" title="Bold">
+                        <div class="flex items-center gap-1 p-2 border-b border-gray-200 dark:border-slate-800 bg-gray-100 dark:bg-slate-900/50">
+                            <button type="button" class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-500 dark:text-slate-400 transition-colors" title="Bold">
                                 <span class="material-symbols-outlined text-[20px]">format_bold</span>
                             </button>
-                            <button type="button" class="p-1.5 rounded hover:bg-slate-700 text-slate-400 transition-colors" title="Italic">
+                            <button type="button" class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-500 dark:text-slate-400 transition-colors" title="Italic">
                                 <span class="material-symbols-outlined text-[20px]">format_italic</span>
                             </button>
-                            <button type="button" class="p-1.5 rounded hover:bg-slate-700 text-slate-400 transition-colors" title="Underline">
+                            <button type="button" class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-500 dark:text-slate-400 transition-colors" title="Underline">
                                 <span class="material-symbols-outlined text-[20px]">format_underlined</span>
                             </button>
-                            <div class="w-px h-5 bg-slate-700 mx-1"></div>
-                            <button type="button" class="p-1.5 rounded hover:bg-slate-700 text-slate-400 transition-colors" title="List">
+                            <div class="w-px h-5 bg-gray-300 dark:bg-slate-700 mx-1"></div>
+                            <button type="button" class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-500 dark:text-slate-400 transition-colors" title="List">
                                 <span class="material-symbols-outlined text-[20px]">format_list_bulleted</span>
                             </button>
                         </div>
                         <!-- Textarea -->
                         <textarea asp-for="Description" 
-                                  class="w-full min-h-[200px] p-4 bg-transparent border-none outline-none resize-y text-white placeholder:text-slate-500 leading-relaxed"
+                                  class="w-full min-h-[200px] p-4 bg-transparent border-none outline-none resize-y text-slate-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 leading-relaxed"
                                   placeholder="Nhập nội dung mô tả khóa học..."></textarea>
                     </div>
                     <span asp-validation-for="Description" class="text-red-500 text-sm"></span>
@@ -154,28 +154,28 @@
 
                 <!-- Status Select -->
                 <div class="flex flex-col gap-2">
-                    <label asp-for="Status" class="text-white text-base font-semibold">Trạng thái khóa học</label>
-                    <select asp-for="Status" class="w-full h-14 px-4 rounded-lg bg-surface-dark border border-slate-700 text-white focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none">
+                    <label asp-for="Status" class="text-slate-900 dark:text-white text-base font-semibold">Trạng thái khóa học</label>
+                    <select asp-for="Status" class="w-full h-14 px-4 rounded-lg bg-gray-50 dark:bg-surface-dark border border-gray-200 dark:border-slate-700 text-slate-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none">
                         <option value="@Online_Course.Models.CourseStatus.Draft">Nháp - Chưa công khai</option>
                         <option value="@Online_Course.Models.CourseStatus.Private">Riêng tư - Chỉ học viên được mời</option>
                         <option value="@Online_Course.Models.CourseStatus.Public">Công khai - Mọi người có thể xem</option>
                     </select>
-                    <p class="text-slate-400 text-sm">Chọn trạng thái hiển thị của khóa học.</p>
+                    <p class="text-gray-500 dark:text-slate-400 text-sm">Chọn trạng thái hiển thị của khóa học.</p>
                 </div>
-                <input type="hidden" asp-for="IsPublished" />
+
             </div>
 
             <!-- Right Column: Preview & Stats -->
             <div class="lg:col-span-1 flex flex-col gap-6">
                 <!-- Preview Card -->
                 <div class="flex flex-col gap-3 sticky top-24">
-                    <h3 class="text-white text-base font-semibold flex items-center gap-2">
+                    <h3 class="text-slate-900 dark:text-white text-base font-semibold flex items-center gap-2">
                         <span class="material-symbols-outlined text-primary">visibility</span>
                         Xem trước thẻ khóa học
                     </h3>
-                    <div class="bg-surface-dark rounded-xl overflow-hidden border border-slate-700 shadow-lg transition-transform hover:-translate-y-1 duration-300">
+                    <div class="bg-white dark:bg-surface-dark rounded-xl overflow-hidden border border-gray-200 dark:border-slate-700 shadow-lg transition-transform hover:-translate-y-1 duration-300">
                         <!-- Image Container -->
-                        <div class="aspect-video w-full bg-slate-800 relative group cursor-pointer overflow-hidden">
+                        <div class="aspect-video w-full bg-gray-200 dark:bg-slate-800 relative group cursor-pointer overflow-hidden">
                             <img id="preview-image" 
                                  src="@(string.IsNullOrEmpty(Model.ThumbnailUrl) ? "https://via.placeholder.com/400x225?text=Course+Preview" : Model.ThumbnailUrl)" 
                                  alt="Course thumbnail preview" 
@@ -192,14 +192,14 @@
                             <div class="flex items-center gap-2 text-xs font-semibold text-primary uppercase tracking-wider">
                                 <span id="preview-category" class="bg-primary/10 px-2 py-0.5 rounded">@(string.IsNullOrEmpty(Model.Category) ? "Category" : Model.Category)</span>
                             </div>
-                            <h4 id="preview-title" class="text-white font-bold text-lg line-clamp-2 leading-tight">@(string.IsNullOrEmpty(Model.Title) ? "Tiêu đề khóa học" : Model.Title)</h4>
-                            <div class="flex items-center gap-2 text-sm text-slate-400">
+                            <h4 id="preview-title" class="text-slate-900 dark:text-white font-bold text-lg line-clamp-2 leading-tight">@(string.IsNullOrEmpty(Model.Title) ? "Tiêu đề khóa học" : Model.Title)</h4>
+                            <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-slate-400">
                                 <div class="size-6 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xs font-bold">
                                     @(Model.InstructorName.Length > 0 ? Model.InstructorName[0].ToString().ToUpper() : "I")
                                 </div>
                                 <span>@Model.InstructorName</span>
                             </div>
-                            <div class="pt-3 mt-1 border-t border-slate-700 flex items-center justify-between text-xs text-slate-400">
+                            <div class="pt-3 mt-1 border-t border-gray-200 dark:border-slate-700 flex items-center justify-between text-xs text-gray-500 dark:text-slate-400">
                                 <div class="flex items-center gap-1">
                                     <span class="material-symbols-outlined text-[16px]">group</span>
                                     <span>@Model.EnrollmentCount học viên</span>
@@ -213,18 +213,22 @@
                     </div>
 
                     <!-- Status Box -->
-                    <div class="@(Model.IsPublished ? "bg-green-500/10 border-green-500/20" : "bg-blue-500/10 border-blue-500/20") border rounded-lg p-4 mt-2">
+                    <div class="@(Model.Status == Online_Course.Models.CourseStatus.Public ? "bg-green-500/10 border-green-500/20" : Model.Status == Online_Course.Models.CourseStatus.Private ? "bg-yellow-500/10 border-yellow-500/20" : "bg-blue-500/10 border-blue-500/20") border rounded-lg p-4 mt-2">
                         <div class="flex gap-3">
-                            <span class="material-symbols-outlined @(Model.IsPublished ? "text-green-500" : "text-primary") mt-0.5">info</span>
+                            <span class="material-symbols-outlined @(Model.Status == Online_Course.Models.CourseStatus.Public ? "text-green-500" : Model.Status == Online_Course.Models.CourseStatus.Private ? "text-yellow-500" : "text-primary") mt-0.5">info</span>
                             <div>
-                                <p class="text-sm font-semibold text-white mb-1">Trạng thái khóa học</p>
-                                @if (Model.IsPublished)
+                                <p class="text-sm font-semibold text-slate-900 dark:text-white mb-1">Trạng thái khóa học</p>
+                                @if (Model.Status == Online_Course.Models.CourseStatus.Public)
                                 {
-                                    <p class="text-sm text-slate-400 leading-snug">Khóa học này đang ở trạng thái <strong class="text-green-500">Đã xuất bản</strong>.</p>
+                                    <p class="text-sm text-gray-500 dark:text-slate-400 leading-snug">Khóa học này đang ở trạng thái <strong class="text-green-500">Công khai</strong>.</p>
+                                }
+                                else if (Model.Status == Online_Course.Models.CourseStatus.Private)
+                                {
+                                    <p class="text-sm text-gray-500 dark:text-slate-400 leading-snug">Khóa học này đang ở trạng thái <strong class="text-yellow-500">Riêng tư</strong>.</p>
                                 }
                                 else
                                 {
-                                    <p class="text-sm text-slate-400 leading-snug">Khóa học này đang ở trạng thái <strong class="text-primary">Nháp (Draft)</strong>. Hãy hoàn thiện nội dung trước khi xuất bản.</p>
+                                    <p class="text-sm text-gray-500 dark:text-slate-400 leading-snug">Khóa học này đang ở trạng thái <strong class="text-primary">Nháp</strong>. Hãy hoàn thiện nội dung trước khi xuất bản.</p>
                                 }
                             </div>
                         </div>
@@ -233,22 +237,22 @@
                     <!-- Quick Links -->
                     <div class="flex flex-col gap-2 mt-2">
                         <a asp-area="Instructor" asp-controller="Lessons" asp-action="Index" asp-route-courseId="@Model.CourseId"
-                           class="flex items-center gap-3 p-3 bg-surface-dark rounded-lg border border-slate-700 hover:border-slate-600 transition-colors">
+                           class="flex items-center gap-3 p-3 bg-white dark:bg-surface-dark rounded-lg border border-gray-200 dark:border-slate-700 hover:border-primary/50 transition-colors">
                             <span class="material-symbols-outlined text-primary">menu_book</span>
                             <div>
-                                <p class="text-white font-medium text-sm">Quản lý bài học</p>
-                                <p class="text-slate-400 text-xs">@Model.LessonCount bài học</p>
+                                <p class="text-slate-900 dark:text-white font-medium text-sm">Quản lý bài học</p>
+                                <p class="text-gray-500 dark:text-slate-400 text-xs">@Model.LessonCount bài học</p>
                             </div>
-                            <span class="material-symbols-outlined text-slate-500 ml-auto">chevron_right</span>
+                            <span class="material-symbols-outlined text-gray-400 dark:text-slate-500 ml-auto">chevron_right</span>
                         </a>
                         <a asp-area="Instructor" asp-controller="Students" asp-action="Index" asp-route-courseId="@Model.CourseId"
-                           class="flex items-center gap-3 p-3 bg-surface-dark rounded-lg border border-slate-700 hover:border-slate-600 transition-colors">
+                           class="flex items-center gap-3 p-3 bg-white dark:bg-surface-dark rounded-lg border border-gray-200 dark:border-slate-700 hover:border-primary/50 transition-colors">
                             <span class="material-symbols-outlined text-orange-400">group</span>
                             <div>
-                                <p class="text-white font-medium text-sm">Học viên & Tiến độ</p>
-                                <p class="text-slate-400 text-xs">@Model.EnrollmentCount học viên</p>
+                                <p class="text-slate-900 dark:text-white font-medium text-sm">Học viên & Tiến độ</p>
+                                <p class="text-gray-500 dark:text-slate-400 text-xs">@Model.EnrollmentCount học viên</p>
                             </div>
-                            <span class="material-symbols-outlined text-slate-500 ml-auto">chevron_right</span>
+                            <span class="material-symbols-outlined text-gray-400 dark:text-slate-500 ml-auto">chevron_right</span>
                         </a>
                     </div>
                 </div>
@@ -282,12 +286,12 @@
             
             if (tab === 'upload') {
                 tabUpload.className = 'px-4 py-2 text-sm font-medium rounded-lg bg-primary text-white transition-colors';
-                tabUrl.className = 'px-4 py-2 text-sm font-medium rounded-lg bg-slate-700 text-slate-300 hover:bg-slate-600 transition-colors';
+                tabUrl.className = 'px-4 py-2 text-sm font-medium rounded-lg bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors';
                 panelUpload.classList.remove('hidden');
                 panelUrl.classList.add('hidden');
             } else {
                 tabUrl.className = 'px-4 py-2 text-sm font-medium rounded-lg bg-primary text-white transition-colors';
-                tabUpload.className = 'px-4 py-2 text-sm font-medium rounded-lg bg-slate-700 text-slate-300 hover:bg-slate-600 transition-colors';
+                tabUpload.className = 'px-4 py-2 text-sm font-medium rounded-lg bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors';
                 panelUrl.classList.remove('hidden');
                 panelUpload.classList.add('hidden');
             }

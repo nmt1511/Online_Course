@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html class="dark" lang="vi">
+<html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -87,6 +87,18 @@
         <!-- Footer -->
         @await Html.PartialAsync("_Footer")
     </div>
+    
+    <!-- jQuery (required for validation) -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    
+    <script>
+        // Apply saved theme on page load (default: light)
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
     
     @await RenderSectionAsync("Scripts", required: false)
 </body>

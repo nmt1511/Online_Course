@@ -6,25 +6,25 @@
 
 <!-- Breadcrumbs -->
 <div class="flex items-center gap-2 text-sm mb-6">
-    <a asp-area="Instructor" asp-controller="Dashboard" asp-action="Index" class="text-slate-400 hover:text-primary transition-colors">Dashboard</a>
-    <span class="material-symbols-outlined text-slate-500 text-[16px]">chevron_right</span>
-    <span class="text-white font-medium">@Model.CourseTitle</span>
-    <span class="material-symbols-outlined text-slate-500 text-[16px]">chevron_right</span>
+    <a asp-area="Instructor" asp-controller="Dashboard" asp-action="Index" class="text-gray-500 dark:text-slate-400 hover:text-primary transition-colors">Dashboard</a>
+    <span class="material-symbols-outlined text-gray-400 dark:text-slate-500 text-[16px]">chevron_right</span>
+    <span class="text-slate-900 dark:text-white font-medium">@Model.CourseTitle</span>
+    <span class="material-symbols-outlined text-gray-400 dark:text-slate-500 text-[16px]">chevron_right</span>
     <span class="text-primary font-medium">Quản lý bài học</span>
 </div>
 
 <!-- Header -->
 <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
     <div>
-        <h1 class="text-2xl font-bold text-white">Danh sách bài học</h1>
-        <p class="text-slate-400 text-sm mt-1">Khóa học: @Model.CourseTitle</p>
+        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Danh sách bài học</h1>
+        <p class="text-gray-500 dark:text-slate-400 text-sm mt-1">Khóa học: @Model.CourseTitle</p>
     </div>
     <div class="flex items-center gap-3">
         <span class="text-xs bg-primary/10 text-primary px-3 py-1.5 rounded-lg font-medium">
             @Model.Lessons.Count() Bài học
         </span>
         <a asp-area="Instructor" asp-controller="Students" asp-action="Index" asp-route-courseId="@Model.CourseId"
-           class="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-surface-border text-white text-sm font-medium hover:bg-surface-border/50 transition-colors">
+           class="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-gray-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm font-medium hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
             <span class="material-symbols-outlined text-[18px]">group</span>
             <span>Học viên</span>
         </a>
@@ -38,22 +38,22 @@
 
 @if (TempData["SuccessMessage"] != null)
 {
-    <div class="mb-6 p-4 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 flex items-center gap-3">
+    <div class="mb-6 p-4 rounded-lg bg-green-500/10 border border-green-500/20 text-green-600 dark:text-green-400 flex items-center gap-3">
         <span class="material-symbols-outlined">check_circle</span>
         <span>@TempData["SuccessMessage"]</span>
     </div>
 }
 
 <!-- Lessons List -->
-<div class="bg-surface-dark rounded-xl border border-slate-700/50 overflow-hidden">
+<div class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-slate-700/50 overflow-hidden">
     @if (!Model.Lessons.Any())
     {
         <div class="p-12 text-center">
-            <div class="size-16 rounded-full bg-slate-800 flex items-center justify-center mx-auto mb-4">
-                <span class="material-symbols-outlined text-slate-500 text-[32px]">library_books</span>
+            <div class="size-16 rounded-full bg-gray-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-4">
+                <span class="material-symbols-outlined text-gray-400 dark:text-slate-500 text-[32px]">library_books</span>
             </div>
-            <h3 class="text-white font-medium mb-2">Chưa có bài học nào</h3>
-            <p class="text-slate-400 text-sm mb-6">Bắt đầu tạo bài học đầu tiên cho khóa học của bạn</p>
+            <h3 class="text-slate-900 dark:text-white font-medium mb-2">Chưa có bài học nào</h3>
+            <p class="text-gray-500 dark:text-slate-400 text-sm mb-6">Bắt đầu tạo bài học đầu tiên cho khóa học của bạn</p>
             <a asp-action="Create" asp-route-courseId="@Model.CourseId" 
                class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-white text-sm font-medium hover:bg-blue-600 transition-colors">
                 <span class="material-symbols-outlined text-[18px]">add</span>
@@ -63,29 +63,29 @@
     }
     else
     {
-        <div class="divide-y divide-slate-700/50">
+        <div class="divide-y divide-gray-200 dark:divide-slate-700/50">
             @foreach (var lesson in Model.Lessons.OrderBy(l => l.OrderIndex))
             {
-                <div class="group flex items-center gap-4 p-4 hover:bg-surface-dark-highlight transition-colors">
+                <div class="group flex items-center gap-4 p-4 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
                     <!-- Drag Handle -->
-                    <span class="material-symbols-outlined text-slate-500 cursor-grab text-[20px] opacity-0 group-hover:opacity-100 transition-opacity">drag_indicator</span>
+                    <span class="material-symbols-outlined text-gray-400 dark:text-slate-500 cursor-grab text-[20px] opacity-0 group-hover:opacity-100 transition-opacity">drag_indicator</span>
                     
                     <!-- Lesson Info -->
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-1">
                             <span class="text-xs text-primary font-medium">Bài @lesson.OrderIndex</span>
                         </div>
-                        <h3 class="text-white font-medium truncate">@lesson.Title</h3>
+                        <h3 class="text-slate-900 dark:text-white font-medium truncate">@lesson.Title</h3>
                         @if (!string.IsNullOrEmpty(lesson.Description))
                         {
-                            <p class="text-slate-400 text-sm truncate mt-1">@lesson.Description</p>
+                            <p class="text-gray-500 dark:text-slate-400 text-sm truncate mt-1">@lesson.Description</p>
                         }
                     </div>
                     
                     <!-- Video Indicator -->
                     @if (!string.IsNullOrEmpty(lesson.VideoUrl))
                     {
-                        <div class="flex items-center gap-1 text-slate-400 text-sm">
+                        <div class="flex items-center gap-1 text-gray-500 dark:text-slate-400 text-sm">
                             <span class="material-symbols-outlined text-[18px]">smart_display</span>
                             <span>Video</span>
                         </div>
@@ -93,15 +93,15 @@
                     
                     <!-- Actions -->
                     <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <a asp-action="Edit" asp-route-id="@lesson.LessonId" 
-                           class="size-9 rounded-lg flex items-center justify-center bg-slate-700/50 text-slate-300 hover:bg-primary hover:text-white transition-colors"
+                        <a asp-area="Instructor" asp-controller="Lessons" asp-action="Edit" asp-route-id="@lesson.LessonId" 
+                           class="size-9 rounded-lg flex items-center justify-center bg-gray-100 dark:bg-slate-700/50 text-gray-600 dark:text-slate-300 hover:bg-primary hover:text-white transition-colors"
                            title="Chỉnh sửa">
                             <span class="material-symbols-outlined text-[18px]">edit</span>
                         </a>
                         <form asp-action="Delete" asp-route-id="@lesson.LessonId" method="post" class="inline delete-form">
                             @Html.AntiForgeryToken()
                             <button type="button" onclick="showConfirmDialog(this.closest('form'), 'Xóa bài học', 'Bạn có chắc chắn muốn xóa bài học này? Tiến độ học của học viên liên quan sẽ bị xóa.', 'Xóa', 'danger')" 
-                                    class="size-9 rounded-lg flex items-center justify-center bg-slate-700/50 text-slate-300 hover:bg-red-500 hover:text-white transition-colors"
+                                    class="size-9 rounded-lg flex items-center justify-center bg-gray-100 dark:bg-slate-700/50 text-gray-600 dark:text-slate-300 hover:bg-red-500 hover:text-white transition-colors"
                                     title="Xóa">
                                 <span class="material-symbols-outlined text-[18px]">delete</span>
                             </button>
@@ -116,7 +116,7 @@
 <!-- Back Button -->
 <div class="mt-6">
     <a asp-area="Instructor" asp-controller="Dashboard" asp-action="Index" 
-       class="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
+       class="inline-flex items-center gap-2 text-gray-500 dark:text-slate-400 hover:text-primary transition-colors">
         <span class="material-symbols-outlined text-[18px]">arrow_back</span>
         <span>Quay lại Dashboard</span>
     </a>

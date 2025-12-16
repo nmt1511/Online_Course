@@ -6,25 +6,25 @@
 <div class="max-w-2xl mx-auto">
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="mb-6 p-4 bg-green-500/10 border border-green-500/30 rounded-lg flex items-center gap-3">
-            <span class="material-symbols-outlined text-green-500">check_circle</span>
-            <span class="text-green-500">@TempData["SuccessMessage"]</span>
+        <div class="mb-6 p-4 bg-green-100 dark:bg-green-500/10 border border-green-300 dark:border-green-500/30 rounded-lg flex items-center gap-3">
+            <span class="material-symbols-outlined text-green-600 dark:text-green-500">check_circle</span>
+            <span class="text-green-700 dark:text-green-500">@TempData["SuccessMessage"]</span>
         </div>
     }
 
-    <div class="bg-[#1a222c] border border-[#283039] rounded-xl overflow-hidden">
+    <div class="bg-white dark:bg-[#1a222c] border border-gray-200 dark:border-[#283039] rounded-xl overflow-hidden">
         <div class="bg-gradient-to-r from-primary/20 to-blue-600/20 p-6">
             <div class="flex items-center gap-4">
                 <div class="w-20 h-20 bg-primary/30 rounded-full flex items-center justify-center">
                     <span class="material-symbols-outlined text-primary text-4xl">admin_panel_settings</span>
                 </div>
                 <div>
-                    <h2 class="text-white text-xl font-bold">@Model.FullName</h2>
+                    <h2 class="text-slate-900 dark:text-white text-xl font-bold">@Model.FullName</h2>
                     <div class="flex items-center gap-2 mt-1">
-                        <span class="px-3 py-1 bg-red-500/20 text-red-400 text-xs font-medium rounded-full">@Model.Role</span>
+                        <span class="px-3 py-1 bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 text-xs font-medium rounded-full">@Model.Role</span>
                         @if (Model.IsActive)
                         {
-                            <span class="px-3 py-1 bg-green-500/20 text-green-500 text-xs font-medium rounded-full">Hoạt động</span>
+                            <span class="px-3 py-1 bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-500 text-xs font-medium rounded-full">Hoạt động</span>
                         }
                     </div>
                 </div>
@@ -32,33 +32,33 @@
         </div>
 
         <div class="p-6 space-y-4">
-            <div class="flex items-center gap-4 p-4 bg-[#111418] rounded-lg">
-                <div class="p-2 bg-[#283039] rounded-lg">
-                    <span class="material-symbols-outlined text-[#9dabb9]">email</span>
+            <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-[#111418] rounded-lg">
+                <div class="p-2 bg-gray-200 dark:bg-[#283039] rounded-lg">
+                    <span class="material-symbols-outlined text-gray-500 dark:text-[#9dabb9]">email</span>
                 </div>
                 <div>
-                    <p class="text-[#9dabb9] text-xs uppercase tracking-wider">Email</p>
-                    <p class="text-white font-medium">@Model.Email</p>
+                    <p class="text-gray-500 dark:text-[#9dabb9] text-xs uppercase tracking-wider">Email</p>
+                    <p class="text-slate-900 dark:text-white font-medium">@Model.Email</p>
                 </div>
             </div>
 
-            <div class="flex items-center gap-4 p-4 bg-[#111418] rounded-lg">
-                <div class="p-2 bg-[#283039] rounded-lg">
-                    <span class="material-symbols-outlined text-[#9dabb9]">calendar_today</span>
+            <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-[#111418] rounded-lg">
+                <div class="p-2 bg-gray-200 dark:bg-[#283039] rounded-lg">
+                    <span class="material-symbols-outlined text-gray-500 dark:text-[#9dabb9]">calendar_today</span>
                 </div>
                 <div>
-                    <p class="text-[#9dabb9] text-xs uppercase tracking-wider">Ngày tham gia</p>
-                    <p class="text-white font-medium">@Model.CreatedAt.ToString("dd/MM/yyyy")</p>
+                    <p class="text-gray-500 dark:text-[#9dabb9] text-xs uppercase tracking-wider">Ngày tham gia</p>
+                    <p class="text-slate-900 dark:text-white font-medium">@Model.CreatedAt.ToString("dd/MM/yyyy")</p>
                 </div>
             </div>
         </div>
 
-        <div class="p-6 border-t border-[#283039] flex gap-4">
+        <div class="p-6 border-t border-gray-200 dark:border-[#283039] flex gap-4">
             <a asp-action="Edit" class="flex-1 h-12 bg-primary hover:bg-blue-600 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
                 <span class="material-symbols-outlined">edit</span>
                 Chỉnh sửa
             </a>
-            <a asp-action="ChangePassword" class="flex-1 h-12 bg-[#283039] hover:bg-[#3b4754] text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
+            <a asp-action="ChangePassword" class="flex-1 h-12 bg-gray-200 dark:bg-[#283039] hover:bg-gray-300 dark:hover:bg-[#3b4754] text-slate-900 dark:text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
                 <span class="material-symbols-outlined">lock</span>
                 Đổi mật khẩu
             </a>

@@ -5,7 +5,7 @@
 }
 
 <!DOCTYPE html>
-<html class="dark" lang="vi">
+<html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -52,10 +52,18 @@
             font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
         ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #111418; }
-        ::-webkit-scrollbar-thumb { background: #3b4754; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #4b5966; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a1a1a1; }
+        .dark ::-webkit-scrollbar-track { background: #111418; }
+        .dark ::-webkit-scrollbar-thumb { background: #3b4754; }
+        .dark ::-webkit-scrollbar-thumb:hover { background: #4b5966; }
     </style>
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
 </head>
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display overflow-hidden h-screen flex flex-col">
 

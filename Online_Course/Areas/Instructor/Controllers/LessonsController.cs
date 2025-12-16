@@ -123,13 +123,31 @@ public class LessonsController : Controller
     // GET: Instructor/Lessons/Edit/{id}
     public async Task<IActionResult> Edit(int id)
     {
+        Console.WriteLine($"[Edit GET] LessonId: {id}, CurrentUserId: {GetCurrentUserId()}");
+        
         var lesson = await _lessonService.GetLessonByIdAsync(id);
         if (lesson == null)
+        {
+            Console.WriteLine($"[Edit GET] Lesson not found: {id}");
             return NotFound();
+        }
 
+        Console.WriteLine($"[Edit GET] Lesson found - CourseId: {lesson.CourseId}");
+        
         var course = await _courseService.GetCourseByIdAsync(lesson.CourseId);
-        if (course == null || course.CreatedBy != GetCurrentUserId())
+        if (course == null)
+        {
+            Console.WriteLine($"[Edit GET] Course not found: {lesson.CourseId}");
             return Forbid();
+        }
+        
+        Console.WriteLine($"[Edit GET] Course found - CreatedBy: {course.CreatedBy}, CurrentUser: {GetCurrentUserId()}");
+        
+        if (course.CreatedBy != GetCurrentUserId())
+        {
+            Console.WriteLine($"[Edit GET] Forbidden - Course owner: {course.CreatedBy}, Current user: {GetCurrentUserId()}");
+            return Forbid();
+        }
 
         var viewModel = new LessonViewModel
         {
@@ -142,7 +160,18 @@ public class LessonsController : Controller
             CourseTitle = course.Title
         };
 
-        return View(viewModel);
+        Console.WriteLine($"[Edit GET] Returning view with model: LessonId={viewModel.LessonId}, CourseId={viewModel.CourseId}, Title={viewModel.Title}");
+        
+        try
+        {
+            return View(viewModel);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Edit GET] View Error: {ex.Message}");
+            Console.WriteLine($"[Edit GET] Stack: {ex.StackTrace}");
+            throw;
+        }
     }
 
     // POST: Instructor/Lessons/Edit
@@ -150,37 +179,54 @@ public class LessonsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(LessonViewModel model)
     {
+        // Debug: Log received data
+        Console.WriteLine($"[Edit POST] LessonId: {model.LessonId}, CourseId: {model.CourseId}, Title: {model.Title}");
+        
         var existingLesson = await _lessonService.GetLessonByIdAsync(model.LessonId);
         if (existingLesson == null)
+        {
+            Console.WriteLine($"[Edit POST] Lesson not found: {model.LessonId}");
             return NotFound();
+        }
 
         // Use existing lesson's CourseId if model.CourseId is 0
         var courseId = model.CourseId > 0 ? model.CourseId : existingLesson.CourseId;
         
         var course = await _courseService.GetCourseByIdAsync(courseId);
         if (course == null || course.CreatedBy != GetCurrentUserId())
-            return Forbid();
-
-        if (ModelState.IsValid)
         {
-            var lesson = new Lesson
-            {
-                LessonId = model.LessonId,
-                CourseId = courseId,
-                Title = model.Title,
-                Description = model.Description ?? string.Empty,
-                VideoUrl = model.VideoUrl ?? string.Empty,
-                OrderIndex = model.OrderIndex
-            };
-
-            await _lessonService.UpdateLessonAsync(lesson);
-            TempData["SuccessMessage"] = "Bài học đã được cập nhật thành công!";
-            return RedirectToAction(nameof(Index), new { courseId = courseId });
+            Console.WriteLine($"[Edit POST] Forbidden - CourseId: {courseId}");
+            return Forbid();
         }
 
-        model.CourseId = courseId;
-        model.CourseTitle = course.Title;
-        return View(model);
+        if (!ModelState.IsValid)
+        {
+            // Debug: Log validation errors
+            foreach (var error in ModelState)
+            {
+                foreach (var e in error.Value.Errors)
+                {
+                    Console.WriteLine($"[Edit POST] Validation Error - {error.Key}: {e.ErrorMessage}");
+                }
+            }
+            model.CourseId = courseId;
+            model.CourseTitle = course.Title;
+            return View(model);
+        }
+
+        var lesson = new Lesson
+        {
+            LessonId = model.LessonId,
+            CourseId = courseId,
+            Title = model.Title,
+            Description = model.Description ?? string.Empty,
+            VideoUrl = model.VideoUrl ?? string.Empty,
+            OrderIndex = model.OrderIndex
+        };
+
+        await _lessonService.UpdateLessonAsync(lesson);
+        TempData["SuccessMessage"] = "Bài học đã được cập nhật thành công!";
+        return RedirectToAction(nameof(Index), new { courseId = courseId });
     }
 
     // POST: Instructor/Lessons/Delete/{id}

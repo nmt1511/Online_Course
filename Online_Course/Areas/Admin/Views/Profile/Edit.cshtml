@@ -5,13 +5,13 @@
 
 <div class="max-w-2xl mx-auto">
     <div class="flex items-center gap-4 mb-6">
-        <a asp-action="Index" class="p-2 text-[#9dabb9] hover:text-white hover:bg-[#283039] rounded-lg transition-colors">
+        <a asp-action="Index" class="p-2 text-gray-500 dark:text-[#9dabb9] hover:text-slate-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-[#283039] rounded-lg transition-colors">
             <span class="material-symbols-outlined">arrow_back</span>
         </a>
-        <h1 class="text-white text-xl font-bold">Chỉnh sửa hồ sơ</h1>
+        <h1 class="text-slate-900 dark:text-white text-xl font-bold">Chỉnh sửa hồ sơ</h1>
     </div>
 
-    <div class="bg-[#1a222c] border border-[#283039] rounded-xl p-6">
+    <div class="bg-white dark:bg-[#1a222c] border border-gray-200 dark:border-[#283039] rounded-xl p-6">
         <form asp-action="Edit" method="post">
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="UserId" />
@@ -21,17 +21,17 @@
 
             <div class="space-y-6">
                 <div>
-                    <label asp-for="FullName" class="block text-sm font-medium text-white mb-2">Họ và tên</label>
-                    <input asp-for="FullName" class="w-full h-12 px-4 bg-[#111418] border border-[#283039] rounded-lg text-white focus:ring-2 focus:ring-primary focus:border-primary" />
-                    <span asp-validation-for="FullName" class="text-red-400 text-sm"></span>
+                    <label asp-for="FullName" class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Họ và tên</label>
+                    <input asp-for="FullName" class="w-full h-12 px-4 bg-gray-50 dark:bg-[#111418] border border-gray-300 dark:border-[#283039] rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary" />
+                    <span asp-validation-for="FullName" class="text-red-500 dark:text-red-400 text-sm"></span>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-white mb-2">Email</label>
+                    <label class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Email</label>
                     <input type="hidden" asp-for="Email" />
-                    <div class="w-full h-12 px-4 bg-[#111418] border border-[#283039] rounded-lg text-[#9dabb9] flex items-center">
+                    <div class="w-full h-12 px-4 bg-gray-100 dark:bg-[#111418] border border-gray-300 dark:border-[#283039] rounded-lg text-gray-500 dark:text-[#9dabb9] flex items-center">
                         @Model.Email
-                        <span class="ml-2 text-xs text-[#586472]">(Không thể thay đổi)</span>
+                        <span class="ml-2 text-xs text-gray-400 dark:text-[#586472]">(Không thể thay đổi)</span>
                     </div>
                 </div>
 
@@ -39,7 +39,7 @@
                     <button type="submit" class="flex-1 h-12 bg-primary hover:bg-blue-600 text-white font-bold rounded-lg transition-colors">
                         Lưu thay đổi
                     </button>
-                    <a asp-action="Index" class="flex-1 h-12 bg-[#283039] hover:bg-[#3b4754] text-white font-medium rounded-lg transition-colors flex items-center justify-center">
+                    <a asp-action="Index" class="flex-1 h-12 bg-gray-200 dark:bg-[#283039] hover:bg-gray-300 dark:hover:bg-[#3b4754] text-slate-900 dark:text-white font-medium rounded-lg transition-colors flex items-center justify-center">
                         Hủy
                     </a>
                 </div>

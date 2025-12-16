@@ -66,7 +66,9 @@ public class UsersController : Controller
     public async Task<IActionResult> Create()
     {
         var roles = await _userService.GetAllRolesAsync();
-        ViewBag.Roles = new SelectList(roles, "RoleId", "Name");
+        // Exclude Admin role from selection
+        var filteredRoles = roles.Where(r => r.Name != "Admin");
+        ViewBag.Roles = new SelectList(filteredRoles, "RoleId", "Name");
         return View();
     }
 
@@ -78,13 +80,24 @@ public class UsersController : Controller
     {
         if (ModelState.IsValid)
         {
+            // Prevent creating Admin users
+            var allRoles = await _userService.GetAllRolesAsync();
+            var adminRole = allRoles.FirstOrDefault(r => r.Name == "Admin");
+            if (adminRole != null && model.RoleId == adminRole.RoleId)
+            {
+                ModelState.AddModelError("RoleId", "Không thể tạo người dùng với vai trò Admin");
+                var filteredRoles = allRoles.Where(r => r.Name != "Admin");
+                ViewBag.Roles = new SelectList(filteredRoles, "RoleId", "Name");
+                return View(model);
+            }
+            
             // Check if email already exists
             var existingUser = await _userService.GetUserByEmailAsync(model.Email);
             if (existingUser != null)
             {
-                ModelState.AddModelError("Email", "Email already exists");
-                var roles = await _userService.GetAllRolesAsync();
-                ViewBag.Roles = new SelectList(roles, "RoleId", "Name");
+                ModelState.AddModelError("Email", "Email đã tồn tại");
+                var filteredRoles = allRoles.Where(r => r.Name != "Admin");
+                ViewBag.Roles = new SelectList(filteredRoles, "RoleId", "Name");
                 return View(model);
             }
 
@@ -95,12 +108,14 @@ public class UsersController : Controller
             };
 
             await _userService.CreateUserAsync(user, model.Password, model.RoleId);
-            TempData["SuccessMessage"] = "User created successfully!";
+            TempData["SuccessMessage"] = "Tạo người dùng thành công!";
             return RedirectToAction(nameof(Index));
         }
 
-        var allRoles = await _userService.GetAllRolesAsync();
-        ViewBag.Roles = new SelectList(allRoles, "RoleId", "Name");
+        var roles = await _userService.GetAllRolesAsync();
+        // Exclude Admin role from selection
+        var filteredRolesForView = roles.Where(r => r.Name != "Admin");
+        ViewBag.Roles = new SelectList(filteredRolesForView, "RoleId", "Name");
         return View(model);
     }
 
@@ -159,7 +174,9 @@ public class UsersController : Controller
         };
 
         var roles = await _userService.GetAllRolesAsync();
-        ViewBag.Roles = new SelectList(roles, "RoleId", "Name", viewModel.RoleId);
+        // Exclude Admin role from selection
+        var filteredRoles = roles.Where(r => r.Name != "Admin");
+        ViewBag.Roles = new SelectList(filteredRoles, "RoleId", "Name", viewModel.RoleId);
         return View(viewModel);
     }
 
@@ -181,13 +198,24 @@ public class UsersController : Controller
                 return NotFound();
             }
 
+            // Prevent assigning Admin role
+            var allRoles = await _userService.GetAllRolesAsync();
+            var adminRole = allRoles.FirstOrDefault(r => r.Name == "Admin");
+            if (adminRole != null && model.RoleId == adminRole.RoleId)
+            {
+                ModelState.AddModelError("RoleId", "Không thể gán vai trò Admin");
+                var filteredRoles = allRoles.Where(r => r.Name != "Admin");
+                ViewBag.Roles = new SelectList(filteredRoles, "RoleId", "Name", model.RoleId);
+                return View(model);
+            }
+
             // Check if email is taken by another user
             var existingUser = await _userService.GetUserByEmailAsync(model.Email);
             if (existingUser != null && existingUser.UserId != id)
             {
-                ModelState.AddModelError("Email", "Email already exists");
-                var roles = await _userService.GetAllRolesAsync();
-                ViewBag.Roles = new SelectList(roles, "RoleId", "Name", model.RoleId);
+                ModelState.AddModelError("Email", "Email đã tồn tại");
+                var filteredRoles = allRoles.Where(r => r.Name != "Admin");
+                ViewBag.Roles = new SelectList(filteredRoles, "RoleId", "Name", model.RoleId);
                 return View(model);
             }
 
@@ -198,12 +226,14 @@ public class UsersController : Controller
             await _userService.UpdateUserAsync(user);
             await _userService.AssignRoleAsync(id, model.RoleId);
 
-            TempData["SuccessMessage"] = "User updated successfully!";
+            TempData["SuccessMessage"] = "Cập nhật người dùng thành công!";
             return RedirectToAction(nameof(Index));
         }
 
-        var allRoles = await _userService.GetAllRolesAsync();
-        ViewBag.Roles = new SelectList(allRoles, "RoleId", "Name", model.RoleId);
+        var roles = await _userService.GetAllRolesAsync();
+        // Exclude Admin role from selection
+        var filteredRolesForView = roles.Where(r => r.Name != "Admin");
+        ViewBag.Roles = new SelectList(filteredRolesForView, "RoleId", "Name", model.RoleId);
         return View(model);
     }
 

@@ -26,15 +26,17 @@
             }
         </div>
         <div class="flex items-center gap-3">
+            <!-- Theme Toggle -->
+            <button id="themeToggleHeader" type="button" class="p-2 text-text-secondary hover:text-primary transition-colors" title="Chuyển đổi giao diện">
+                <span class="material-symbols-outlined dark:hidden">dark_mode</span>
+                <span class="material-symbols-outlined hidden dark:block">light_mode</span>
+            </button>
             <button class="flex items-center justify-center text-text-secondary hover:text-primary lg:hidden">
                 <span class="material-symbols-outlined">menu</span>
             </button>
             @if (User.Identity?.IsAuthenticated == true)
             {
                 <div class="flex items-center gap-2">
-                    <button class="relative p-2 text-text-secondary hover:text-primary transition-colors">
-                        <span class="material-symbols-outlined">notifications</span>
-                    </button>
                     <!-- User Dropdown -->
                     <div class="relative">
                         <button id="headerUserMenuBtn" type="button" class="bg-primary/20 rounded-full size-8 md:size-10 border-2 border-transparent hover:border-primary cursor-pointer transition-all flex items-center justify-center">
@@ -93,5 +95,21 @@
                 }
             });
         }
+        
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggleHeader');
+        if (themeToggle) {
+            themeToggle.addEventListener('click', function() {
+                document.documentElement.classList.toggle('dark');
+                localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+            });
+        }
     });
+    
+    // Apply saved theme on page load (default: light)
+    if (localStorage.getItem('theme') === 'dark') {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
 </script>

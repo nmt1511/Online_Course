@@ -99,23 +99,18 @@ public class ProfileController : Controller
             return View(model);
         }
 
-        var user = await _context.Users.FindAsync(userId);
+        var user = await _context.Users
+            .Include(u => u.UserRoles)
+            .ThenInclude(ur => ur.Role)
+            .FirstOrDefaultAsync(u => u.UserId == userId);
         if (user == null)
         {
             return NotFound();
         }
 
-        // Check if email is already used by another user
-        var existingUser = await _context.Users
-            .FirstOrDefaultAsync(u => u.Email == model.Email && u.UserId != userId);
-        if (existingUser != null)
-        {
-            ModelState.AddModelError("Email", "Email đã được sử dụng bởi tài khoản khác");
-            return View(model);
-        }
-
+        // Only update FullName, email cannot be changed
         user.FullName = model.FullName;
-        user.Email = model.Email;
+        // Keep original email (ignore model.Email)
 
         await _context.SaveChangesAsync();
 

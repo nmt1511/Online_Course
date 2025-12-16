@@ -12,12 +12,10 @@ public class LessonViewModel
     [StringLength(200, ErrorMessage = "Tiêu đề không được vượt quá 200 ký tự")]
     public string Title { get; set; } = string.Empty;
     
-    [StringLength(2000, ErrorMessage = "Mô tả không được vượt quá 2000 ký tự")]
-    public string Description { get; set; } = string.Empty;
+    public string? Description { get; set; }
     
-    [Url(ErrorMessage = "URL video không hợp lệ")]
     [StringLength(500, ErrorMessage = "URL không được vượt quá 500 ký tự")]
-    public string VideoUrl { get; set; } = string.Empty;
+    public string? VideoUrl { get; set; }
     
     public int OrderIndex { get; set; }
     

@@ -8,19 +8,19 @@
     <!-- Page Header -->
     <div class="flex items-center justify-between">
         <div>
-            <h1 class="text-2xl font-bold text-white">Báo cáo & Thống kê</h1>
-            <p class="text-[#9dabb9] text-sm mt-1">Tổng quan tháng @Model.CurrentMonth</p>
+            <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Báo cáo & Thống kê</h1>
+            <p class="text-gray-500 dark:text-[#9dabb9] text-sm mt-1">Tổng quan tháng @Model.CurrentMonth</p>
         </div>
     </div>
 
     <!-- Summary Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Total Courses -->
-        <div class="bg-[#182430] rounded-xl p-5 border border-gray-800">
+        <div class="bg-white dark:bg-[#182430] rounded-xl p-5 border border-gray-200 dark:border-gray-800">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-[#9dabb9] text-sm">Tổng khóa học</p>
-                    <p class="text-2xl font-bold text-white mt-1">@Model.TotalCourses</p>
+                    <p class="text-gray-500 dark:text-[#9dabb9] text-sm">Tổng khóa học</p>
+                    <p class="text-2xl font-bold text-slate-900 dark:text-white mt-1">@Model.TotalCourses</p>
                 </div>
                 <div class="size-12 rounded-lg bg-primary/20 flex items-center justify-center">
                     <span class="material-symbols-outlined text-primary">school</span>
@@ -35,52 +35,52 @@
         </div>
 
         <!-- Total Users -->
-        <div class="bg-[#182430] rounded-xl p-5 border border-gray-800">
+        <div class="bg-white dark:bg-[#182430] rounded-xl p-5 border border-gray-200 dark:border-gray-800">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-[#9dabb9] text-sm">Tổng người dùng</p>
-                    <p class="text-2xl font-bold text-white mt-1">@Model.TotalUsers</p>
+                    <p class="text-gray-500 dark:text-[#9dabb9] text-sm">Tổng người dùng</p>
+                    <p class="text-2xl font-bold text-slate-900 dark:text-white mt-1">@Model.TotalUsers</p>
                 </div>
                 <div class="size-12 rounded-lg bg-green-500/20 flex items-center justify-center">
                     <span class="material-symbols-outlined text-green-400">group</span>
                 </div>
             </div>
             <div class="mt-3 flex items-center text-sm">
-                <span class="text-[#9dabb9]">
+                <span class="text-gray-500 dark:text-[#9dabb9]">
                     @Model.MonthlyStatistics.NewStudents mới trong tháng
                 </span>
             </div>
         </div>
 
         <!-- Monthly Enrollments -->
-        <div class="bg-[#182430] rounded-xl p-5 border border-gray-800">
+        <div class="bg-white dark:bg-[#182430] rounded-xl p-5 border border-gray-200 dark:border-gray-800">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-[#9dabb9] text-sm">Đăng ký trong tháng</p>
-                    <p class="text-2xl font-bold text-white mt-1">@Model.MonthlyStatistics.TotalEnrollments</p>
+                    <p class="text-gray-500 dark:text-[#9dabb9] text-sm">Đăng ký trong tháng</p>
+                    <p class="text-2xl font-bold text-slate-900 dark:text-white mt-1">@Model.MonthlyStatistics.TotalEnrollments</p>
                 </div>
                 <div class="size-12 rounded-lg bg-purple-500/20 flex items-center justify-center">
                     <span class="material-symbols-outlined text-purple-400">how_to_reg</span>
                 </div>
             </div>
             <div class="mt-3 flex items-center text-sm">
-                <span class="text-[#9dabb9]">Tháng này</span>
+                <span class="text-gray-500 dark:text-[#9dabb9]">Tháng này</span>
             </div>
         </div>
 
         <!-- Active Instructors -->
-        <div class="bg-[#182430] rounded-xl p-5 border border-gray-800">
+        <div class="bg-white dark:bg-[#182430] rounded-xl p-5 border border-gray-200 dark:border-gray-800">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-[#9dabb9] text-sm">Giảng viên hoạt động</p>
-                    <p class="text-2xl font-bold text-white mt-1">@Model.MonthlyStatistics.ActiveInstructors</p>
+                    <p class="text-gray-500 dark:text-[#9dabb9] text-sm">Giảng viên hoạt động</p>
+                    <p class="text-2xl font-bold text-slate-900 dark:text-white mt-1">@Model.MonthlyStatistics.ActiveInstructors</p>
                 </div>
                 <div class="size-12 rounded-lg bg-orange-500/20 flex items-center justify-center">
                     <span class="material-symbols-outlined text-orange-400">person</span>
                 </div>
             </div>
             <div class="mt-3 flex items-center text-sm">
-                <span class="text-[#9dabb9]">Có khóa học đã xuất bản</span>
+                <span class="text-gray-500 dark:text-[#9dabb9]">Có khóa học đã xuất bản</span>
             </div>
         </div>
     </div>
@@ -88,19 +88,19 @@
     <!-- Charts and Tables Row -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Enrollment Trends Chart -->
-        <div class="bg-[#182430] rounded-xl p-6 border border-gray-800">
-            <h3 class="text-lg font-semibold text-white mb-4">Xu hướng đăng ký</h3>
+        <div class="bg-white dark:bg-[#182430] rounded-xl p-6 border border-gray-200 dark:border-gray-800">
+            <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-4">Xu hướng đăng ký</h3>
             <div class="space-y-3">
                 @foreach (var trend in Model.EnrollmentTrends)
                 {
                     var maxCount = Model.EnrollmentTrends.Max(t => t.Count);
                     var percentage = maxCount > 0 ? (trend.Count * 100.0 / maxCount) : 0;
                     <div class="flex items-center gap-3">
-                        <span class="text-[#9dabb9] text-sm w-20">@trend.MonthName</span>
-                        <div class="flex-1 bg-gray-700 rounded-full h-2">
+                        <span class="text-gray-500 dark:text-[#9dabb9] text-sm w-20">@trend.MonthName</span>
+                        <div class="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                             <div class="bg-primary h-2 rounded-full" style="width: @percentage%"></div>
                         </div>
-                        <span class="text-white text-sm w-8 text-right">@trend.Count</span>
+                        <span class="text-slate-900 dark:text-white text-sm w-8 text-right">@trend.Count</span>
                     </div>
                 }
             </div>
@@ -108,8 +108,8 @@
 
 
         <!-- User Distribution -->
-        <div class="bg-[#182430] rounded-xl p-6 border border-gray-800">
-            <h3 class="text-lg font-semibold text-white mb-4">Phân bố người dùng</h3>
+        <div class="bg-white dark:bg-[#182430] rounded-xl p-6 border border-gray-200 dark:border-gray-800">
+            <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-4">Phân bố người dùng</h3>
             <div class="space-y-4">
                 <!-- Students -->
                 <div class="flex items-center justify-between">
@@ -118,11 +118,11 @@
                             <span class="material-symbols-outlined text-blue-400 text-xl">school</span>
                         </div>
                         <div>
-                            <p class="text-white font-medium">Học viên</p>
-                            <p class="text-[#9dabb9] text-sm">Đang học tập</p>
+                            <p class="text-slate-900 dark:text-white font-medium">Học viên</p>
+                            <p class="text-gray-500 dark:text-[#9dabb9] text-sm">Đang học tập</p>
                         </div>
                     </div>
-                    <span class="text-2xl font-bold text-white">@Model.TotalStudents</span>
+                    <span class="text-2xl font-bold text-slate-900 dark:text-white">@Model.TotalStudents</span>
                 </div>
                 <!-- Instructors -->
                 <div class="flex items-center justify-between">
@@ -131,11 +131,11 @@
                             <span class="material-symbols-outlined text-green-400 text-xl">person</span>
                         </div>
                         <div>
-                            <p class="text-white font-medium">Giảng viên</p>
-                            <p class="text-[#9dabb9] text-sm">Tạo khóa học</p>
+                            <p class="text-slate-900 dark:text-white font-medium">Giảng viên</p>
+                            <p class="text-gray-500 dark:text-[#9dabb9] text-sm">Tạo khóa học</p>
                         </div>
                     </div>
-                    <span class="text-2xl font-bold text-white">@Model.TotalInstructors</span>
+                    <span class="text-2xl font-bold text-slate-900 dark:text-white">@Model.TotalInstructors</span>
                 </div>
                 <!-- Ratio Bar -->
                 <div class="pt-4">
@@ -148,7 +148,7 @@
                         <div class="bg-blue-500 h-full" style="width: @studentPercent%"></div>
                         <div class="bg-green-500 h-full" style="width: @instructorPercent%"></div>
                     </div>
-                    <div class="flex justify-between mt-2 text-xs text-[#9dabb9]">
+                    <div class="flex justify-between mt-2 text-xs text-gray-500 dark:text-[#9dabb9]">
                         <span>Học viên (@studentPercent.ToString("F1")%)</span>
                         <span>Giảng viên (@instructorPercent.ToString("F1")%)</span>
                     </div>
@@ -158,42 +158,42 @@
     </div>
 
     <!-- Popular Courses Table -->
-    <div class="bg-[#182430] rounded-xl border border-gray-800 overflow-hidden">
-        <div class="p-6 border-b border-gray-800">
-            <h3 class="text-lg font-semibold text-white">Khóa học phổ biến</h3>
-            <p class="text-[#9dabb9] text-sm mt-1">Các khóa học có nhiều đăng ký nhất</p>
+    <div class="bg-white dark:bg-[#182430] rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+        <div class="p-6 border-b border-gray-200 dark:border-gray-800">
+            <h3 class="text-lg font-semibold text-slate-900 dark:text-white">Khóa học phổ biến</h3>
+            <p class="text-gray-500 dark:text-[#9dabb9] text-sm mt-1">Các khóa học có nhiều đăng ký nhất</p>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full">
-                <thead class="bg-[#111418]">
+                <thead class="bg-gray-50 dark:bg-[#111418]">
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#9dabb9] uppercase tracking-wider">#</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#9dabb9] uppercase tracking-wider">Khóa học</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#9dabb9] uppercase tracking-wider">Danh mục</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-[#9dabb9] uppercase tracking-wider">Giảng viên</th>
-                        <th class="px-6 py-4 text-right text-xs font-semibold text-[#9dabb9] uppercase tracking-wider">Đăng ký</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-[#9dabb9] uppercase tracking-wider">#</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-[#9dabb9] uppercase tracking-wider">Khóa học</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-[#9dabb9] uppercase tracking-wider">Danh mục</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-[#9dabb9] uppercase tracking-wider">Giảng viên</th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold text-gray-500 dark:text-[#9dabb9] uppercase tracking-wider">Đăng ký</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-800">
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
                     @if (Model.PopularCourses.Any())
                     {
                         var rank = 1;
                         foreach (var course in Model.PopularCourses)
                         {
-                            <tr class="hover:bg-[#1c2832] transition-colors">
+                            <tr class="hover:bg-gray-50 dark:hover:bg-[#1c2832] transition-colors">
                                 <td class="px-6 py-4">
                                     <span class="size-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-sm">@rank</span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <p class="text-white font-medium">@course.Title</p>
+                                    <p class="text-slate-900 dark:text-white font-medium">@course.Title</p>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <span class="px-3 py-1 rounded-full text-xs font-medium bg-gray-700 text-[#9dabb9]">@course.Category</span>
+                                    <span class="px-3 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-[#9dabb9]">@course.Category</span>
                                 </td>
-                                <td class="px-6 py-4 text-[#9dabb9]">@course.InstructorName</td>
+                                <td class="px-6 py-4 text-gray-500 dark:text-[#9dabb9]">@course.InstructorName</td>
                                 <td class="px-6 py-4 text-right">
-                                    <span class="text-white font-semibold">@course.EnrollmentCount</span>
-                                    <span class="text-[#9dabb9] text-sm ml-1">học viên</span>
+                                    <span class="text-slate-900 dark:text-white font-semibold">@course.EnrollmentCount</span>
+                                    <span class="text-gray-500 dark:text-[#9dabb9] text-sm ml-1">học viên</span>
                                 </td>
                             </tr>
                             rank++;
@@ -202,7 +202,7 @@
                     else
                     {
                         <tr>
-                            <td colspan="5" class="px-6 py-12 text-center text-[#9dabb9]">
+                            <td colspan="5" class="px-6 py-12 text-center text-gray-500 dark:text-[#9dabb9]">
                                 <span class="material-symbols-outlined text-4xl mb-2 block">school</span>
                                 Chưa có khóa học nào
                             </td>

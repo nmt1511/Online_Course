@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html class="dark" lang="vi">
+<html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Admin Portal</title>
+    <title>@ViewData["Title"] - Quản trị hệ thống</title>
     
     <!-- Google Fonts: Lexend -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -138,10 +138,10 @@
                     </span>
                     <input type="text" class="w-full h-10 pl-10 pr-4 text-sm bg-gray-100 dark:bg-[#283039] border-none rounded-lg focus:ring-2 focus:ring-primary text-gray-900 dark:text-white placeholder-gray-500" placeholder="Tìm kiếm..." />
                 </div>
-                <!-- Notifications -->
-                <button class="relative p-2 text-gray-500 hover:text-primary dark:text-[#9dabb9] dark:hover:text-white transition-colors">
-                    <span class="material-symbols-outlined">notifications</span>
-                    <span class="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-white dark:border-[#111418]"></span>
+                <!-- Theme Toggle -->
+                <button id="themeToggle" type="button" class="p-2 text-gray-500 hover:text-primary dark:text-[#9dabb9] dark:hover:text-white transition-colors" title="Chuyển đổi giao diện">
+                    <span class="material-symbols-outlined dark:hidden">dark_mode</span>
+                    <span class="material-symbols-outlined hidden dark:block">light_mode</span>
                 </button>
             </div>
         </header>
@@ -152,10 +152,28 @@
             
             <!-- Footer for Content Area -->
             <div class="flex justify-center py-6 text-xs text-gray-500 dark:text-gray-600">
-                © @DateTime.Now.Year EduAdmin Portal. All rights reserved.
+                © @DateTime.Now.Year Hệ thống quản lý khóa học trực tuyến. Bảo lưu mọi quyền.
             </div>
         </div>
     </main>
+    
+    <!-- jQuery (required for validation) -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    
+    <script>
+        // Theme Toggle
+        document.getElementById('themeToggle')?.addEventListener('click', function() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        });
+        
+        // Apply saved theme on page load (default: light)
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
     
     @await RenderSectionAsync("Scripts", required: false)
     
