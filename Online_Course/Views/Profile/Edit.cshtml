@@ -1,0 +1,109 @@
+@model Online_Course.ViewModels.ProfileViewModel
+@{
+    ViewData["Title"] = "Chỉnh sửa hồ sơ";
+}
+
+<div class="min-h-screen bg-background-dark py-8 px-4">
+    <div class="max-w-2xl mx-auto">
+        <!-- Page Header -->
+        <div class="flex items-center gap-4 mb-8">
+            <a asp-action="Index" class="p-2 text-[#9dabb9] hover:text-white hover:bg-[#283039] rounded-lg transition-colors">
+                <span class="material-symbols-outlined">arrow_back</span>
+            </a>
+            <div>
+                <h1 class="text-white text-2xl font-bold">Chỉnh sửa hồ sơ</h1>
+                <p class="text-[#9dabb9] text-sm">Cập nhật thông tin cá nhân của bạn</p>
+            </div>
+        </div>
+
+        <!-- Form Card -->
+        <div class="bg-[#1a222c] border border-[#283039] rounded-xl p-6">
+            <form asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="UserId" />
+                <input type="hidden" asp-for="Role" />
+                <input type="hidden" asp-for="CreatedAt" />
+                <input type="hidden" asp-for="IsActive" />
+                
+                <div class="space-y-6">
+                    <!-- Avatar Preview -->
+                    <div class="flex justify-center mb-6">
+                        <div class="w-24 h-24 bg-primary/30 rounded-full flex items-center justify-center">
+                            <span class="material-symbols-outlined text-primary text-5xl">person</span>
+                        </div>
+                    </div>
+
+                    <!-- Full Name -->
+                    <div>
+                        <label asp-for="FullName" class="block text-sm font-medium text-white mb-2">
+                            <span class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-lg">badge</span>
+                                Họ tên
+                            </span>
+                        </label>
+                        <input asp-for="FullName" class="w-full h-12 px-4 bg-[#111418] border border-[#283039] rounded-lg text-white placeholder-[#586472] focus:ring-2 focus:ring-primary focus:border-primary transition-colors" placeholder="Nhập họ tên của bạn" />
+                        <span asp-validation-for="FullName" class="text-red-400 text-sm mt-1 block"></span>
+                    </div>
+
+
+                    <!-- Email (Read-only) -->
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-2">
+                            <span class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-lg">email</span>
+                                Email
+                            </span>
+                        </label>
+                        <input type="hidden" asp-for="Email" />
+                        <div class="w-full h-12 px-4 bg-[#111418] border border-[#283039] rounded-lg text-[#9dabb9] flex items-center">
+                            @Model.Email
+                            <span class="ml-2 text-xs text-[#586472]">(Không thể thay đổi)</span>
+                        </div>
+                    </div>
+
+                    <!-- Role (Read-only) -->
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-2">
+                            <span class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-lg">shield_person</span>
+                                Vai trò
+                            </span>
+                        </label>
+                        <div class="w-full h-12 px-4 bg-[#111418] border border-[#283039] rounded-lg text-[#9dabb9] flex items-center">
+                            @Model.Role
+                            <span class="ml-2 text-xs text-[#586472]">(Không thể thay đổi)</span>
+                        </div>
+                    </div>
+
+                    <!-- Created Date (Read-only) -->
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-2">
+                            <span class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-lg">calendar_today</span>
+                                Ngày tham gia
+                            </span>
+                        </label>
+                        <div class="w-full h-12 px-4 bg-[#111418] border border-[#283039] rounded-lg text-white flex items-center">
+                            @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                        </div>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="flex items-center gap-4 pt-4">
+                        <button type="submit" class="flex-1 h-12 bg-primary hover:bg-blue-600 text-white font-bold rounded-lg transition-colors flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined">save</span>
+                            Lưu thay đổi
+                        </button>
+                        <a asp-action="Index" class="flex-1 h-12 bg-[#283039] hover:bg-[#3b4754] text-white font-medium rounded-lg transition-colors flex items-center justify-center">
+                            Hủy
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

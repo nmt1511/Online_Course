@@ -1,0 +1,138 @@
+﻿@{
+    ViewData["Title"] = "Trang chủ";
+}
+
+<!-- Hero Section -->
+<section class="relative bg-gradient-to-br from-primary/10 via-background-dark to-background-dark py-16 md:py-24">
+    <div class="max-w-7xl mx-auto px-4 md:px-10">
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+            <div class="space-y-6">
+                <h1 class="text-4xl md:text-5xl font-bold leading-tight">
+                    Học tập trực tuyến
+                    <span class="text-primary">không giới hạn</span>
+                </h1>
+                <p class="text-lg text-text-secondary leading-relaxed">
+                    Khám phá hàng nghìn khóa học chất lượng cao từ các giảng viên hàng đầu. 
+                    Nâng cao kỹ năng và phát triển sự nghiệp của bạn ngay hôm nay.
+                </p>
+                <div class="flex flex-wrap gap-4">
+                    <a asp-area="Student" asp-controller="Courses" asp-action="Index" 
+                       class="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-blue-600 text-white font-medium rounded-lg transition-colors">
+                        <span class="material-symbols-outlined">school</span>
+                        Khám phá khóa học
+                    </a>
+                    @if (User.Identity?.IsAuthenticated != true)
+                    {
+                        <a asp-area="" asp-controller="Account" asp-action="Register" 
+                           class="inline-flex items-center gap-2 px-6 py-3 border border-primary text-primary hover:bg-primary/10 font-medium rounded-lg transition-colors">
+                            Đăng ký miễn phí
+                        </a>
+                    }
+                </div>
+            </div>
+            <div class="hidden md:flex justify-center">
+                <div class="relative">
+                    <div class="w-80 h-80 bg-primary/20 rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[150px] text-primary">school</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-16 bg-surface-dark">
+    <div class="max-w-7xl mx-auto px-4 md:px-10">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold mb-4">Tại sao chọn EduTech?</h2>
+            <p class="text-text-secondary max-w-2xl mx-auto">
+                Nền tảng học tập trực tuyến hàng đầu với nhiều tính năng vượt trội
+            </p>
+        </div>
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="bg-background-dark p-6 rounded-xl border border-border-dark hover:border-primary/50 transition-colors">
+                <div class="w-14 h-14 bg-primary/20 rounded-lg flex items-center justify-center mb-4">
+                    <span class="material-symbols-outlined text-primary text-[28px]">play_circle</span>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Video chất lượng cao</h3>
+                <p class="text-text-secondary">Nội dung video được sản xuất chuyên nghiệp, dễ hiểu và thực tế.</p>
+            </div>
+            <div class="bg-background-dark p-6 rounded-xl border border-border-dark hover:border-primary/50 transition-colors">
+                <div class="w-14 h-14 bg-green-500/20 rounded-lg flex items-center justify-center mb-4">
+                    <span class="material-symbols-outlined text-green-500 text-[28px]">verified</span>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Giảng viên uy tín</h3>
+                <p class="text-text-secondary">Đội ngũ giảng viên giàu kinh nghiệm, chuyên môn cao trong lĩnh vực.</p>
+            </div>
+            <div class="bg-background-dark p-6 rounded-xl border border-border-dark hover:border-primary/50 transition-colors">
+                <div class="w-14 h-14 bg-orange-500/20 rounded-lg flex items-center justify-center mb-4">
+                    <span class="material-symbols-outlined text-orange-500 text-[28px]">schedule</span>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Học mọi lúc mọi nơi</h3>
+                <p class="text-text-secondary">Truy cập khóa học 24/7 trên mọi thiết bị, học theo tiến độ riêng.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="py-16">
+    <div class="max-w-7xl mx-auto px-4 md:px-10">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-2xl font-bold">Danh mục phổ biến</h2>
+            <a asp-area="Student" asp-controller="Courses" asp-action="Index" 
+               class="text-primary hover:underline flex items-center gap-1">
+                Xem tất cả
+                <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+            </a>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            @{
+                var categories = new[] {
+                    ("Marketing", "campaign", "bg-blue-500/20", "text-blue-500"),
+                    ("Data Science & AI", "psychology", "bg-purple-500/20", "text-purple-500"),
+                    ("Lập Trình", "code", "bg-green-500/20", "text-green-500"),
+                    ("Tài Chính", "account_balance", "bg-yellow-500/20", "text-yellow-500"),
+                    ("Thiết Kế", "palette", "bg-pink-500/20", "text-pink-500")
+                };
+            }
+            @foreach (var (name, icon, bgColor, textColor) in categories)
+            {
+                <a asp-area="Student" asp-controller="Courses" asp-action="Index" asp-route-category="@name"
+                   class="flex flex-col items-center p-4 bg-surface-dark rounded-xl border border-border-dark hover:border-primary/50 transition-all hover:-translate-y-1">
+                    <div class="w-12 h-12 @bgColor rounded-lg flex items-center justify-center mb-3">
+                        <span class="material-symbols-outlined @textColor">@icon</span>
+                    </div>
+                    <span class="text-sm font-medium text-center">@name</span>
+                </a>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-16 bg-gradient-to-r from-primary to-blue-600">
+    <div class="max-w-4xl mx-auto px-4 md:px-10 text-center">
+        <h2 class="text-3xl font-bold text-white mb-4">Sẵn sàng bắt đầu học?</h2>
+        <p class="text-white/80 mb-8 text-lg">
+            Tham gia cùng hàng nghìn học viên đang phát triển kỹ năng mỗi ngày
+        </p>
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <a asp-area="Student" asp-controller="Courses" asp-action="Index" 
+               class="inline-flex items-center gap-2 px-8 py-4 bg-white text-primary font-semibold rounded-lg hover:bg-gray-100 transition-colors">
+                <span class="material-symbols-outlined">explore</span>
+                Khám phá ngay
+            </a>
+        }
+        else
+        {
+            <a asp-area="" asp-controller="Account" asp-action="Register" 
+               class="inline-flex items-center gap-2 px-8 py-4 bg-white text-primary font-semibold rounded-lg hover:bg-gray-100 transition-colors">
+                <span class="material-symbols-outlined">person_add</span>
+                Đăng ký miễn phí
+            </a>
+        }
+    </div>
+</section>

@@ -1,0 +1,85 @@
+@model Online_Course.ViewModels.CreateCourseViewModel
+@{
+    ViewData["Title"] = "Tạo khóa học";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="max-w-2xl mx-auto">
+    <!-- Page Header -->
+    <div class="flex items-center gap-4 mb-8">
+        <a asp-action="Index" class="p-2 text-[#9dabb9] hover:text-white hover:bg-[#283039] rounded-lg transition-colors">
+            <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <div>
+            <h1 class="text-white text-2xl font-bold">Tạo khóa học mới</h1>
+            <p class="text-[#9dabb9] text-sm">Thêm khóa học mới vào hệ thống</p>
+        </div>
+    </div>
+
+    <!-- Form Card -->
+    <div class="bg-[#1a222c] border border-[#283039] rounded-xl p-6">
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+            
+            <div class="space-y-6">
+                <!-- Title -->
+                <div>
+                    <label asp-for="Title" class="block text-sm font-medium text-white mb-2">Tên khóa học</label>
+                    <input asp-for="Title" class="w-full h-12 px-4 bg-[#111418] border border-[#283039] rounded-lg text-white placeholder-[#586472] focus:ring-2 focus:ring-primary focus:border-primary transition-colors" placeholder="Nhập tên khóa học" />
+                    <span asp-validation-for="Title" class="text-red-400 text-sm mt-1"></span>
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <label asp-for="Description" class="block text-sm font-medium text-white mb-2">Mô tả</label>
+                    <textarea asp-for="Description" rows="4" class="w-full px-4 py-3 bg-[#111418] border border-[#283039] rounded-lg text-white placeholder-[#586472] focus:ring-2 focus:ring-primary focus:border-primary transition-colors resize-none" placeholder="Nhập mô tả khóa học"></textarea>
+                    <span asp-validation-for="Description" class="text-red-400 text-sm mt-1"></span>
+                </div>
+
+                <!-- Category -->
+                <div>
+                    <label asp-for="Category" class="block text-sm font-medium text-white mb-2">Danh mục</label>
+                    <input asp-for="Category" class="w-full h-12 px-4 bg-[#111418] border border-[#283039] rounded-lg text-white placeholder-[#586472] focus:ring-2 focus:ring-primary focus:border-primary transition-colors" placeholder="VD: Lập trình, Thiết kế, Kinh doanh" />
+                    <span asp-validation-for="Category" class="text-red-400 text-sm mt-1"></span>
+                </div>
+
+
+                <!-- Thumbnail URL -->
+                <div>
+                    <label asp-for="ThumbnailUrl" class="block text-sm font-medium text-white mb-2">URL hình ảnh</label>
+                    <input asp-for="ThumbnailUrl" class="w-full h-12 px-4 bg-[#111418] border border-[#283039] rounded-lg text-white placeholder-[#586472] focus:ring-2 focus:ring-primary focus:border-primary transition-colors" placeholder="https://example.com/image.jpg" />
+                    <span asp-validation-for="ThumbnailUrl" class="text-red-400 text-sm mt-1"></span>
+                </div>
+
+                <!-- Instructor -->
+                <div>
+                    <label asp-for="InstructorId" class="block text-sm font-medium text-white mb-2">Giảng viên</label>
+                    <select asp-for="InstructorId" asp-items="ViewBag.Instructors" class="w-full h-12 px-4 bg-[#111418] border border-[#283039] rounded-lg text-white focus:ring-2 focus:ring-primary focus:border-primary transition-colors cursor-pointer">
+                        <option value="">Chọn giảng viên</option>
+                    </select>
+                    <span asp-validation-for="InstructorId" class="text-red-400 text-sm mt-1"></span>
+                </div>
+
+                <!-- Published -->
+                <div class="flex items-center gap-3">
+                    <input asp-for="IsPublished" type="checkbox" class="w-5 h-5 bg-[#111418] border border-[#283039] rounded text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer" />
+                    <label asp-for="IsPublished" class="text-sm font-medium text-white cursor-pointer">Xuất bản ngay</label>
+                </div>
+
+                <!-- Buttons -->
+                <div class="flex items-center gap-4 pt-4">
+                    <button type="submit" class="flex-1 h-12 bg-primary hover:bg-blue-600 text-white font-bold rounded-lg transition-colors">
+                        Tạo khóa học
+                    </button>
+                    <a asp-action="Index" class="flex-1 h-12 bg-[#283039] hover:bg-[#3b4754] text-white font-medium rounded-lg transition-colors flex items-center justify-center">
+                        Hủy
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

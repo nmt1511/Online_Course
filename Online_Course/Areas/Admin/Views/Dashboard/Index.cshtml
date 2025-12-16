@@ -1,0 +1,76 @@
+@{
+    ViewData["Title"] = "Bảng điều khiển";
+}
+
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white dark:bg-[#182430] rounded-xl p-6 border border-gray-200 dark:border-gray-800">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-500 dark:text-[#9dabb9] text-sm font-medium">Tổng người dùng</p>
+                <p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">@ViewBag.TotalUsers</p>
+            </div>
+            <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+                <span class="material-symbols-outlined text-blue-600 dark:text-blue-400">group</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white dark:bg-[#182430] rounded-xl p-6 border border-gray-200 dark:border-gray-800">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-500 dark:text-[#9dabb9] text-sm font-medium">Tổng khóa học</p>
+                <p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">@ViewBag.TotalCourses</p>
+            </div>
+            <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
+                <span class="material-symbols-outlined text-green-600 dark:text-green-400">school</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white dark:bg-[#182430] rounded-xl p-6 border border-gray-200 dark:border-gray-800">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-500 dark:text-[#9dabb9] text-sm font-medium">Tổng danh mục</p>
+                <p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">@ViewBag.TotalCategories</p>
+            </div>
+            <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
+                <span class="material-symbols-outlined text-purple-600 dark:text-purple-400">category</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white dark:bg-[#182430] rounded-xl p-6 border border-gray-200 dark:border-gray-800">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-500 dark:text-[#9dabb9] text-sm font-medium">Danh mục hoạt động</p>
+                <p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">@ViewBag.ActiveCategories</p>
+            </div>
+            <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
+                <span class="material-symbols-outlined text-orange-600 dark:text-orange-400">check_circle</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="bg-white dark:bg-[#182430] rounded-xl p-6 border border-gray-200 dark:border-gray-800">
+    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Thao tác nhanh</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <a asp-area="Admin" asp-controller="Users" asp-action="Create" 
+           class="flex items-center gap-3 p-4 bg-gray-50 dark:bg-[#1c2833] rounded-lg hover:bg-gray-100 dark:hover:bg-[#243040] transition-colors border border-gray-200 dark:border-gray-700">
+            <span class="material-symbols-outlined text-primary">person_add</span>
+            <span class="text-sm font-medium text-gray-900 dark:text-white">Thêm người dùng</span>
+        </a>
+        <a asp-area="Admin" asp-controller="Courses" asp-action="Create" 
+           class="flex items-center gap-3 p-4 bg-gray-50 dark:bg-[#1c2833] rounded-lg hover:bg-gray-100 dark:hover:bg-[#243040] transition-colors border border-gray-200 dark:border-gray-700">
+            <span class="material-symbols-outlined text-green-500">add_circle</span>
+            <span class="text-sm font-medium text-gray-900 dark:text-white">Thêm khóa học</span>
+        </a>
+        <a asp-area="Admin" asp-controller="Reports" asp-action="Index" 
+           class="flex items-center gap-3 p-4 bg-gray-50 dark:bg-[#1c2833] rounded-lg hover:bg-gray-100 dark:hover:bg-[#243040] transition-colors border border-gray-200 dark:border-gray-700">
+            <span class="material-symbols-outlined text-purple-500">analytics</span>
+            <span class="text-sm font-medium text-gray-900 dark:text-white">Xem báo cáo</span>
+        </a>
+    </div>
+</div>

@@ -1,0 +1,97 @@
+<!-- Top Navigation Header -->
+<header class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-border-light dark:border-border-dark bg-surface-light dark:bg-[#111418] px-4 md:px-10 py-3 shadow-sm">
+    <div class="flex items-center gap-4 md:gap-8">
+        <a asp-area="" asp-controller="Home" asp-action="Index" class="flex items-center gap-2 md:gap-4 text-slate-900 dark:text-white cursor-pointer hover:opacity-80 transition-opacity">
+            <div class="size-8 md:size-10 flex items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <span class="material-symbols-outlined text-[24px] md:text-[32px]">school</span>
+            </div>
+            <h2 class="text-lg md:text-xl font-bold leading-tight tracking-[-0.015em]">EduTech</h2>
+        </a>
+        <label class="hidden md:flex flex-col min-w-40 !h-10 max-w-64">
+            <div class="flex w-full flex-1 items-stretch rounded-lg h-full group">
+                <div class="text-text-secondary flex border border-r-0 border-border-light dark:border-none bg-slate-50 dark:bg-surface-dark items-center justify-center pl-4 rounded-l-lg transition-colors group-focus-within:text-primary">
+                    <span class="material-symbols-outlined text-[20px]">search</span>
+                </div>
+                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-r-lg border border-l-0 border-border-light dark:border-none bg-slate-50 dark:bg-surface-dark text-slate-900 dark:text-white focus:outline-0 focus:ring-0 focus:border-primary h-full placeholder:text-text-secondary px-4 pl-2 text-sm font-normal leading-normal" placeholder="Tìm kiếm..." />
+            </div>
+        </label>
+    </div>
+    <div class="flex flex-1 justify-end gap-4 md:gap-8 items-center">
+        <div class="hidden lg:flex items-center gap-6">
+            <a asp-area="" asp-controller="Home" asp-action="Index" class="text-slate-900 dark:text-white text-sm font-medium leading-normal hover:text-primary transition-colors">Trang chủ</a>
+            <a asp-area="Student" asp-controller="Courses" asp-action="Index" class="text-slate-900 dark:text-white text-sm font-medium leading-normal hover:text-primary transition-colors">Khóa học</a>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <a asp-area="Student" asp-controller="Progress" asp-action="Index" class="text-slate-900 dark:text-white text-sm font-medium leading-normal hover:text-primary transition-colors">Của tôi</a>
+            }
+        </div>
+        <div class="flex items-center gap-3">
+            <button class="flex items-center justify-center text-text-secondary hover:text-primary lg:hidden">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <div class="flex items-center gap-2">
+                    <button class="relative p-2 text-text-secondary hover:text-primary transition-colors">
+                        <span class="material-symbols-outlined">notifications</span>
+                    </button>
+                    <!-- User Dropdown -->
+                    <div class="relative">
+                        <button id="headerUserMenuBtn" type="button" class="bg-primary/20 rounded-full size-8 md:size-10 border-2 border-transparent hover:border-primary cursor-pointer transition-all flex items-center justify-center">
+                            <span class="material-symbols-outlined text-primary">person</span>
+                        </button>
+                        <div id="headerUserDropdown" class="hidden absolute right-0 mt-2 w-56 rounded-lg bg-white dark:bg-surface-dark shadow-lg border border-border-light dark:border-border-dark py-2 z-50">
+                            <div class="px-4 py-3 border-b border-border-light dark:border-border-dark">
+                                <p class="text-sm font-medium text-slate-900 dark:text-white">@User.Identity?.Name</p>
+                                <p class="text-xs text-text-secondary">Người dùng</p>
+                            </div>
+                            <a asp-area="" asp-controller="Profile" asp-action="Index" class="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                <span class="material-symbols-outlined text-[18px]">person</span>
+                                Hồ sơ cá nhân
+                            </a>
+                            <a asp-area="Student" asp-controller="Progress" asp-action="Index" class="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                <span class="material-symbols-outlined text-[18px]">school</span>
+                                Khóa học của tôi
+                            </a>
+                            <a asp-area="" asp-controller="Profile" asp-action="ChangePassword" class="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                <span class="material-symbols-outlined text-[18px]">lock</span>
+                                Đổi mật khẩu
+                            </a>
+                            <div class="border-t border-border-light dark:border-border-dark my-1"></div>
+                            <a asp-area="" asp-controller="Account" asp-action="Logout" class="flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                                <span class="material-symbols-outlined text-[18px]">logout</span>
+                                Đăng xuất
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <a asp-area="" asp-controller="Account" asp-action="Login" class="flex items-center justify-center h-9 px-4 rounded-lg bg-primary hover:bg-blue-600 text-white text-sm font-medium transition-colors">
+                    Đăng nhập
+                </a>
+            }
+        </div>
+    </div>
+</header>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const userBtn = document.getElementById('headerUserMenuBtn');
+        const dropdown = document.getElementById('headerUserDropdown');
+        
+        if (userBtn && dropdown) {
+            userBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dropdown.classList.toggle('hidden');
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (!dropdown.contains(e.target) && !userBtn.contains(e.target)) {
+                    dropdown.classList.add('hidden');
+                }
+            });
+        }
+    });
+</script>

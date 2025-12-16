@@ -1,0 +1,21 @@
+@{
+    ViewData["Title"] = "Truy cập bị từ chối";
+    Layout = "_Layout";
+}
+
+<div class="flex min-h-[calc(100vh-200px)] items-center justify-center px-4 py-12">
+    <div class="text-center">
+        <div class="mb-6">
+            <span class="material-symbols-outlined text-red-500 text-7xl">block</span>
+        </div>
+        <h1 class="text-3xl font-bold text-slate-900 dark:text-white mb-4">Truy cập bị từ chối</h1>
+        <p class="text-text-secondary mb-8 max-w-md">
+            Bạn không có quyền truy cập trang này. Vui lòng liên hệ quản trị viên nếu bạn cho rằng đây là lỗi.
+        </p>
+        <a asp-action="Index" asp-controller="Home" 
+           class="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-xl transition-all">
+            <span class="material-symbols-outlined">home</span>
+            Về trang chủ
+        </a>
+    </div>
+</div>
