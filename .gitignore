@@ -59,9 +59,9 @@ Online_Course.Tests/
 *.mdf
 *.ldf
 
-## App settings (uncomment if you want to ignore)
-# appsettings.Development.json
-# appsettings.json
+## App settings
+appsettings.json
+appsettings.Development.json
 
 ## NuGet Packages
 *.nupkg
