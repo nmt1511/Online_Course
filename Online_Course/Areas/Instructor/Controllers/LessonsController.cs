@@ -53,7 +53,7 @@ public class LessonsController : Controller
                     CourseId = l.CourseId,
                     Title = l.Title,
                     Description = l.Description,
-                    VideoUrl = l.VideoUrl,
+                    VideoUrl = l.ContentUrl,
                     OrderIndex = l.OrderIndex
                 })
             };
@@ -106,7 +106,7 @@ public class LessonsController : Controller
                 CourseId = model.CourseId,
                 Title = model.Title,
                 Description = model.Description,
-                VideoUrl = model.VideoUrl,
+                ContentUrl = model.VideoUrl,
                 OrderIndex = model.OrderIndex
             };
 
@@ -155,7 +155,7 @@ public class LessonsController : Controller
             CourseId = lesson.CourseId,
             Title = lesson.Title,
             Description = lesson.Description,
-            VideoUrl = lesson.VideoUrl,
+            VideoUrl = lesson.ContentUrl,
             OrderIndex = lesson.OrderIndex,
             CourseTitle = course.Title
         };
@@ -220,7 +220,7 @@ public class LessonsController : Controller
             CourseId = courseId,
             Title = model.Title,
             Description = model.Description ?? string.Empty,
-            VideoUrl = model.VideoUrl ?? string.Empty,
+            ContentUrl = model.VideoUrl ?? string.Empty,
             OrderIndex = model.OrderIndex
         };
 

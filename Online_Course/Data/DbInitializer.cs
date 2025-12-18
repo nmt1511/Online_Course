@@ -457,7 +457,7 @@ public static class DbInitializer
                     CourseId = course.CourseId,
                     Title = $"Bài {i + 1}: {lessons[i]}",
                     Description = $"Nội dung chi tiết về {lessons[i].ToLower()} trong khóa học {course.Title}.",
-                    VideoUrl = $"https://example.com/videos/course-{course.CourseId}/lesson-{i + 1}.mp4",
+                    ContentUrl = $"https://example.com/videos/course-{course.CourseId}/lesson-{i + 1}.mp4",
                     OrderIndex = i + 1
                 };
                 await context.Lessons.AddAsync(lesson);

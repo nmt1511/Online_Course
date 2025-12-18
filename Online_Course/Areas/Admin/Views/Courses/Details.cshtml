@@ -1,0 +1,190 @@
+@model Online_Course.ViewModels.CourseDetailViewModel
+@{
+    ViewData["Title"] = Model.Title;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="max-w-[1400px] mx-auto flex flex-col gap-6">
+    <!-- Page Header -->
+    <div class="flex items-center gap-4">
+        <a asp-action="Index" class="p-2 text-gray-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+            <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <div class="flex-1">
+            <h1 class="text-slate-900 dark:text-white text-2xl font-bold">@Model.Title</h1>
+            <p class="text-gray-500 dark:text-slate-400 text-sm">Chi tiết khóa học</p>
+        </div>
+        <a asp-action="Edit" asp-route-id="@Model.CourseId" class="flex items-center gap-2 px-4 py-2.5 bg-primary hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors">
+            <span class="material-symbols-outlined text-[18px]">edit</span>
+            Chỉnh sửa
+        </a>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Left Column: Course Info -->
+        <div class="lg:col-span-1 flex flex-col">
+            <!-- Thumbnail Card -->
+            <div class="bg-white dark:bg-[#1a222c] rounded-xl border border-gray-200 dark:border-[#283039] overflow-hidden flex flex-col h-full">
+                <div class="h-48 bg-cover bg-center bg-gray-200 dark:bg-slate-700 relative flex-shrink-0" style="background-image: url('@(string.IsNullOrEmpty(Model.ThumbnailUrl) ? "/images/default-course.png" : Model.ThumbnailUrl)');">
+                    <div class="absolute top-3 left-3 flex items-center gap-2">
+                        <span class="@Model.StatusColor text-white text-xs font-bold px-2.5 py-1 rounded">@Model.StatusText</span>
+                        @if (!string.IsNullOrEmpty(Model.Category))
+                        {
+                            <span class="bg-white/90 dark:bg-slate-800/90 text-primary text-xs font-semibold px-2.5 py-1 rounded backdrop-blur-sm">@Model.Category</span>
+                        }
+                    </div>
+                </div>
+                <div class="p-5 flex-1 flex flex-col">
+                    <p class="text-gray-600 dark:text-[#9dabb9] text-sm mb-4 flex-1">@Model.Description</p>
+                    
+                    @if (Model.ShowInstructor)
+                    {
+                        <div class="flex items-center gap-3 pb-4 mb-4 border-b border-gray-200 dark:border-[#283039]">
+                            <div class="size-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                                @Model.InstructorName?.Substring(0, Math.Min(2, Model.InstructorName?.Length ?? 0)).ToUpper()
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 dark:text-[#9dabb9]">Giảng viên</p>
+                                <p class="font-medium text-slate-900 dark:text-white">@Model.InstructorName</p>
+                            </div>
+                        </div>
+                    }
+                    
+                    <div class="flex items-center gap-6 pt-4 border-t border-gray-200 dark:border-[#283039]">
+                        <div class="flex items-center gap-2">
+                            <div class="size-9 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-blue-500 text-[20px]">play_lesson</span>
+                            </div>
+                            <div>
+                                <p class="text-lg font-bold text-slate-900 dark:text-white">@Model.TotalLessons</p>
+                                <p class="text-xs text-gray-500 dark:text-[#9dabb9]">Bài học</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="size-9 rounded-lg bg-green-500/10 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-green-500 text-[20px]">group</span>
+                            </div>
+                            <div>
+                                <p class="text-lg font-bold text-slate-900 dark:text-white">@Model.TotalStudents</p>
+                                <p class="text-xs text-gray-500 dark:text-[#9dabb9]">Học viên</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Lessons -->
+        <div class="lg:col-span-2">
+            <div class="bg-white dark:bg-[#1a222c] rounded-xl border border-gray-200 dark:border-[#283039] overflow-hidden h-full">
+                <div class="flex items-center justify-between p-5 border-b border-gray-200 dark:border-[#283039]">
+                    <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">play_lesson</span>
+                        Danh sách bài học
+                    </h2>
+                    <span class="bg-gray-100 dark:bg-[#283039] text-gray-600 dark:text-[#9dabb9] text-sm font-medium px-3 py-1 rounded-full">@Model.TotalLessons bài</span>
+                </div>
+                
+                @if (Model.Lessons.Any())
+                {
+                    <div class="divide-y divide-gray-200 dark:divide-[#283039] max-h-[400px] overflow-y-auto">
+                        @foreach (var lesson in Model.Lessons)
+                        {
+                            <div class="flex items-center gap-4 p-4 hover:bg-gray-50 dark:hover:bg-[#202934] transition-colors">
+                                <div class="size-10 rounded-lg bg-gray-100 dark:bg-[#283039] flex items-center justify-center text-gray-500 dark:text-[#9dabb9] font-bold">
+                                    @lesson.OrderIndex
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="font-medium text-slate-900 dark:text-white truncate">@lesson.Title</h4>
+                                    @if (!string.IsNullOrEmpty(lesson.Description))
+                                    {
+                                        <p class="text-sm text-gray-500 dark:text-[#9dabb9] truncate">@lesson.Description</p>
+                                    }
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="flex items-center gap-1 text-xs font-medium @(lesson.LessonType == "pdf" ? "text-red-500" : "text-blue-500")">
+                                        <span class="material-symbols-outlined text-[16px]">@lesson.LessonTypeIcon</span>
+                                        @lesson.LessonTypeText
+                                    </span>
+                                    @if (!string.IsNullOrEmpty(lesson.ContentUrl))
+                                    {
+                                        <a href="@lesson.ContentUrl" target="_blank" class="p-2 text-gray-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors" title="Mở nội dung">
+                                            <span class="material-symbols-outlined text-[18px]">open_in_new</span>
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="p-8 text-center">
+                        <span class="material-symbols-outlined text-gray-400 dark:text-[#9dabb9] text-4xl mb-2">school</span>
+                        <p class="text-gray-500 dark:text-[#9dabb9]">Chưa có bài học nào</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Students Section -->
+    <div class="bg-white dark:bg-[#1a222c] rounded-xl border border-gray-200 dark:border-[#283039] overflow-hidden">
+        <div class="flex items-center justify-between p-5 border-b border-gray-200 dark:border-[#283039]">
+            <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <span class="material-symbols-outlined text-green-500">group</span>
+                Danh sách học viên
+            </h2>
+            <span class="bg-gray-100 dark:bg-[#283039] text-gray-600 dark:text-[#9dabb9] text-sm font-medium px-3 py-1 rounded-full">@Model.TotalStudents học viên</span>
+        </div>
+        
+        @if (Model.Students.Any())
+        {
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50 dark:bg-[#202934]">
+                        <tr>
+                            <th class="px-5 py-3 text-left text-xs font-bold text-gray-500 dark:text-[#9dabb9] uppercase tracking-wider">Học viên</th>
+                            <th class="px-5 py-3 text-left text-xs font-bold text-gray-500 dark:text-[#9dabb9] uppercase tracking-wider hidden md:table-cell">Email</th>
+                            <th class="px-5 py-3 text-left text-xs font-bold text-gray-500 dark:text-[#9dabb9] uppercase tracking-wider hidden sm:table-cell">Ngày đăng ký</th>
+                            <th class="px-5 py-3 text-left text-xs font-bold text-gray-500 dark:text-[#9dabb9] uppercase tracking-wider">Tiến độ</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 dark:divide-[#283039]">
+                        @foreach (var student in Model.Students)
+                        {
+                            <tr class="hover:bg-gray-50 dark:hover:bg-[#202934] transition-colors">
+                                <td class="px-5 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="size-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
+                                            @student.FullName.Substring(0, Math.Min(2, student.FullName.Length)).ToUpper()
+                                        </div>
+                                        <span class="font-medium text-slate-900 dark:text-white">@student.FullName</span>
+                                    </div>
+                                </td>
+                                <td class="px-5 py-4 text-sm text-gray-500 dark:text-[#9dabb9] hidden md:table-cell">@student.Email</td>
+                                <td class="px-5 py-4 text-sm text-gray-500 dark:text-[#9dabb9] hidden sm:table-cell">@student.EnrolledAt.ToString("dd/MM/yyyy")</td>
+                                <td class="px-5 py-4">
+                                    <div class="flex items-center gap-2">
+                                        <div class="flex-1 h-2 bg-gray-200 dark:bg-[#283039] rounded-full max-w-[100px]">
+                                            <div class="h-2 @student.CompletionColor rounded-full transition-all" style="width: @student.CompletionPercentage%"></div>
+                                        </div>
+                                        <span class="text-sm font-medium text-slate-900 dark:text-white">@student.CompletionPercentage.ToString("F0")%</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="p-8 text-center">
+                <span class="material-symbols-outlined text-gray-400 dark:text-[#9dabb9] text-4xl mb-2">group_off</span>
+                <p class="text-gray-500 dark:text-[#9dabb9]">Chưa có học viên nào đăng ký</p>
+            </div>
+        }
+    </div>
+</div>

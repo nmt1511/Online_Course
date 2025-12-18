@@ -85,7 +85,7 @@ public class ApplicationDbContext : DbContext
             entity.HasKey(l => l.LessonId);
             entity.Property(l => l.Title).IsRequired().HasMaxLength(200);
             entity.Property(l => l.Description).HasColumnType("nvarchar(max)");
-            entity.Property(l => l.VideoUrl).HasMaxLength(500);
+            entity.Property(l => l.ContentUrl).HasMaxLength(500);
             entity.HasIndex(l => new { l.CourseId, l.OrderIndex });
             
             entity.HasOne(l => l.Course)

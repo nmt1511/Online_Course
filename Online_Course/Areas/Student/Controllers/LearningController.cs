@@ -67,7 +67,7 @@ public class LearningController : Controller
                 LessonId = lesson.LessonId,
                 Title = lesson.Title,
                 Description = lesson.Description,
-                VideoUrl = lesson.VideoUrl,
+                VideoUrl = lesson.ContentUrl,
                 OrderIndex = lesson.OrderIndex,
                 IsCompleted = isCompleted
             });
@@ -127,7 +127,7 @@ public class LearningController : Controller
                 LessonId = l.LessonId,
                 Title = l.Title,
                 Description = l.Description,
-                VideoUrl = l.VideoUrl,
+                VideoUrl = l.ContentUrl,
                 OrderIndex = l.OrderIndex,
                 IsCompleted = completed
             });
@@ -138,7 +138,7 @@ public class LearningController : Controller
             LessonId = lesson.LessonId,
             LessonTitle = lesson.Title,
             LessonDescription = lesson.Description,
-            VideoUrl = lesson.VideoUrl,
+            VideoUrl = lesson.ContentUrl,
             OrderIndex = lesson.OrderIndex,
             IsCompleted = isCompleted,
             CourseId = lesson.CourseId,
