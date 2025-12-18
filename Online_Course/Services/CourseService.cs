@@ -27,6 +27,7 @@ public class CourseService : ICourseService
         return await _context.Courses
             .Include(c => c.Instructor)
             .Include(c => c.Enrollments)
+            .Include(c => c.Lessons)
             .Where(c => c.CreatedBy == instructorId)
             .OrderByDescending(c => c.CourseId)
             .ToListAsync();

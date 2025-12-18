@@ -66,6 +66,9 @@ public class CoursesController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(InstructorCreateCourseViewModel model, IFormFile? thumbnailFile)
     {
+        // Remove ThumbnailUrl from validation - it's optional
+        ModelState.Remove("ThumbnailUrl");
+        
         if (!ModelState.IsValid)
         {
             ViewBag.Categories = await _categoryService.GetAllCategoriesAsync();
@@ -73,12 +76,29 @@ public class CoursesController : Controller
         }
 
         var instructorId = GetCurrentUserId();
-        var thumbnailUrl = model.ThumbnailUrl;
+        string thumbnailUrl;
 
-        // Handle file upload
+        // Handle file upload first
         if (thumbnailFile != null && thumbnailFile.Length > 0)
         {
+            // Check file size (5MB max)
+            if (thumbnailFile.Length > 5 * 1024 * 1024)
+            {
+                ModelState.AddModelError("thumbnailFile", "Kích thước file vượt quá 5MB");
+                ViewBag.Categories = await _categoryService.GetAllCategoriesAsync();
+                return View(model);
+            }
             thumbnailUrl = await SaveImageAsync(thumbnailFile);
+        }
+        // Then check URL
+        else if (!string.IsNullOrWhiteSpace(model.ThumbnailUrl))
+        {
+            thumbnailUrl = model.ThumbnailUrl;
+        }
+        // Use default image if no thumbnail provided
+        else
+        {
+            thumbnailUrl = "/images/default-course.png";
         }
 
         // Find CategoryId from Category name
@@ -91,7 +111,7 @@ public class CoursesController : Controller
             Description = model.Description,
             Category = model.Category,
             CategoryId = category?.CategoryId,
-            ThumbnailUrl = thumbnailUrl ?? "",
+            ThumbnailUrl = thumbnailUrl,
             Status = model.Status,
             CreatedBy = instructorId
         };
