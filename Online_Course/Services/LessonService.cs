@@ -48,7 +48,7 @@ public class LessonService : ILessonService
 
         existingLesson.Title = lesson.Title;
         existingLesson.Description = lesson.Description;
-        existingLesson.VideoUrl = lesson.VideoUrl;
+        existingLesson.ContentUrl = lesson.ContentUrl;
         existingLesson.OrderIndex = lesson.OrderIndex;
 
         await _context.SaveChangesAsync();

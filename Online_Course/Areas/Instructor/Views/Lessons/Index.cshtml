@@ -23,11 +23,11 @@
         <span class="text-xs bg-primary/10 text-primary px-3 py-1.5 rounded-lg font-medium">
             @Model.Lessons.Count() Bài học
         </span>
-        <a asp-area="Instructor" asp-controller="Students" asp-action="Index" asp-route-courseId="@Model.CourseId"
+ <!--      <a asp-area="Instructor" asp-controller="Students" asp-action="Index" asp-route-courseId="@Model.CourseId"
            class="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-gray-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm font-medium hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
             <span class="material-symbols-outlined text-[18px]">group</span>
             <span>Học viên</span>
-        </a>
+               </a>-->
         <a asp-action="Create" asp-route-courseId="@Model.CourseId" 
            class="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-white text-sm font-medium hover:bg-blue-600 transition-colors shadow-lg shadow-primary/20">
             <span class="material-symbols-outlined text-[18px]">add</span>

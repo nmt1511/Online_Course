@@ -180,6 +180,9 @@
                             </td>
                             <td class="p-4 text-right">
                                 <div class="flex items-center justify-end gap-2">
+                                    <a asp-action="Details" asp-route-id="@course.CourseId" class="p-1.5 text-gray-500 dark:text-[#9dabb9] hover:text-primary hover:bg-primary/10 rounded transition-colors" title="Xem chi tiết">
+                                        <span class="material-symbols-outlined text-[20px]">visibility</span>
+                                    </a>
                                     <a asp-action="Edit" asp-route-id="@course.CourseId" class="p-1.5 text-gray-500 dark:text-[#9dabb9] hover:text-slate-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-[#3b4754] rounded transition-colors" title="Chỉnh sửa">
                                         <span class="material-symbols-outlined text-[20px]">edit</span>
                                     </a>

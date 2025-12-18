@@ -14,17 +14,20 @@ public class CoursesController : Controller
     private readonly ICourseService _courseService;
     private readonly IEnrollmentService _enrollmentService;
     private readonly ICategoryService _categoryService;
+    private readonly IProgressService _progressService;
     private readonly IWebHostEnvironment _webHostEnvironment;
 
     public CoursesController(
         ICourseService courseService,
         IEnrollmentService enrollmentService,
         ICategoryService categoryService,
+        IProgressService progressService,
         IWebHostEnvironment webHostEnvironment)
     {
         _courseService = courseService;
         _enrollmentService = enrollmentService;
         _categoryService = categoryService;
+        _progressService = progressService;
         _webHostEnvironment = webHostEnvironment;
     }
 
@@ -143,6 +146,78 @@ public class CoursesController : Controller
 
         // Return relative URL
         return $"/images/courses/{fileName}";
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Details(int id)
+    {
+        var instructorId = GetCurrentUserId();
+        var course = await _courseService.GetCourseByIdAsync(id);
+
+        if (course == null)
+        {
+            return NotFound();
+        }
+
+        // Verify the course belongs to this instructor
+        if (course.CreatedBy != instructorId)
+        {
+            return Forbid();
+        }
+
+        // Get enrollments for this course
+        var enrollments = await _enrollmentService.GetEnrollmentsByCourseAsync(id);
+
+        // Build student list with completion percentage
+        var students = new List<StudentEnrollmentViewModel>();
+        foreach (var enrollment in enrollments)
+        {
+            var completionPercentage = await _progressService.CalculateProgressPercentageAsync(enrollment.StudentId, id);
+            students.Add(new StudentEnrollmentViewModel
+            {
+                StudentId = enrollment.StudentId,
+                FullName = enrollment.Student?.FullName ?? "Unknown",
+                Email = enrollment.Student?.Email ?? "",
+                EnrolledAt = enrollment.EnrolledAt,
+                CompletionPercentage = completionPercentage
+            });
+        }
+
+        var viewModel = new CourseDetailViewModel
+        {
+            CourseId = course.CourseId,
+            Title = course.Title,
+            Description = course.Description,
+            Category = course.Category,
+            ThumbnailUrl = course.ThumbnailUrl,
+            Status = course.Status,
+            ShowInstructor = false, // Instructor doesn't need to see their own name
+            TotalLessons = course.Lessons?.Count ?? 0,
+            TotalStudents = enrollments.Count(),
+            Lessons = course.Lessons?.OrderBy(l => l.OrderIndex).Select(l => new LessonSummaryViewModel
+            {
+                LessonId = l.LessonId,
+                Title = l.Title,
+                Description = l.Description,
+                OrderIndex = l.OrderIndex,
+                ContentUrl = l.ContentUrl,
+                LessonType = DetectLessonType(l.ContentUrl)
+            }) ?? Enumerable.Empty<LessonSummaryViewModel>(),
+            Students = students
+        };
+
+        return View(viewModel);
+    }
+
+    private string DetectLessonType(string url)
+    {
+        if (string.IsNullOrEmpty(url)) return "video";
+        
+        var lowerUrl = url.ToLower();
+        if (lowerUrl.EndsWith(".pdf") || lowerUrl.Contains("pdf"))
+            return "pdf";
+        
+        return "video";
     }
 
 
