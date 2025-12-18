@@ -4,9 +4,9 @@
     Layout = "~/Views/Shared/_InstructorLayout.cshtml";
 }
 
-<div class="max-w-2xl mx-auto">
+<div class="max-w-10xl mx-auto">
     <!-- Page Header -->
-    <div class="flex items-center gap-4 mb-8">
+    <div class="flex items-center gap-4 mb-6">
         <a asp-action="Index" class="p-2 text-gray-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
             <span class="material-symbols-outlined">arrow_back</span>
         </a>
@@ -17,51 +17,67 @@
     </div>
 
     <!-- Form Card -->
-    <div class="bg-white dark:bg-surface-dark border border-gray-200 dark:border-slate-800 rounded-xl p-6">
+    <div class="bg-white dark:bg-surface-dark border border-gray-200 dark:border-slate-800 rounded-xl p-6 lg:p-8">
         <form asp-action="Create" method="post" enctype="multipart/form-data">
             @Html.AntiForgeryToken()
             
-            <div class="space-y-6">
-                <!-- Title -->
-                <div>
-                    <label asp-for="Title" class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Tiêu đề khóa học</label>
-                    <input asp-for="Title" class="w-full h-12 px-4 bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-primary focus:border-primary transition-colors" placeholder="Nhập tiêu đề khóa học" />
-                    <span asp-validation-for="Title" class="text-red-500 dark:text-red-400 text-sm mt-1"></span>
-                </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Left Column -->
+                <div class="space-y-5">
+                    <!-- Title -->
+                    <div>
+                        <label asp-for="Title" class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Tiêu đề khóa học <span class="text-red-500">*</span></label>
+                        <input asp-for="Title" class="w-full h-12 px-4 bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-primary focus:border-primary transition-colors" placeholder="Nhập tiêu đề khóa học" />
+                        <span asp-validation-for="Title" class="text-red-500 dark:text-red-400 text-sm mt-1"></span>
+                    </div>
 
-                <!-- Description -->
-                <div>
-                    <label asp-for="Description" class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Mô tả chi tiết</label>
-                    <textarea asp-for="Description" rows="4" class="w-full px-4 py-3 bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-primary focus:border-primary transition-colors resize-none" placeholder="Nhập mô tả khóa học"></textarea>
-                    <span asp-validation-for="Description" class="text-red-500 dark:text-red-400 text-sm mt-1"></span>
-                </div>
+                    <!-- Description -->
+                    <div>
+                        <label asp-for="Description" class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Mô tả chi tiết</label>
+                        <textarea asp-for="Description" rows="5" class="w-full px-4 py-3 bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-primary focus:border-primary transition-colors resize-none" placeholder="Nhập mô tả khóa học"></textarea>
+                        <span asp-validation-for="Description" class="text-red-500 dark:text-red-400 text-sm mt-1"></span>
+                    </div>
 
-                <!-- Category -->
-                <div>
-                    <label asp-for="Category" class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Danh mục</label>
-                    @if (ViewBag.Categories != null && ((IEnumerable<Online_Course.Models.Category>)ViewBag.Categories).Any())
-                    {
-                        <select asp-for="Category" class="w-full h-12 px-4 bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-colors cursor-pointer">
-                            <option value="">Chọn danh mục</option>
-                            @foreach (var category in (IEnumerable<Online_Course.Models.Category>)ViewBag.Categories)
+                    <!-- Category and Status in row -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Category -->
+                        <div>
+                            <label asp-for="Category" class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Danh mục</label>
+                            @if (ViewBag.Categories != null && ((IEnumerable<Online_Course.Models.Category>)ViewBag.Categories).Any())
                             {
-                                <option value="@category.Name">@category.Name</option>
+                                <select asp-for="Category" class="w-full h-12 px-4 bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-colors cursor-pointer">
+                                    <option value="">Chọn danh mục</option>
+                                    @foreach (var category in (IEnumerable<Online_Course.Models.Category>)ViewBag.Categories)
+                                    {
+                                        <option value="@category.Name">@category.Name</option>
+                                    }
+                                </select>
                             }
-                        </select>
-                    }
-                    else
-                    {
-                        <input asp-for="Category" class="w-full h-12 px-4 bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-primary focus:border-primary transition-colors" placeholder="VD: Development, Design, Business" />
-                    }
-                    <span asp-validation-for="Category" class="text-red-500 dark:text-red-400 text-sm mt-1"></span>
+                            else
+                            {
+                                <input asp-for="Category" class="w-full h-12 px-4 bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-primary focus:border-primary transition-colors" placeholder="VD: Development" />
+                            }
+                            <span asp-validation-for="Category" class="text-red-500 dark:text-red-400 text-sm mt-1"></span>
+                        </div>
+
+                        <!-- Status -->
+                        <div>
+                            <label asp-for="Status" class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Trạng thái</label>
+                            <select asp-for="Status" class="w-full h-12 px-4 bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-colors cursor-pointer">
+                                <option value="@Online_Course.Models.CourseStatus.Draft">Nháp</option>
+                                <option value="@Online_Course.Models.CourseStatus.Private">Riêng tư</option>
+                                <option value="@Online_Course.Models.CourseStatus.Public">Công khai</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Thumbnail Image -->
-                <div>
-                    <label class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Ảnh bìa khóa học</label>
+                <!-- Right Column - Thumbnail -->
+                <div class="space-y-4">
+                    <label class="block text-sm font-medium text-slate-900 dark:text-white">Ảnh bìa khóa học</label>
                     
                     <!-- Tab buttons -->
-                    <div class="flex gap-2 mb-3">
+                    <div class="flex gap-2">
                         <button type="button" id="tab-upload" onclick="switchTab('upload')" class="px-4 py-2 text-sm font-medium rounded-lg bg-primary text-white transition-colors">
                             <span class="material-symbols-outlined text-sm align-middle mr-1">upload</span>
                             Upload từ máy
@@ -74,45 +90,51 @@
                     
                     <!-- Upload file -->
                     <div id="panel-upload" class="block">
-                        <div class="border-2 border-dashed border-gray-300 dark:border-slate-600 rounded-lg p-6 text-center hover:border-primary transition-colors">
+                        <div id="upload-zone" class="border-2 border-dashed border-gray-300 dark:border-slate-600 rounded-xl p-8 text-center hover:border-primary hover:bg-primary/5 transition-all cursor-pointer" onclick="document.getElementById('thumbnailFile').click()">
                             <input type="file" name="thumbnailFile" id="thumbnailFile" accept="image/*" class="hidden" onchange="previewImage(this)" />
-                            <label for="thumbnailFile" class="cursor-pointer">
-                                <span class="material-symbols-outlined text-4xl text-gray-400 dark:text-slate-500 mb-2">cloud_upload</span>
-                                <p class="text-gray-500 dark:text-slate-400 text-sm">Kéo thả hoặc click để chọn ảnh</p>
-                                <p class="text-gray-400 dark:text-slate-500 text-xs mt-1">PNG, JPG, GIF (tối đa 5MB)</p>
-                            </label>
-                            <img id="image-preview" class="hidden mt-4 mx-auto max-h-48 rounded-lg" />
+                            <div id="upload-placeholder">
+                                <span class="material-symbols-outlined text-5xl text-gray-400 dark:text-slate-500 mb-3 block">cloud_upload</span>
+                                <p class="text-gray-600 dark:text-slate-300 text-sm font-medium">Kéo thả hoặc click để chọn ảnh</p>
+                                <p class="text-gray-400 dark:text-slate-500 text-xs mt-2">PNG, JPG, GIF (tối đa 5MB)</p>
+                            </div>
+                            <div id="file-selected" class="hidden">
+                                <img id="image-preview" class="mx-auto max-h-40 rounded-lg mb-3 shadow-md" />
+                                <p id="file-name" class="text-gray-600 dark:text-slate-300 text-sm font-medium truncate"></p>
+                                <p id="file-size" class="text-gray-400 dark:text-slate-500 text-xs mt-1"></p>
+                                <button type="button" onclick="removeImage(event)" class="mt-3 px-4 py-2 text-sm font-medium text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
+                                    <span class="material-symbols-outlined text-sm align-middle mr-1">delete</span>
+                                    Xóa ảnh
+                                </button>
+                            </div>
                         </div>
                     </div>
                     
                     <!-- URL input -->
                     <div id="panel-url" class="hidden">
-                        <input asp-for="ThumbnailUrl" class="w-full h-12 px-4 bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-primary focus:border-primary transition-colors" placeholder="https://example.com/image.jpg" />
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500">
+                                <span class="material-symbols-outlined text-[20px]">link</span>
+                            </span>
+                            <input asp-for="ThumbnailUrl" class="w-full h-12 pl-12 pr-4 bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-primary focus:border-primary transition-colors" placeholder="https://example.com/image.jpg" />
+                        </div>
+                        <p class="text-gray-400 dark:text-slate-500 text-xs mt-2">Nhập đường dẫn URL trực tiếp đến hình ảnh</p>
                     </div>
-                    <span asp-validation-for="ThumbnailUrl" class="text-red-500 dark:text-red-400 text-sm mt-1"></span>
+                    <p class="text-gray-400 dark:text-slate-500 text-xs mt-3">
+                        <span class="material-symbols-outlined text-xs align-middle mr-1">info</span>
+                        Không bắt buộc - nếu không có ảnh, hệ thống sẽ dùng ảnh mặc định
+                    </p>
                 </div>
+            </div>
 
-                <!-- Status -->
-                <div>
-                    <label asp-for="Status" class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Trạng thái khóa học</label>
-                    <select asp-for="Status" class="w-full h-12 px-4 bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-colors cursor-pointer">
-                        <option value="@Online_Course.Models.CourseStatus.Draft">Nháp - Chưa công khai</option>
-                        <option value="@Online_Course.Models.CourseStatus.Private">Riêng tư - Chỉ học viên được mời</option>
-                        <option value="@Online_Course.Models.CourseStatus.Public">Công khai - Mọi người có thể xem</option>
-                    </select>
-                    <p class="text-gray-400 dark:text-slate-500 text-xs mt-1">Chọn trạng thái hiển thị của khóa học</p>
-                </div>
-
-                <!-- Buttons -->
-                <div class="flex items-center gap-4 pt-4">
-                    <button type="submit" class="flex-1 h-12 bg-primary hover:bg-blue-600 text-white font-bold rounded-lg transition-colors flex items-center justify-center gap-2">
-                        <span class="material-symbols-outlined text-[20px]">add</span>
-                        Tạo khóa học
-                    </button>
-                    <a asp-action="Index" class="flex-1 h-12 bg-gray-200 dark:bg-slate-800 hover:bg-gray-300 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-medium rounded-lg transition-colors flex items-center justify-center">
-                        Hủy bỏ
-                    </a>
-                </div>
+            <!-- Buttons -->
+            <div class="flex items-center gap-4 pt-6 mt-6 border-t border-gray-200 dark:border-slate-700">
+                <button type="submit" class="flex-1 sm:flex-none sm:min-w-[200px] h-12 bg-primary hover:bg-blue-600 text-white font-bold rounded-lg transition-colors flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-[20px]">add</span>
+                    Tạo khóa học
+                </button>
+                <a asp-action="Index" class="flex-1 sm:flex-none sm:min-w-[120px] h-12 bg-gray-200 dark:bg-slate-800 hover:bg-gray-300 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-medium rounded-lg transition-colors flex items-center justify-center">
+                    Hủy bỏ
+                </a>
             </div>
         </form>
     </div>
@@ -121,35 +143,153 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
+        let currentMode = 'upload';
+        
         function switchTab(tab) {
             const tabUpload = document.getElementById('tab-upload');
             const tabUrl = document.getElementById('tab-url');
             const panelUpload = document.getElementById('panel-upload');
             const panelUrl = document.getElementById('panel-url');
+            const thumbnailUrlInput = document.getElementById('ThumbnailUrl');
+            
+            currentMode = tab;
             
             if (tab === 'upload') {
                 tabUpload.className = 'px-4 py-2 text-sm font-medium rounded-lg bg-primary text-white transition-colors';
-                tabUrl.className = 'px-4 py-2 text-sm font-medium rounded-lg bg-slate-700 text-slate-300 hover:bg-slate-600 transition-colors';
+                tabUrl.className = 'px-4 py-2 text-sm font-medium rounded-lg bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors';
                 panelUpload.classList.remove('hidden');
                 panelUrl.classList.add('hidden');
+                // Clear URL field when switching to upload mode
+                thumbnailUrlInput.value = '';
+                // Remove validation error message
+                clearValidationError(thumbnailUrlInput);
             } else {
                 tabUrl.className = 'px-4 py-2 text-sm font-medium rounded-lg bg-primary text-white transition-colors';
-                tabUpload.className = 'px-4 py-2 text-sm font-medium rounded-lg bg-slate-700 text-slate-300 hover:bg-slate-600 transition-colors';
+                tabUpload.className = 'px-4 py-2 text-sm font-medium rounded-lg bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors';
                 panelUrl.classList.remove('hidden');
                 panelUpload.classList.add('hidden');
+                // Clear file input when switching to URL mode
+                removeImageSilent();
             }
+        }
+        
+        function clearValidationError(input) {
+            const validationSpan = document.querySelector('[data-valmsg-for="ThumbnailUrl"]');
+            if (validationSpan) {
+                validationSpan.textContent = '';
+                validationSpan.classList.remove('field-validation-error');
+                validationSpan.classList.add('field-validation-valid');
+            }
+            input.classList.remove('input-validation-error');
         }
         
         function previewImage(input) {
             const preview = document.getElementById('image-preview');
+            const placeholder = document.getElementById('upload-placeholder');
+            const fileSelected = document.getElementById('file-selected');
+            const fileName = document.getElementById('file-name');
+            const fileSize = document.getElementById('file-size');
+            const thumbnailUrlInput = document.getElementById('ThumbnailUrl');
+            
             if (input.files && input.files[0]) {
+                const file = input.files[0];
+                
+                // Check file size (5MB max)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Kích thước file vượt quá 5MB. Vui lòng chọn file nhỏ hơn.');
+                    input.value = '';
+                    return;
+                }
+                
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     preview.src = e.target.result;
-                    preview.classList.remove('hidden');
+                    fileName.textContent = file.name;
+                    fileSize.textContent = formatFileSize(file.size);
+                    placeholder.classList.add('hidden');
+                    fileSelected.classList.remove('hidden');
+                    // Clear any URL validation error when file is selected
+                    clearValidationError(thumbnailUrlInput);
                 };
-                reader.readAsDataURL(input.files[0]);
+                reader.readAsDataURL(file);
             }
         }
+        
+        function removeImage(event) {
+            event.stopPropagation();
+            removeImageSilent();
+        }
+        
+        function removeImageSilent() {
+            const input = document.getElementById('thumbnailFile');
+            const preview = document.getElementById('image-preview');
+            const placeholder = document.getElementById('upload-placeholder');
+            const fileSelected = document.getElementById('file-selected');
+            
+            input.value = '';
+            preview.src = '';
+            placeholder.classList.remove('hidden');
+            fileSelected.classList.add('hidden');
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // Drag and drop support
+        const uploadZone = document.getElementById('upload-zone');
+        
+        uploadZone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.classList.add('border-primary', 'bg-primary/10');
+        });
+        
+        uploadZone.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            this.classList.remove('border-primary', 'bg-primary/10');
+        });
+        
+        uploadZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.classList.remove('border-primary', 'bg-primary/10');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                const input = document.getElementById('thumbnailFile');
+                input.files = files;
+                previewImage(input);
+            }
+        });
+        
+        // Override form validation for ThumbnailUrl when file is uploaded
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const thumbnailUrlInput = document.getElementById('ThumbnailUrl');
+            const thumbnailFileInput = document.getElementById('thumbnailFile');
+            
+            // Remove any required validation from ThumbnailUrl
+            if (thumbnailUrlInput) {
+                thumbnailUrlInput.removeAttribute('data-val-required');
+                thumbnailUrlInput.removeAttribute('required');
+            }
+            
+            form.addEventListener('submit', function(e) {
+                // If in upload mode and file is selected, skip URL validation
+                if (currentMode === 'upload' && thumbnailFileInput.files && thumbnailFileInput.files.length > 0) {
+                    clearValidationError(thumbnailUrlInput);
+                    return true;
+                }
+                
+                // If in URL mode and URL is empty, that's okay (optional field)
+                if (currentMode === 'url' && !thumbnailUrlInput.value) {
+                    clearValidationError(thumbnailUrlInput);
+                    return true;
+                }
+            });
+        });
     </script>
 }
