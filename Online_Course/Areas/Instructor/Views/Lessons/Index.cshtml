@@ -1,4 +1,5 @@
 @model Online_Course.ViewModels.LessonListViewModel
+@using Online_Course.Models
 @{
     ViewData["Title"] = "Quản lý Bài học";
     Layout = "~/Views/Shared/_InstructorLayout.cshtml";
@@ -23,11 +24,6 @@
         <span class="text-xs bg-primary/10 text-primary px-3 py-1.5 rounded-lg font-medium">
             @Model.Lessons.Count() Bài học
         </span>
- <!--      <a asp-area="Instructor" asp-controller="Students" asp-action="Index" asp-route-courseId="@Model.CourseId"
-           class="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-gray-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm font-medium hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
-            <span class="material-symbols-outlined text-[18px]">group</span>
-            <span>Học viên</span>
-               </a>-->
         <a asp-action="Create" asp-route-courseId="@Model.CourseId" 
            class="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-white text-sm font-medium hover:bg-blue-600 transition-colors shadow-lg shadow-primary/20">
             <span class="material-symbols-outlined text-[18px]">add</span>
@@ -70,10 +66,32 @@
                     <!-- Drag Handle -->
                     <span class="material-symbols-outlined text-gray-400 dark:text-slate-500 cursor-grab text-[20px] opacity-0 group-hover:opacity-100 transition-opacity">drag_indicator</span>
                     
+                    <!-- Lesson Type Icon -->
+                    @if (lesson.LessonType == LessonType.Pdf)
+                    {
+                        <div class="size-10 rounded-lg bg-red-100 dark:bg-red-500/20 flex items-center justify-center flex-shrink-0">
+                            <span class="material-symbols-outlined text-red-500 text-[20px]">picture_as_pdf</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="size-10 rounded-lg bg-blue-100 dark:bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                            <span class="material-symbols-outlined text-blue-500 text-[20px]">smart_display</span>
+                        </div>
+                    }
+                    
                     <!-- Lesson Info -->
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-1">
                             <span class="text-xs text-primary font-medium">Bài @lesson.OrderIndex</span>
+                            @if (lesson.LessonType == LessonType.Pdf)
+                            {
+                                <span class="text-xs bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 px-2 py-0.5 rounded font-medium">PDF</span>
+                            }
+                            else
+                            {
+                                <span class="text-xs bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded font-medium">Video</span>
+                            }
                         </div>
                         <h3 class="text-slate-900 dark:text-white font-medium truncate">@lesson.Title</h3>
                         @if (!string.IsNullOrEmpty(lesson.Description))
@@ -82,14 +100,25 @@
                         }
                     </div>
                     
-                    <!-- Video Indicator -->
-                    @if (!string.IsNullOrEmpty(lesson.VideoUrl))
-                    {
-                        <div class="flex items-center gap-1 text-gray-500 dark:text-slate-400 text-sm">
-                            <span class="material-symbols-outlined text-[18px]">smart_display</span>
-                            <span>Video</span>
-                        </div>
-                    }
+                    <!-- Lesson Metadata -->
+                    <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-slate-400">
+                        @if (lesson.LessonType == LessonType.Pdf && lesson.TotalPages.HasValue)
+                        {
+                            <div class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[16px]">description</span>
+                                <span>@lesson.TotalPages trang</span>
+                            </div>
+                        }
+                        else if (lesson.LessonType == LessonType.Video && lesson.TotalDurationSeconds.HasValue)
+                        {
+                            var mins = lesson.TotalDurationSeconds.Value / 60;
+                            var secs = lesson.TotalDurationSeconds.Value % 60;
+                            <div class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[16px]">timer</span>
+                                <span>@mins:@secs.ToString("D2")</span>
+                            </div>
+                        }
+                    </div>
                     
                     <!-- Actions -->
                     <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">

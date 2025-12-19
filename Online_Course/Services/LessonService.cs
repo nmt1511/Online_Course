@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Online_Course.Data;
+using Online_Course.Helper;
 using Online_Course.Models;
 
 namespace Online_Course.Services;
@@ -30,11 +31,15 @@ public class LessonService : ILessonService
 
     public async Task<Lesson> CreateLessonAsync(Lesson lesson)
     {
+        // Tự động tính OrderIndex nếu chưa được set
         if (lesson.OrderIndex == 0)
         {
             lesson.OrderIndex = await GetNextOrderIndexAsync(lesson.CourseId);
         }
         
+        // Set thời gian tạo
+        lesson.CreatedAt = DateTimeHelper.GetVietnamTimeNow();
+
         _context.Lessons.Add(lesson);
         await _context.SaveChangesAsync();
         return lesson;
@@ -46,10 +51,17 @@ public class LessonService : ILessonService
         if (existingLesson == null)
             throw new ArgumentException("Lesson not found");
 
+        // Cập nhật các trường cơ bản
         existingLesson.Title = lesson.Title;
         existingLesson.Description = lesson.Description;
         existingLesson.ContentUrl = lesson.ContentUrl;
         existingLesson.OrderIndex = lesson.OrderIndex;
+        
+        // Cập nhật các trường mới cho PDF và Video
+        existingLesson.LessonType = lesson.LessonType;
+        existingLesson.TotalPages = lesson.TotalPages;
+        existingLesson.TotalDurationSeconds = lesson.TotalDurationSeconds;
+        existingLesson.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
     }
