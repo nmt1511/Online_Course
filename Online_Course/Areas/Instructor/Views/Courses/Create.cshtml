@@ -18,8 +18,11 @@
 
     <!-- Form Card -->
     <div class="bg-white dark:bg-surface-dark border border-gray-200 dark:border-slate-800 rounded-xl p-6 lg:p-8">
-        <form asp-action="Create" method="post" enctype="multipart/form-data">
+        <form asp-action="Create" method="post" enctype="multipart/form-data" id="createCourseForm">
             @Html.AntiForgeryToken()
+            
+            <!-- Validation Summary -->
+            <div asp-validation-summary="ModelOnly" class="text-red-500 dark:text-red-400 text-sm mb-4"></div>
             
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Left Column -->
@@ -69,6 +72,62 @@
                                 <option value="@Online_Course.Models.CourseStatus.Public">Công khai</option>
                             </select>
                         </div>
+                    </div>
+
+                    <!-- Course Type -->
+                    <div>
+                        <label asp-for="CourseType" class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Loại khóa học</label>
+                        <select asp-for="CourseType" id="courseTypeSelect" class="w-full h-12 px-4 bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-colors cursor-pointer">
+                            <option value="@Online_Course.Models.CourseType.Open_Always">Mở xuyên suốt</option>
+                            <option value="@Online_Course.Models.CourseType.Fixed_Time">Thời gian cố định</option>
+                        </select>
+                        <p class="text-gray-400 dark:text-slate-500 text-xs mt-1">
+                            <span class="material-symbols-outlined text-xs align-middle mr-1">info</span>
+                            Chọn "Thời gian cố định" nếu khóa học có thời gian đăng ký và học cụ thể.
+                        </p>
+                    </div>
+
+                    <!-- Date Fields (shown only for Fixed_Time) -->
+                    <div id="dateFieldsSection" class="hidden space-y-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                        <h3 class="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">calendar_month</span>
+                            Thời gian khóa học
+                        </h3>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- Registration Start Date -->
+                            <div>
+                                <label asp-for="RegistrationStartDate" class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Ngày bắt đầu đăng ký <span class="text-red-500">*</span></label>
+                                <input asp-for="RegistrationStartDate" type="date" class="w-full h-12 px-4 bg-white dark:bg-background-dark border border-gray-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-colors" />
+                                <span asp-validation-for="RegistrationStartDate" class="text-red-500 dark:text-red-400 text-sm mt-1"></span>
+                            </div>
+
+                            <!-- Registration End Date -->
+                            <div>
+                                <label asp-for="RegistrationEndDate" class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Ngày kết thúc đăng ký <span class="text-red-500">*</span></label>
+                                <input asp-for="RegistrationEndDate" type="date" class="w-full h-12 px-4 bg-white dark:bg-background-dark border border-gray-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-colors" />
+                                <span asp-validation-for="RegistrationEndDate" class="text-red-500 dark:text-red-400 text-sm mt-1"></span>
+                            </div>
+
+                            <!-- Start Date -->
+                            <div>
+                                <label asp-for="StartDate" class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Ngày bắt đầu học <span class="text-red-500">*</span></label>
+                                <input asp-for="StartDate" type="date" class="w-full h-12 px-4 bg-white dark:bg-background-dark border border-gray-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-colors" />
+                                <span asp-validation-for="StartDate" class="text-red-500 dark:text-red-400 text-sm mt-1"></span>
+                            </div>
+
+                            <!-- End Date -->
+                            <div>
+                                <label asp-for="EndDate" class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Ngày kết thúc học <span class="text-red-500">*</span></label>
+                                <input asp-for="EndDate" type="date" class="w-full h-12 px-4 bg-white dark:bg-background-dark border border-gray-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-colors" />
+                                <span asp-validation-for="EndDate" class="text-red-500 dark:text-red-400 text-sm mt-1"></span>
+                            </div>
+                        </div>
+                        
+                        <p class="text-xs text-gray-500 dark:text-slate-400">
+                            <span class="material-symbols-outlined text-xs align-middle mr-1">info</span>
+                            Thứ tự: Ngày bắt đầu đăng ký → Ngày kết thúc đăng ký → Ngày bắt đầu học → Ngày kết thúc học
+                        </p>
                     </div>
                 </div>
 
@@ -140,10 +199,69 @@
     </div>
 </div>
 
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
         let currentMode = 'upload';
+        
+        // CourseType toggle functionality
+        function toggleDateFields() {
+            const courseTypeSelect = document.getElementById('courseTypeSelect');
+            const dateFieldsSection = document.getElementById('dateFieldsSection');
+            
+            if (courseTypeSelect.value === '@((int)Online_Course.Models.CourseType.Fixed_Time)' || 
+                courseTypeSelect.value === 'Fixed_Time') {
+                dateFieldsSection.classList.remove('hidden');
+            } else {
+                dateFieldsSection.classList.add('hidden');
+                // Clear date fields when switching to Open_Always
+                document.getElementById('RegistrationStartDate').value = '';
+                document.getElementById('RegistrationEndDate').value = '';
+                document.getElementById('StartDate').value = '';
+                document.getElementById('EndDate').value = '';
+            }
+        }
+        
+        // Date validation
+        function validateDates() {
+            const courseTypeSelect = document.getElementById('courseTypeSelect');
+            if (courseTypeSelect.value !== '@((int)Online_Course.Models.CourseType.Fixed_Time)' && 
+                courseTypeSelect.value !== 'Fixed_Time') {
+                return true;
+            }
+            
+            const regStart = new Date(document.getElementById('RegistrationStartDate').value);
+            const regEnd = new Date(document.getElementById('RegistrationEndDate').value);
+            const startDate = new Date(document.getElementById('StartDate').value);
+            const endDate = new Date(document.getElementById('EndDate').value);
+            
+            let errors = [];
+            
+            if (!document.getElementById('RegistrationStartDate').value || 
+                !document.getElementById('RegistrationEndDate').value ||
+                !document.getElementById('StartDate').value || 
+                !document.getElementById('EndDate').value) {
+                errors.push('Vui lòng nhập đầy đủ các ngày khi chọn loại khóa học thời gian cố định.');
+            } else {
+                if (regStart >= regEnd) {
+                    errors.push('Ngày kết thúc đăng ký phải sau ngày bắt đầu đăng ký.');
+                }
+                if (regEnd >= startDate) {
+                    errors.push('Ngày bắt đầu học phải sau ngày kết thúc đăng ký.');
+                }
+                if (startDate >= endDate) {
+                    errors.push('Ngày kết thúc học phải sau ngày bắt đầu học.');
+                }
+            }
+            
+            if (errors.length > 0) {
+                alert(errors.join('\n'));
+                return false;
+            }
+            
+            return true;
+        }
         
         function switchTab(tab) {
             const tabUpload = document.getElementById('tab-upload');
@@ -265,11 +383,12 @@
             }
         });
         
-        // Override form validation for ThumbnailUrl when file is uploaded
+        // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
-            const form = document.querySelector('form');
+            const form = document.getElementById('createCourseForm');
             const thumbnailUrlInput = document.getElementById('ThumbnailUrl');
             const thumbnailFileInput = document.getElementById('thumbnailFile');
+            const courseTypeSelect = document.getElementById('courseTypeSelect');
             
             // Remove any required validation from ThumbnailUrl
             if (thumbnailUrlInput) {
@@ -277,7 +396,19 @@
                 thumbnailUrlInput.removeAttribute('required');
             }
             
+            // Initialize date fields visibility
+            toggleDateFields();
+            
+            // Add event listener for CourseType change
+            courseTypeSelect.addEventListener('change', toggleDateFields);
+            
             form.addEventListener('submit', function(e) {
+                // Validate dates if Fixed_Time
+                if (!validateDates()) {
+                    e.preventDefault();
+                    return false;
+                }
+                
                 // If in upload mode and file is selected, skip URL validation
                 if (currentMode === 'upload' && thumbnailFileInput.files && thumbnailFileInput.files.length > 0) {
                     clearValidationError(thumbnailUrlInput);
