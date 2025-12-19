@@ -35,7 +35,7 @@ public class CategoriesController : Controller
         var categoryList = new List<CategoryListViewModel>();
         foreach (var category in categories)
         {
-            var courseCount = await _categoryService.GetCourseCountByCategoryAsync(category.Name);
+            var courseCount = await _categoryService.GetCourseCountByCategoryAsync(category.CategoryId);
             categoryList.Add(new CategoryListViewModel
             {
                 CategoryId = category.CategoryId,
@@ -72,22 +72,22 @@ public class CategoriesController : Controller
             var existingCategory = await _categoryService.GetCategoryByNameAsync(model.Name);
             if (existingCategory != null)
             {
-                TempData["ErrorMessage"] = "A category with this name already exists.";
+                TempData["ErrorMessage"] = "Danh mục với tên này đã tồn tại.";
                 return RedirectToAction(nameof(Index));
             }
 
             var category = new Category
             {
                 Name = model.Name,
-                IsActive = true
+                IsActive = model.IsActive
             };
 
             await _categoryService.CreateCategoryAsync(category);
-            TempData["SuccessMessage"] = "Category created successfully!";
+            TempData["SuccessMessage"] = "Thêm danh mục thành công!";
             return RedirectToAction(nameof(Index));
         }
 
-        TempData["ErrorMessage"] = "Invalid category data.";
+        TempData["ErrorMessage"] = "Dữ liệu danh mục không hợp lệ.";
         return RedirectToAction(nameof(Index));
     }
 
@@ -97,7 +97,7 @@ public class CategoriesController : Controller
         var category = await _categoryService.GetCategoryByIdAsync(id);
         if (category == null)
         {
-            TempData["ErrorMessage"] = "Category not found.";
+            TempData["ErrorMessage"] = "Không tìm thấy danh mục.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -118,7 +118,7 @@ public class CategoriesController : Controller
     {
         if (id != model.CategoryId)
         {
-            TempData["ErrorMessage"] = "Invalid category ID.";
+            TempData["ErrorMessage"] = "ID danh mục không hợp lệ.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -127,7 +127,7 @@ public class CategoriesController : Controller
             var existingCategory = await _categoryService.GetCategoryByIdAsync(id);
             if (existingCategory == null)
             {
-                TempData["ErrorMessage"] = "Category not found.";
+                TempData["ErrorMessage"] = "Không tìm thấy danh mục.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -135,7 +135,7 @@ public class CategoriesController : Controller
             var categoryWithSameName = await _categoryService.GetCategoryByNameAsync(model.Name);
             if (categoryWithSameName != null && categoryWithSameName.CategoryId != id)
             {
-                TempData["ErrorMessage"] = "A category with this name already exists.";
+                TempData["ErrorMessage"] = "Danh mục với tên này đã tồn tại.";
                 return View(model);
             }
 
@@ -143,7 +143,7 @@ public class CategoriesController : Controller
             existingCategory.IsActive = model.IsActive;
 
             await _categoryService.UpdateCategoryAsync(existingCategory);
-            TempData["SuccessMessage"] = "Category updated successfully!";
+            TempData["SuccessMessage"] = "Cập nhật danh mục thành công!";
             return RedirectToAction(nameof(Index));
         }
 
@@ -158,20 +158,20 @@ public class CategoriesController : Controller
         var category = await _categoryService.GetCategoryByIdAsync(id);
         if (category == null)
         {
-            TempData["ErrorMessage"] = "Category not found.";
+            TempData["ErrorMessage"] = "Không tìm thấy danh mục.";
             return RedirectToAction(nameof(Index));
         }
 
         // Check if category has courses
-        var courseCount = await _categoryService.GetCourseCountByCategoryAsync(category.Name);
+        var courseCount = await _categoryService.GetCourseCountByCategoryAsync(category.CategoryId);
         if (courseCount > 0)
         {
-            TempData["ErrorMessage"] = $"Cannot delete category '{category.Name}' because it has {courseCount} course(s) assigned.";
+            TempData["ErrorMessage"] = $"Không thể xóa danh mục '{category.Name}' vì có {courseCount} khóa học đang sử dụng.";
             return RedirectToAction(nameof(Index));
         }
 
         await _categoryService.DeleteCategoryAsync(id);
-        TempData["SuccessMessage"] = "Category deleted successfully!";
+        TempData["SuccessMessage"] = "Xóa danh mục thành công!";
         return RedirectToAction(nameof(Index));
     }
 }

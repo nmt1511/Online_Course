@@ -73,7 +73,8 @@ public class ProgressController : Controller
             {
                 CourseId = enrollment.CourseId,
                 Title = enrollment.Course?.Title ?? "",
-                Category = enrollment.Course?.Category ?? "",
+                CategoryId = enrollment.Course?.CategoryId,
+                CategoryName = enrollment.Course?.CategoryEntity?.Name ?? "Chưa phân loại",
                 ThumbnailUrl = enrollment.Course?.ThumbnailUrl ?? "",
                 TotalLessons = totalLessons,
                 CompletedLessons = completedLessons,

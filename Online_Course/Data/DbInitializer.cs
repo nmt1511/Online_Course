@@ -285,7 +285,6 @@ public static class DbInitializer
             {
                 Title = courseData.Title,
                 Description = courseData.Description,
-                Category = courseData.Category,
                 CategoryId = category?.CategoryId,
                 ThumbnailUrl = courseData.Thumbnail,
                 CreatedBy = instructor.UserId,
@@ -446,11 +445,16 @@ public static class DbInitializer
             }
         };
 
+        // Load categories for mapping
+        var categoriesDict = await context.Categories.ToDictionaryAsync(c => c.CategoryId, c => c.Name);
+        
         foreach (var course in courses)
         {
-            var category = course.Category;
-            var lessons = lessonTemplates.ContainsKey(category) 
-                ? lessonTemplates[category] 
+            var categoryName = course.CategoryId.HasValue && categoriesDict.ContainsKey(course.CategoryId.Value) 
+                ? categoriesDict[course.CategoryId.Value] 
+                : "Lập Trình";
+            var lessons = lessonTemplates.ContainsKey(categoryName) 
+                ? lessonTemplates[categoryName] 
                 : lessonTemplates["Lập Trình"];
 
             for (int i = 0; i < lessons.Length; i++)

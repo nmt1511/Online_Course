@@ -29,16 +29,16 @@ public class CoursesController : Controller
     }
 
     // GET: Admin/Courses
-    public async Task<IActionResult> Index(string? category, string? status, string? search)
+    public async Task<IActionResult> Index(int? category, string? status, string? search)
     {
         var courses = await _courseService.GetAllCoursesAsync();
         var totalCourses = await _courseService.GetTotalCoursesCountAsync();
         var publishedCourses = await _courseService.GetPublishedCoursesCountAsync();
 
         // Apply filters
-        if (!string.IsNullOrEmpty(category))
+        if (category.HasValue)
         {
-            courses = courses.Where(c => c.Category == category);
+            courses = courses.Where(c => c.CategoryId == category.Value);
         }
 
         if (!string.IsNullOrEmpty(status))
@@ -66,7 +66,8 @@ public class CoursesController : Controller
                 CourseId = c.CourseId,
                 Title = c.Title,
                 Description = c.Description,
-                Category = c.Category,
+                CategoryId = c.CategoryId,
+                CategoryName = c.CategoryEntity?.Name ?? "Chưa phân loại",
                 ThumbnailUrl = c.ThumbnailUrl,
                 InstructorName = c.Instructor?.FullName ?? "Not Assigned",
                 InstructorId = c.CreatedBy,
@@ -122,7 +123,8 @@ public class CoursesController : Controller
             CourseId = course.CourseId,
             Title = course.Title,
             Description = course.Description,
-            Category = course.Category,
+            CategoryId = course.CategoryId,
+            CategoryName = course.CategoryEntity?.Name ?? "Chưa phân loại",
             ThumbnailUrl = course.ThumbnailUrl,
             Status = course.CourseStatus,
             CourseType = course.CourseType,
@@ -165,6 +167,7 @@ public class CoursesController : Controller
     public async Task<IActionResult> Create()
     {
         await PopulateInstructorsDropdown();
+        await PopulateCategoriesDropdown();
         return View();
     }
 
@@ -179,7 +182,7 @@ public class CoursesController : Controller
             {
                 Title = model.Title,
                 Description = model.Description,
-                Category = model.Category,
+                CategoryId = model.CategoryId,
                 ThumbnailUrl = model.ThumbnailUrl,
                 CreatedBy = model.InstructorId,
                 CourseStatus = model.Status
@@ -191,6 +194,7 @@ public class CoursesController : Controller
         }
 
         await PopulateInstructorsDropdown();
+        await PopulateCategoriesDropdown();
         return View(model);
     }
 
@@ -209,13 +213,14 @@ public class CoursesController : Controller
             CourseId = course.CourseId,
             Title = course.Title,
             Description = course.Description,
-            Category = course.Category,
+            CategoryId = course.CategoryId,
             ThumbnailUrl = course.ThumbnailUrl,
             InstructorId = course.CreatedBy,
             Status = course.CourseStatus
         };
 
         await PopulateInstructorsDropdown(course.CreatedBy);
+        await PopulateCategoriesDropdown(course.CategoryId);
         return View(viewModel);
     }
 
@@ -239,7 +244,7 @@ public class CoursesController : Controller
 
             course.Title = model.Title;
             course.Description = model.Description;
-            course.Category = model.Category;
+            course.CategoryId = model.CategoryId;
             course.ThumbnailUrl = model.ThumbnailUrl;
             course.CreatedBy = model.InstructorId;
             course.CourseStatus = model.Status;
@@ -250,6 +255,7 @@ public class CoursesController : Controller
         }
 
         await PopulateInstructorsDropdown(model.InstructorId);
+        await PopulateCategoriesDropdown(model.CategoryId);
         return View(model);
     }
 
@@ -268,6 +274,12 @@ public class CoursesController : Controller
         var users = await _userService.GetAllUsersAsync();
         var instructors = users.Where(u => u.UserRoles.Any(ur => ur.Role.Name == "Instructor"));
         ViewBag.Instructors = new SelectList(instructors, "UserId", "FullName", selectedId);
+    }
+
+    private async Task PopulateCategoriesDropdown(int? selectedId = null)
+    {
+        var categories = await _courseService.GetAllCategoriesAsync();
+        ViewBag.CategoriesList = new SelectList(categories, "CategoryId", "Name", selectedId);
     }
 }
 

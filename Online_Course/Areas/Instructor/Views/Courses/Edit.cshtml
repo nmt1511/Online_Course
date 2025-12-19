@@ -8,14 +8,11 @@
 <div class="flex flex-col gap-6">
     <!-- Breadcrumbs -->
     <nav class="flex flex-wrap gap-2 items-center text-sm">
-        <a asp-area="Instructor" asp-controller="Dashboard" asp-action="Index" 
-           class="text-gray-500 dark:text-slate-400 hover:text-primary font-medium transition-colors flex items-center gap-1">
-            <span class="material-symbols-outlined text-[18px]">dashboard</span>
-            Dashboard
-        </a>
-        <span class="text-gray-400 dark:text-slate-500">/</span>
         <a asp-area="Instructor" asp-controller="Courses" asp-action="Index" 
-           class="text-gray-500 dark:text-slate-400 hover:text-primary font-medium transition-colors">Khóa học của tôi</a>
+           class="text-gray-500 dark:text-slate-400 hover:text-primary font-medium transition-colors flex items-center gap-1">
+            <span class="material-symbols-outlined text-[18px]">school</span>
+            Quản lý khóa học
+        </a>
         <span class="text-gray-400 dark:text-slate-500">/</span>
         <span class="text-slate-900 dark:text-white font-medium">Sửa khóa học #@Model.CourseId</span>
     </nav>
@@ -62,15 +59,15 @@
 
                 <!-- Category Select -->
                 <div class="flex flex-col gap-2">
-                    <label asp-for="Category" class="text-slate-900 dark:text-white text-base font-semibold"></label>
-                    <select asp-for="Category" class="w-full h-14 px-4 rounded-lg bg-gray-50 dark:bg-surface-dark border border-gray-200 dark:border-slate-700 text-slate-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none">
+                    <label asp-for="CategoryId" class="text-slate-900 dark:text-white text-base font-semibold">Danh mục</label>
+                    <select asp-for="CategoryId" class="w-full h-14 px-4 rounded-lg bg-gray-50 dark:bg-surface-dark border border-gray-200 dark:border-slate-700 text-slate-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none">
                         <option value="">-- Chọn danh mục --</option>
                         @foreach (var category in categories)
                         {
-                            <option value="@category.Name" selected="@(Model.Category == category.Name)">@category.Name</option>
+                            <option value="@category.CategoryId" selected="@(Model.CategoryId == category.CategoryId)">@category.Name</option>
                         }
                     </select>
-                    <span asp-validation-for="Category" class="text-red-500 text-sm"></span>
+                    <span asp-validation-for="CategoryId" class="text-red-500 text-sm"></span>
                 </div>
 
                 <!-- Thumbnail Image -->
@@ -244,7 +241,7 @@
                         <!-- Card Content Preview -->
                         <div class="p-4 flex flex-col gap-3">
                             <div class="flex items-center gap-2 text-xs font-semibold text-primary uppercase tracking-wider">
-                                <span id="preview-category" class="bg-primary/10 px-2 py-0.5 rounded">@(string.IsNullOrEmpty(Model.Category) ? "Category" : Model.Category)</span>
+                                <span id="preview-category" class="bg-primary/10 px-2 py-0.5 rounded">@(Model.CategoryId.HasValue ? categories.FirstOrDefault(c => c.CategoryId == Model.CategoryId)?.Name ?? "Category" : "Category")</span>
                             </div>
                             <h4 id="preview-title" class="text-slate-900 dark:text-white font-bold text-lg line-clamp-2 leading-tight">@(string.IsNullOrEmpty(Model.Title) ? "Tiêu đề khóa học" : Model.Title)</h4>
                             <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-slate-400">

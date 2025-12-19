@@ -24,9 +24,11 @@ public class CategoryListViewModel
 
 public class CreateCategoryViewModel
 {
-    [Required(ErrorMessage = "Category name is required")]
-    [StringLength(100, ErrorMessage = "Category name cannot exceed 100 characters")]
+    [Required(ErrorMessage = "Tên danh mục là bắt buộc")]
+    [StringLength(100, ErrorMessage = "Tên danh mục không được vượt quá 100 ký tự")]
     public string Name { get; set; } = string.Empty;
+    
+    public bool IsActive { get; set; } = true;
 }
 
 public class EditCategoryViewModel

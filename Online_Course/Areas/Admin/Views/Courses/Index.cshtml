@@ -73,12 +73,12 @@
                     <option value="">Tất cả danh mục</option>
                     @if (ViewBag.Categories != null)
                     {
-                        var categories = ViewBag.Categories as IEnumerable<string>;
+                        var categories = ViewBag.Categories as IEnumerable<Online_Course.Models.Category>;
                         if (categories != null)
                         {
                             @foreach (var cat in categories)
                             {
-                                <option value="@cat" selected="@(Model.CategoryFilter == cat)">@cat</option>
+                                <option value="@cat.CategoryId" selected="@(Model.CategoryFilter == cat.CategoryId)">@cat.Name</option>
                             }
                         }
                     }
@@ -143,10 +143,10 @@
                                 </div>
                             </td>
                             <td class="p-4 hidden md:table-cell">
-                                @if (!string.IsNullOrEmpty(course.Category))
+                                @if (!string.IsNullOrEmpty(course.CategoryName))
                                 {
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
-                                        @course.Category
+                                        @course.CategoryName
                                     </span>
                                 }
                                 else

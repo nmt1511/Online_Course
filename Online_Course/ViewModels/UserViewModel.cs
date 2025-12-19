@@ -85,7 +85,8 @@ public class UserCourseViewModel
 {
     public int CourseId { get; set; }
     public string Title { get; set; } = string.Empty;
-    public string Category { get; set; } = string.Empty;
+    public int? CategoryId { get; set; }
+    public string CategoryName { get; set; } = string.Empty;
     public Online_Course.Models.CourseStatus Status { get; set; } = Online_Course.Models.CourseStatus.Draft;
     public int EnrollmentCount { get; set; }
     public int LessonCount { get; set; }

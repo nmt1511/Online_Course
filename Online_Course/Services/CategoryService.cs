@@ -79,7 +79,7 @@ public class CategoryService : ICategoryService
         
         foreach (var category in categories)
         {
-            var courseCount = await GetCourseCountByCategoryAsync(category.Name);
+            var courseCount = await GetCourseCountByCategoryAsync(category.CategoryId);
             if (courseCount > 0)
                 activeCount++;
         }
@@ -94,7 +94,7 @@ public class CategoryService : ICategoryService
         
         foreach (var category in categories)
         {
-            var courseCount = await GetCourseCountByCategoryAsync(category.Name);
+            var courseCount = await GetCourseCountByCategoryAsync(category.CategoryId);
             if (courseCount == 0)
                 emptyCount++;
         }
@@ -102,10 +102,10 @@ public class CategoryService : ICategoryService
         return emptyCount;
     }
 
-    public async Task<int> GetCourseCountByCategoryAsync(string categoryName)
+    public async Task<int> GetCourseCountByCategoryAsync(int categoryId)
     {
         return await _context.Courses
-            .CountAsync(c => c.Category == categoryName);
+            .CountAsync(c => c.CategoryId == categoryId);
     }
 
     private static string GenerateSlug(string name)

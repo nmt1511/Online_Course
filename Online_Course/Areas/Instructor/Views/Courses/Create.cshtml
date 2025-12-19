@@ -45,22 +45,24 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <!-- Category -->
                         <div>
-                            <label asp-for="Category" class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Danh mục</label>
+                            <label asp-for="CategoryId" class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Danh mục</label>
                             @if (ViewBag.Categories != null && ((IEnumerable<Online_Course.Models.Category>)ViewBag.Categories).Any())
                             {
-                                <select asp-for="Category" class="w-full h-12 px-4 bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-colors cursor-pointer">
+                                <select asp-for="CategoryId" class="w-full h-12 px-4 bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-colors cursor-pointer">
                                     <option value="">Chọn danh mục</option>
                                     @foreach (var category in (IEnumerable<Online_Course.Models.Category>)ViewBag.Categories)
                                     {
-                                        <option value="@category.Name">@category.Name</option>
+                                        <option value="@category.CategoryId">@category.Name</option>
                                     }
                                 </select>
                             }
                             else
                             {
-                                <input asp-for="Category" class="w-full h-12 px-4 bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-primary focus:border-primary transition-colors" placeholder="VD: Development" />
+                                <select asp-for="CategoryId" class="w-full h-12 px-4 bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-colors cursor-pointer">
+                                    <option value="">Không có danh mục</option>
+                                </select>
                             }
-                            <span asp-validation-for="Category" class="text-red-500 dark:text-red-400 text-sm mt-1"></span>
+                            <span asp-validation-for="CategoryId" class="text-red-500 dark:text-red-400 text-sm mt-1"></span>
                         </div>
 
                         <!-- Status -->

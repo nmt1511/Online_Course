@@ -77,10 +77,17 @@
                 </label>
             </div>
             <div class="flex flex-1 justify-end gap-4 md:gap-8 items-center">
+                @{
+                    var currentArea = ViewContext.RouteData.Values["area"]?.ToString() ?? "";
+                    var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+                    var isHome = currentArea == "" && currentController == "Home";
+                    var isCourses = currentArea == "Student" && currentController == "Courses";
+                    var isMyProgress = currentArea == "Student" && (currentController == "Progress" || currentController == "Learning");
+                }
                 <div class="hidden lg:flex items-center gap-6">
-                    <a asp-area="" asp-controller="Home" asp-action="Index" class="text-slate-900 dark:text-white text-sm font-medium leading-normal hover:text-primary transition-colors">Trang chủ</a>
-                    <a asp-area="Student" asp-controller="Courses" asp-action="Index" class="text-primary text-sm font-bold leading-normal">Khóa học</a>
-                    <a asp-area="Student" asp-controller="Progress" asp-action="Index" class="text-slate-900 dark:text-white text-sm font-medium leading-normal hover:text-primary transition-colors">Của tôi</a>
+                    <a asp-area="" asp-controller="Home" asp-action="Index" class="@(isHome ? "text-primary font-bold" : "text-slate-900 dark:text-white font-medium hover:text-primary") text-sm leading-normal transition-colors">Trang chủ</a>
+                    <a asp-area="Student" asp-controller="Courses" asp-action="Index" class="@(isCourses ? "text-primary font-bold" : "text-slate-900 dark:text-white font-medium hover:text-primary") text-sm leading-normal transition-colors">Khóa học</a>
+                    <a asp-area="Student" asp-controller="Progress" asp-action="Index" class="@(isMyProgress ? "text-primary font-bold" : "text-slate-900 dark:text-white font-medium hover:text-primary") text-sm leading-normal transition-colors">Của tôi</a>
                 </div>
                 <div class="flex items-center gap-3">
                     <!-- Theme Toggle -->

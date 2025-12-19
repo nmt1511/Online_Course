@@ -8,7 +8,8 @@ public class InstructorCourseListViewModel
     public int CourseId { get; set; }
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public string Category { get; set; } = string.Empty;
+    public int? CategoryId { get; set; }
+    public string CategoryName { get; set; } = string.Empty;
     public string ThumbnailUrl { get; set; } = string.Empty;
     public CourseStatus Status { get; set; } = CourseStatus.Draft;
     public int EnrollmentCount { get; set; }
@@ -43,9 +44,8 @@ public class InstructorEditCourseViewModel
     [Display(Name = "Mô tả chi tiết")]
     public string Description { get; set; } = string.Empty;
 
-    [StringLength(100, ErrorMessage = "Danh mục không được vượt quá 100 ký tự")]
     [Display(Name = "Danh mục")]
-    public string Category { get; set; } = string.Empty;
+    public int? CategoryId { get; set; }
 
     [StringLength(500, ErrorMessage = "URL ảnh bìa không được vượt quá 500 ký tự")]
     [Display(Name = "URL Ảnh bìa")]
@@ -100,9 +100,8 @@ public class InstructorCreateCourseViewModel
     [Display(Name = "Mô tả chi tiết")]
     public string Description { get; set; } = string.Empty;
 
-    [StringLength(100, ErrorMessage = "Danh mục không được vượt quá 100 ký tự")]
     [Display(Name = "Danh mục")]
-    public string Category { get; set; } = string.Empty;
+    public int? CategoryId { get; set; }
 
     [StringLength(500, ErrorMessage = "URL ảnh bìa không được vượt quá 500 ký tự")]
     [Display(Name = "URL Ảnh bìa")]

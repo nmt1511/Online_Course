@@ -13,5 +13,5 @@ public interface ICategoryService
     Task<int> GetTotalCategoriesCountAsync();
     Task<int> GetActiveCategoriesCountAsync();
     Task<int> GetEmptyCategoriesCountAsync();
-    Task<int> GetCourseCountByCategoryAsync(string categoryName);
+    Task<int> GetCourseCountByCategoryAsync(int categoryId);
 }

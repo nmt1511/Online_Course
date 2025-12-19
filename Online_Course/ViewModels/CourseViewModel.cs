@@ -8,7 +8,8 @@ public class CourseListViewModel
     public int CourseId { get; set; }
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public string Category { get; set; } = string.Empty;
+    public int? CategoryId { get; set; }
+    public string CategoryName { get; set; } = string.Empty;
     public string ThumbnailUrl { get; set; } = string.Empty;
     public string InstructorName { get; set; } = string.Empty;
     public int InstructorId { get; set; }
@@ -39,8 +40,8 @@ public class CreateCourseViewModel
     [StringLength(2000, ErrorMessage = "Description cannot exceed 2000 characters")]
     public string Description { get; set; } = string.Empty;
 
-    [StringLength(100, ErrorMessage = "Category cannot exceed 100 characters")]
-    public string Category { get; set; } = string.Empty;
+    [Display(Name = "Danh mục")]
+    public int? CategoryId { get; set; }
 
     [StringLength(500, ErrorMessage = "Thumbnail URL cannot exceed 500 characters")]
     [Display(Name = "Thumbnail URL")]
@@ -65,9 +66,8 @@ public class EditCourseViewModel
     [StringLength(2000, ErrorMessage = "Description cannot exceed 2000 characters")]
     public string Description { get; set; } = string.Empty;
 
-
-    [StringLength(100, ErrorMessage = "Category cannot exceed 100 characters")]
-    public string Category { get; set; } = string.Empty;
+    [Display(Name = "Danh mục")]
+    public int? CategoryId { get; set; }
 
     [StringLength(500, ErrorMessage = "Thumbnail URL cannot exceed 500 characters")]
     [Display(Name = "Thumbnail URL")]
@@ -87,7 +87,7 @@ public class CourseIndexViewModel
     public int TotalCourses { get; set; }
     public int PublishedCourses { get; set; }
     public int DraftCourses { get; set; }
-    public string? CategoryFilter { get; set; }
+    public int? CategoryFilter { get; set; }
     public string? StatusFilter { get; set; }
     public string? SearchQuery { get; set; }
 }

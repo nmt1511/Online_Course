@@ -1,3 +1,5 @@
+using Online_Course.Models;
+
 namespace Online_Course.ViewModels;
 
 public class StudentCourseListViewModel
@@ -5,7 +7,8 @@ public class StudentCourseListViewModel
     public int CourseId { get; set; }
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public string Category { get; set; } = string.Empty;
+    public int? CategoryId { get; set; }
+    public string CategoryName { get; set; } = string.Empty;
     public string ThumbnailUrl { get; set; } = string.Empty;
     public string InstructorName { get; set; } = string.Empty;
     public int EnrollmentCount { get; set; }
@@ -15,8 +18,8 @@ public class StudentCourseListViewModel
 public class StudentCourseIndexViewModel
 {
     public IList<StudentCourseListViewModel> Courses { get; set; } = new List<StudentCourseListViewModel>();
-    public IList<string> Categories { get; set; } = new List<string>();
-    public string? SelectedCategory { get; set; }
+    public IList<Category> Categories { get; set; } = new List<Category>();
+    public int? SelectedCategoryId { get; set; }
 }
 
 public class StudentCourseDetailsViewModel
@@ -24,7 +27,8 @@ public class StudentCourseDetailsViewModel
     public int CourseId { get; set; }
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public string Category { get; set; } = string.Empty;
+    public int? CategoryId { get; set; }
+    public string CategoryName { get; set; } = string.Empty;
     public string ThumbnailUrl { get; set; } = string.Empty;
     public string InstructorName { get; set; } = string.Empty;
     public int EnrollmentCount { get; set; }

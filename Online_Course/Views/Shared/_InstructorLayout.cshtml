@@ -39,62 +39,91 @@
     
     <style>
         body { font-family: 'Lexend', sans-serif; }
+        
+        /* Sidebar collapse styles */
+        .sidebar-expanded { width: 18rem; }
+        .sidebar-collapsed { width: 4.5rem; }
+        .sidebar-collapsed .sidebar-text { display: none; }
     </style>
+    
+    <script>
+        // Apply theme immediately to prevent flash (default: dark)
+        (function() {
+            var theme = localStorage.getItem('theme');
+            if (theme === null) {
+                theme = 'dark';
+                localStorage.setItem('theme', 'dark');
+            }
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            }
+        })();
+        // Apply sidebar state immediately to prevent flash
+        (function() {
+            var isCollapsed = localStorage.getItem('instructorSidebarCollapsed') === 'true';
+            document.write('<style>#sidebar{width:' + (isCollapsed ? '4.5rem' : '18rem') + ';}#sidebar .sidebar-text{display:' + (isCollapsed ? 'none' : 'block') + ';}</style>');
+        })();
+    </script>
     
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white antialiased overflow-hidden">
     <div class="flex h-screen w-full overflow-hidden">
         <!-- Sidebar Navigation -->
-        <aside class="w-72 flex-shrink-0 bg-white dark:bg-surface-dark border-r border-gray-200 dark:border-slate-800 flex flex-col hidden md:flex">
-            <div class="p-6 pb-2">
-                <div class="flex items-center gap-3 mb-8">
-                    <div class="size-10 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white font-bold text-xl">E</div>
-                    <div>
-                        <h1 class="text-slate-900 dark:text-white text-lg font-bold leading-tight">EduDash</h1>
-                        <p class="text-gray-500 dark:text-slate-400 text-xs">Giảng viên</p>
+        <aside id="sidebar" class="flex-shrink-0 bg-white dark:bg-surface-dark border-r border-gray-200 dark:border-slate-800 flex flex-col hidden md:flex transition-all duration-300">
+            <div class="p-4 pb-2">
+                <div class="flex items-center gap-3 mb-6">
+                    <button id="sidebarToggle" class="size-10 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white font-bold text-xl flex-shrink-0 hover:opacity-90 transition-opacity cursor-pointer" title="Thu gọn/Mở rộng menu">
+                        <span class="material-symbols-outlined text-[20px]">menu</span>
+                    </button>
+                    <div class="sidebar-text overflow-hidden">
+                        <h1 class="text-slate-900 dark:text-white text-lg font-bold leading-tight whitespace-nowrap">EduDash</h1>
+                        <p class="text-gray-500 dark:text-slate-400 text-xs whitespace-nowrap">Giảng viên</p>
                     </div>
                 </div>
 
                 <!-- User Profile -->
                 <div class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700/50 mb-6">
-                    <div class="size-10 rounded-full bg-primary/20 flex items-center justify-center">
+                    <div class="size-10 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
                         <span class="material-symbols-outlined text-primary">person</span>
                     </div>
-                    <div class="flex flex-col overflow-hidden">
+                    <div class="flex flex-col overflow-hidden sidebar-text">
                         <h2 class="text-slate-900 dark:text-white text-sm font-medium leading-normal truncate">@User.Identity?.Name</h2>
                         <p class="text-gray-500 dark:text-slate-400 text-xs font-normal leading-normal truncate">Giảng viên</p>
                     </div>
                 </div>
                 
+                @{
+                    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+                }
                 <!-- Navigation -->
                 <nav class="flex flex-col gap-2">
-                    <a asp-area="Instructor" asp-controller="Dashboard" asp-action="Index" class="flex items-center gap-3 px-3 py-2.5 rounded-lg @(ViewContext.RouteData.Values["controller"]?.ToString() == "Dashboard" ? "bg-primary/10 text-primary border border-primary/20" : "text-gray-600 dark:text-slate-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-slate-800") transition-colors">
-                        <span class="material-symbols-outlined text-[20px]">dashboard</span>
-                        <p class="text-sm font-medium leading-normal">Tổng quan</p>
+                    <a asp-area="Instructor" asp-controller="Dashboard" asp-action="Index" class="flex items-center gap-3 px-3 py-2.5 rounded-lg @(controller == "Dashboard" ? "bg-primary/10 text-primary border border-primary/20" : "text-gray-600 dark:text-slate-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-slate-800") transition-colors" title="Tổng quan">
+                        <span class="material-symbols-outlined text-[20px] flex-shrink-0">dashboard</span>
+                        <p class="text-sm font-medium leading-normal sidebar-text whitespace-nowrap">Tổng quan</p>
                     </a>
-                    <a asp-area="Instructor" asp-controller="Courses" asp-action="Index" class="flex items-center gap-3 px-3 py-2.5 rounded-lg @(ViewContext.RouteData.Values["controller"]?.ToString() == "Courses" || ViewContext.RouteData.Values["controller"]?.ToString() == "Lessons" ? "bg-primary/10 text-primary border border-primary/20" : "text-gray-600 dark:text-slate-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-slate-800") transition-colors">
-                        <span class="material-symbols-outlined text-[20px]">school</span>
-                        <p class="text-sm font-medium leading-normal">Quản lý khóa học</p>
+                    <a asp-area="Instructor" asp-controller="Courses" asp-action="Index" class="flex items-center gap-3 px-3 py-2.5 rounded-lg @(controller == "Courses" || controller == "Lessons" ? "bg-primary/10 text-primary border border-primary/20" : "text-gray-600 dark:text-slate-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-slate-800") transition-colors" title="Quản lý khóa học">
+                        <span class="material-symbols-outlined text-[20px] flex-shrink-0">school</span>
+                        <p class="text-sm font-medium leading-normal sidebar-text whitespace-nowrap">Quản lý khóa học</p>
                     </a>
-                    <a asp-area="Instructor" asp-controller="Students" asp-action="Index" class="flex items-center gap-3 px-3 py-2.5 rounded-lg @(ViewContext.RouteData.Values["controller"]?.ToString() == "Students" ? "bg-primary/10 text-primary border border-primary/20" : "text-gray-600 dark:text-slate-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-slate-800") transition-colors">
-                        <span class="material-symbols-outlined text-[20px]">group</span>
-                        <p class="text-sm font-medium leading-normal">Học viên & Tiến độ</p>
+                    <a asp-area="Instructor" asp-controller="Students" asp-action="Index" class="flex items-center gap-3 px-3 py-2.5 rounded-lg @(controller == "Students" ? "bg-primary/10 text-primary border border-primary/20" : "text-gray-600 dark:text-slate-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-slate-800") transition-colors" title="Học viên & Tiến độ">
+                        <span class="material-symbols-outlined text-[20px] flex-shrink-0">group</span>
+                        <p class="text-sm font-medium leading-normal sidebar-text whitespace-nowrap">Học viên & Tiến độ</p>
                     </a>
-                    <a asp-area="Instructor" asp-controller="Analytics" asp-action="Index" class="flex items-center gap-3 px-3 py-2.5 rounded-lg @(ViewContext.RouteData.Values["controller"]?.ToString() == "Analytics" ? "bg-primary/10 text-primary border border-primary/20" : "text-gray-600 dark:text-slate-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-slate-800") transition-colors">
-                        <span class="material-symbols-outlined text-[20px]">bar_chart</span>
-                        <p class="text-sm font-medium leading-normal">Thống kê</p>
+                    <a asp-area="Instructor" asp-controller="Analytics" asp-action="Index" class="flex items-center gap-3 px-3 py-2.5 rounded-lg @(controller == "Analytics" ? "bg-primary/10 text-primary border border-primary/20" : "text-gray-600 dark:text-slate-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-slate-800") transition-colors" title="Thống kê">
+                        <span class="material-symbols-outlined text-[20px] flex-shrink-0">bar_chart</span>
+                        <p class="text-sm font-medium leading-normal sidebar-text whitespace-nowrap">Thống kê</p>
                     </a>
                 </nav>
             </div>
-            <div class="mt-auto p-6 pt-2 space-y-1">
-                <a asp-area="Instructor" asp-controller="Profile" asp-action="Index" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 dark:text-slate-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
-                    <span class="material-symbols-outlined text-[20px]">account_circle</span>
-                    <p class="text-sm font-medium leading-normal">Hồ sơ cá nhân</p>
+            <div class="mt-auto p-4 pt-2 space-y-1">
+                <a asp-area="Instructor" asp-controller="Profile" asp-action="Index" class="flex items-center gap-3 px-3 py-2.5 rounded-lg @(controller == "Profile" ? "bg-primary/10 text-primary border border-primary/20" : "text-gray-600 dark:text-slate-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-slate-800") transition-colors" title="Hồ sơ cá nhân">
+                    <span class="material-symbols-outlined text-[20px] flex-shrink-0">account_circle</span>
+                    <p class="text-sm font-medium leading-normal sidebar-text whitespace-nowrap">Hồ sơ cá nhân</p>
                 </a>
-                <a asp-area="" asp-controller="Account" asp-action="Logout" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
-                    <span class="material-symbols-outlined text-[20px]">logout</span>
-                    <p class="text-sm font-medium leading-normal">Đăng xuất</p>
+                <a asp-area="" asp-controller="Account" asp-action="Logout" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" title="Đăng xuất">
+                    <span class="material-symbols-outlined text-[20px] flex-shrink-0">logout</span>
+                    <p class="text-sm font-medium leading-normal sidebar-text whitespace-nowrap">Đăng xuất</p>
                 </a>
             </div>
         </aside>
@@ -141,12 +170,26 @@
             localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
         });
         
-        // Apply saved theme on page load (default: light)
-        if (localStorage.getItem('theme') === 'dark') {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
+        // Sidebar Toggle
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        
+        function updateSidebar(collapsed) {
+            if (collapsed) {
+                sidebar.style.width = '4.5rem';
+                sidebar.querySelectorAll('.sidebar-text').forEach(el => el.style.display = 'none');
+            } else {
+                sidebar.style.width = '18rem';
+                sidebar.querySelectorAll('.sidebar-text').forEach(el => el.style.display = 'block');
+            }
         }
+        
+        sidebarToggle?.addEventListener('click', function() {
+            const isCurrentlyCollapsed = localStorage.getItem('instructorSidebarCollapsed') === 'true';
+            const willCollapse = !isCurrentlyCollapsed;
+            localStorage.setItem('instructorSidebarCollapsed', willCollapse);
+            updateSidebar(willCollapse);
+        });
     </script>
     
     @await RenderSectionAsync("Scripts", required: false)

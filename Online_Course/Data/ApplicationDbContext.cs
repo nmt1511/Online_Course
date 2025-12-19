@@ -78,7 +78,6 @@ public class ApplicationDbContext : DbContext
             entity.Property(c => c.CourseId).HasColumnName("course_id");
             entity.Property(c => c.Title).HasColumnName("title").IsRequired().HasMaxLength(200);
             entity.Property(c => c.Description).HasColumnName("description").HasMaxLength(2000);
-            entity.Property(c => c.Category).HasColumnName("category").HasMaxLength(100);
             entity.Property(c => c.ThumbnailUrl).HasColumnName("thumbnail_url").HasMaxLength(500);
             entity.Property(c => c.CreatedBy).HasColumnName("created_by");
             entity.Property(c => c.CourseStatus).HasColumnName("course_status");
@@ -89,7 +88,7 @@ public class ApplicationDbContext : DbContext
             entity.Property(c => c.RegistrationEndDate).HasColumnName("registration_end_date");
             entity.Property(c => c.CategoryId).HasColumnName("category_id");
 
-            entity.HasIndex(c => c.Category);
+            entity.HasIndex(c => c.CategoryId);
             entity.HasIndex(c => c.CourseStatus);
             entity.HasIndex(c => c.CourseType);
 

@@ -7,9 +7,9 @@
 
 <!-- Breadcrumbs -->
 <div class="flex items-center gap-2 text-sm mb-6">
-    <a asp-area="Instructor" asp-controller="Dashboard" asp-action="Index" class="text-gray-500 dark:text-slate-400 hover:text-primary transition-colors">Dashboard</a>
+    <a asp-area="Instructor" asp-controller="Courses" asp-action="Index" class="text-gray-500 dark:text-slate-400 hover:text-primary transition-colors">Quản lý khóa học</a>
     <span class="material-symbols-outlined text-gray-400 dark:text-slate-500 text-[16px]">chevron_right</span>
-    <span class="text-slate-900 dark:text-white font-medium">@Model.CourseTitle</span>
+    <a asp-area="Instructor" asp-controller="Courses" asp-action="Edit" asp-route-id="@Model.CourseId" class="text-gray-500 dark:text-slate-400 hover:text-primary transition-colors">@Model.CourseTitle</a>
     <span class="material-symbols-outlined text-gray-400 dark:text-slate-500 text-[16px]">chevron_right</span>
     <span class="text-primary font-medium">Quản lý bài học</span>
 </div>
@@ -144,9 +144,9 @@
 
 <!-- Back Button -->
 <div class="mt-6">
-    <a asp-area="Instructor" asp-controller="Dashboard" asp-action="Index" 
+    <a asp-area="Instructor" asp-controller="Courses" asp-action="Index" 
        class="inline-flex items-center gap-2 text-gray-500 dark:text-slate-400 hover:text-primary transition-colors">
         <span class="material-symbols-outlined text-[18px]">arrow_back</span>
-        <span>Quay lại Dashboard</span>
+        <span>Quay lại Quản lý khóa học</span>
     </a>
 </div>

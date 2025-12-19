@@ -60,7 +60,8 @@ public class AnalyticsController : Controller
             {
                 CourseId = course.CourseId,
                 Title = course.Title,
-                Category = course.Category,
+                CategoryId = course.CategoryId,
+                CategoryName = course.CategoryEntity?.Name ?? "Chưa phân loại",
                 TotalStudents = enrollments.Count,
                 TotalLessons = lessonCount,
                 AverageProgress = Math.Round(avgProgress, 1),
@@ -87,7 +88,8 @@ public class CourseAnalyticsViewModel
 {
     public int CourseId { get; set; }
     public string Title { get; set; } = string.Empty;
-    public string Category { get; set; } = string.Empty;
+    public int? CategoryId { get; set; }
+    public string CategoryName { get; set; } = string.Empty;
     public int TotalStudents { get; set; }
     public int TotalLessons { get; set; }
     public double AverageProgress { get; set; }

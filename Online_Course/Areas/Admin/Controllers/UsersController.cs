@@ -143,7 +143,8 @@ public class UsersController : Controller
             {
                 CourseId = c.CourseId,
                 Title = c.Title,
-                Category = c.Category,
+                CategoryId = c.CategoryId,
+                CategoryName = c.CategoryEntity?.Name ?? "Chưa phân loại",
                 Status = c.CourseStatus,
                 EnrollmentCount = c.Enrollments?.Count ?? 0,
                 LessonCount = c.Lessons?.Count ?? 0
