@@ -71,7 +71,7 @@ public class CourseService : ICourseService
         existingCourse.Category = course.Category;
         existingCourse.ThumbnailUrl = course.ThumbnailUrl;
         existingCourse.CreatedBy = course.CreatedBy;
-        existingCourse.Status = course.Status;
+        existingCourse.CourseStatus = course.CourseStatus;
         existingCourse.CategoryId = course.CategoryId;
 
         await _context.SaveChangesAsync();
@@ -113,7 +113,7 @@ public class CourseService : ICourseService
 
     public async Task<int> GetPublishedCoursesCountAsync()
     {
-        return await _context.Courses.CountAsync(c => c.Status == CourseStatus.Public);
+        return await _context.Courses.CountAsync(c => c.CourseStatus == CourseStatus.Public);
     }
 
     public async Task<IEnumerable<string>> GetAllCategoriesAsync()

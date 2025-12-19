@@ -144,7 +144,7 @@ public class UsersController : Controller
                 CourseId = c.CourseId,
                 Title = c.Title,
                 Category = c.Category,
-                Status = c.Status,
+                Status = c.CourseStatus,
                 EnrollmentCount = c.Enrollments?.Count ?? 0,
                 LessonCount = c.Lessons?.Count ?? 0
             }).ToList(),

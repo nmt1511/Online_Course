@@ -37,8 +37,8 @@ public class DashboardController : Controller
         var courses = await _courseService.GetCoursesByInstructorAsync(instructorId);
 
         var totalStudents = courses.Sum(c => c.Enrollments?.Count ?? 0);
-        var activeCourses = courses.Count(c => c.Status == Models.CourseStatus.Public);
-        var draftCourses = courses.Count(c => c.Status == Models.CourseStatus.Draft);
+        var activeCourses = courses.Count(c => c.CourseStatus == Models.CourseStatus.Public);
+        var draftCourses = courses.Count(c => c.CourseStatus == Models.CourseStatus.Draft);
 
         var viewModel = new InstructorDashboardViewModel
         {
@@ -54,7 +54,7 @@ public class DashboardController : Controller
                 Description = c.Description,
                 Category = c.Category,
                 ThumbnailUrl = c.ThumbnailUrl,
-                Status = c.Status,
+                Status = c.CourseStatus,
                 EnrollmentCount = c.Enrollments?.Count ?? 0,
                 LessonCount = c.Lessons?.Count ?? 0,
                 AverageRating = 4.5

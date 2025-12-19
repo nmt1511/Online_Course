@@ -49,7 +49,7 @@ public class CoursesController : Controller
             Description = c.Description,
             Category = c.Category,
             ThumbnailUrl = c.ThumbnailUrl,
-            Status = c.Status,
+            Status = c.CourseStatus,
             EnrollmentCount = c.Enrollments?.Count ?? 0,
             LessonCount = c.Lessons?.Count ?? 0,
             AverageRating = 4.5 // Placeholder - would come from ratings system
@@ -115,7 +115,7 @@ public class CoursesController : Controller
             Category = model.Category,
             CategoryId = category?.CategoryId,
             ThumbnailUrl = thumbnailUrl,
-            Status = model.Status,
+            CourseStatus = model.Status,
             CreatedBy = instructorId
         };
 
@@ -190,7 +190,7 @@ public class CoursesController : Controller
             Description = course.Description,
             Category = course.Category,
             ThumbnailUrl = course.ThumbnailUrl,
-            Status = course.Status,
+            Status = course.CourseStatus,
             ShowInstructor = false, // Instructor doesn't need to see their own name
             TotalLessons = course.Lessons?.Count ?? 0,
             TotalStudents = enrollments.Count(),
@@ -245,7 +245,7 @@ public class CoursesController : Controller
             Description = course.Description,
             Category = course.Category,
             ThumbnailUrl = course.ThumbnailUrl,
-            Status = course.Status,
+            Status = course.CourseStatus,
             InstructorName = course.Instructor?.FullName ?? "",
             EnrollmentCount = course.Enrollments?.Count ?? 0,
             LessonCount = course.Lessons?.Count ?? 0
@@ -292,7 +292,7 @@ public class CoursesController : Controller
         existingCourse.Description = model.Description;
         existingCourse.Category = model.Category;
         existingCourse.CategoryId = category?.CategoryId;
-        existingCourse.Status = model.Status;
+        existingCourse.CourseStatus = model.Status;
 
         // Handle file upload
         if (thumbnailFile != null && thumbnailFile.Length > 0)

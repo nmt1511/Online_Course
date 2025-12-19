@@ -44,11 +44,11 @@ public class CoursesController : Controller
         if (!string.IsNullOrEmpty(status))
         {
             if (status == "published")
-                courses = courses.Where(c => c.Status == CourseStatus.Public);
+                courses = courses.Where(c => c.CourseStatus == CourseStatus.Public);
             else if (status == "draft")
-                courses = courses.Where(c => c.Status == CourseStatus.Draft);
+                courses = courses.Where(c => c.CourseStatus == CourseStatus.Draft);
             else if (status == "private")
-                courses = courses.Where(c => c.Status == CourseStatus.Private);
+                courses = courses.Where(c => c.CourseStatus == CourseStatus.Private);
         }
 
         if (!string.IsNullOrEmpty(search))
@@ -70,7 +70,7 @@ public class CoursesController : Controller
                 ThumbnailUrl = c.ThumbnailUrl,
                 InstructorName = c.Instructor?.FullName ?? "Not Assigned",
                 InstructorId = c.CreatedBy,
-                Status = c.Status,
+                Status = c.CourseStatus,
                 EnrollmentCount = c.Enrollments?.Count ?? 0
             }),
             TotalCourses = totalCourses,
@@ -124,7 +124,7 @@ public class CoursesController : Controller
             Description = course.Description,
             Category = course.Category,
             ThumbnailUrl = course.ThumbnailUrl,
-            Status = course.Status,
+            Status = course.CourseStatus,
             InstructorName = course.Instructor?.FullName ?? "Chưa phân công",
             ShowInstructor = true, // Admin can see instructor name
             TotalLessons = course.Lessons?.Count ?? 0,
@@ -176,7 +176,7 @@ public class CoursesController : Controller
                 Category = model.Category,
                 ThumbnailUrl = model.ThumbnailUrl,
                 CreatedBy = model.InstructorId,
-                Status = model.Status
+                CourseStatus = model.Status
             };
 
             await _courseService.CreateCourseAsync(course);
@@ -206,7 +206,7 @@ public class CoursesController : Controller
             Category = course.Category,
             ThumbnailUrl = course.ThumbnailUrl,
             InstructorId = course.CreatedBy,
-            Status = course.Status
+            Status = course.CourseStatus
         };
 
         await PopulateInstructorsDropdown(course.CreatedBy);
@@ -236,7 +236,7 @@ public class CoursesController : Controller
             course.Category = model.Category;
             course.ThumbnailUrl = model.ThumbnailUrl;
             course.CreatedBy = model.InstructorId;
-            course.Status = model.Status;
+            course.CourseStatus = model.Status;
 
             await _courseService.UpdateCourseAsync(course);
             TempData["SuccessMessage"] = "Course updated successfully!";

@@ -36,7 +36,7 @@ public class CoursesController : Controller
 
         // Check if course exists and is published
         var course = await _courseService.GetCourseByIdAsync(courseId);
-        if (course == null || course.Status != CourseStatus.Public)
+        if (course == null || course.CourseStatus != CourseStatus.Public)
         {
             TempData["Error"] = "Khóa học không tồn tại hoặc chưa được xuất bản.";
             return RedirectToAction(nameof(Index));
@@ -66,7 +66,7 @@ public class CoursesController : Controller
             : await _courseService.GetCoursesByCategoryAsync(category);
 
         // Only show published courses to students
-        var publishedCourses = courses.Where(c => c.Status == CourseStatus.Public).ToList();
+        var publishedCourses = courses.Where(c => c.CourseStatus == CourseStatus.Public).ToList();
 
         var categories = await _categoryService.GetAllCategoriesAsync();
 
@@ -95,7 +95,7 @@ public class CoursesController : Controller
     {
         var course = await _courseService.GetCourseByIdAsync(id);
         
-        if (course == null || course.Status != CourseStatus.Public)
+        if (course == null || course.CourseStatus != CourseStatus.Public)
         {
             return NotFound();
         }

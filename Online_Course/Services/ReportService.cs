@@ -18,14 +18,14 @@ public class ReportService : IReportService
         // Since Course doesn't have CreatedAt, we count all published courses
         // In a real scenario, you'd add a CreatedAt field to Course
         return await _context.Courses
-            .Where(c => c.Status == CourseStatus.Public)
+            .Where(c => c.CourseStatus == CourseStatus.Public)
             .CountAsync();
     }
 
     public async Task<IEnumerable<CoursePopularityReport>> GetPopularCoursesAsync(int topCount = 10)
     {
         return await _context.Courses
-            .Where(c => c.Status == CourseStatus.Public)
+            .Where(c => c.CourseStatus == CourseStatus.Public)
             .Select(c => new CoursePopularityReport
             {
                 CourseId = c.CourseId,
@@ -54,7 +54,7 @@ public class ReportService : IReportService
     {
         // Active instructors are those who have at least one published course
         return await _context.Courses
-            .Where(c => c.Status == CourseStatus.Public)
+            .Where(c => c.CourseStatus == CourseStatus.Public)
             .Select(c => c.CreatedBy)
             .Distinct()
             .CountAsync();
@@ -66,7 +66,7 @@ public class ReportService : IReportService
         var endDate = startDate.AddMonths(1);
 
         var publishedCourses = await _context.Courses
-            .Where(c => c.Status == CourseStatus.Public)
+            .Where(c => c.CourseStatus == CourseStatus.Public)
             .CountAsync();
 
         var totalEnrollments = await _context.Enrollments
@@ -74,7 +74,7 @@ public class ReportService : IReportService
             .CountAsync();
 
         var activeInstructors = await _context.Courses
-            .Where(c => c.Status == CourseStatus.Public)
+            .Where(c => c.CourseStatus == CourseStatus.Public)
             .Select(c => c.CreatedBy)
             .Distinct()
             .CountAsync();
@@ -132,7 +132,7 @@ public class ReportService : IReportService
 
         // Since Course doesn't have CreatedAt, we'll return the total published courses
         // divided evenly for demonstration purposes
-        var totalPublished = await _context.Courses.Where(c => c.Status == CourseStatus.Public).CountAsync();
+        var totalPublished = await _context.Courses.Where(c => c.CourseStatus == CourseStatus.Public).CountAsync();
 
         for (int i = months - 1; i >= 0; i--)
         {

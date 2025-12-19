@@ -289,7 +289,7 @@ public static class DbInitializer
                 CategoryId = category?.CategoryId,
                 ThumbnailUrl = courseData.Thumbnail,
                 CreatedBy = instructor.UserId,
-                Status = CourseStatus.Public
+                CourseStatus = CourseStatus.Public
             };
             coursesToAdd.Add(course);
         }
@@ -304,6 +304,9 @@ public static class DbInitializer
 
     private static async Task SeedLessonsAsync(ApplicationDbContext context)
     {
+        //Nếu đã có bất kỳ bài học nào trong DB thì dừng lại
+        if (await context.Lessons.AnyAsync()) return;
+
         // Get courses that don't have lessons yet
         var coursesWithLessons = await context.Lessons.Select(l => l.CourseId).Distinct().ToListAsync();
         var courses = await context.Courses.Where(c => !coursesWithLessons.Contains(c.CourseId)).ToListAsync();
@@ -469,6 +472,10 @@ public static class DbInitializer
 
     private static async Task SeedEnrollmentsAndProgressAsync(ApplicationDbContext context)
     {
+        //Nếu đã có dữ liệu đăng ký hoặc tiến trình thì dừng
+        if (await context.Enrollments.AnyAsync() || await context.Progresses.AnyAsync())
+            return;
+
         var students = await context.Users
             .Where(u => u.UserRoles.Any(ur => ur.Role.Name == "Student"))
             .ToListAsync();
@@ -482,7 +489,7 @@ public static class DbInitializer
 
         var courses = await context.Courses
             .Include(c => c.Lessons)
-            .Where(c => c.Status == CourseStatus.Public)
+            .Where(c => c.CourseStatus == CourseStatus.Public)
             .ToListAsync();
 
         if (!courses.Any()) return;

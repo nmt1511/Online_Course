@@ -65,7 +65,7 @@ public class AnalyticsController : Controller
                 TotalLessons = lessonCount,
                 AverageProgress = Math.Round(avgProgress, 1),
                 CompletedStudents = completedStudents,
-                Status = course.Status
+                Status = course.CourseStatus
             });
         }
 
