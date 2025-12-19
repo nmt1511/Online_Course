@@ -72,6 +72,31 @@ public class CoursesController : Controller
         // Remove ThumbnailUrl from validation - it's optional
         ModelState.Remove("ThumbnailUrl");
         
+        // Validate dates if CourseType is Fixed_Time
+        if (model.CourseType == CourseType.Fixed_Time)
+        {
+            if (!model.RegistrationStartDate.HasValue || !model.RegistrationEndDate.HasValue ||
+                !model.StartDate.HasValue || !model.EndDate.HasValue)
+            {
+                ModelState.AddModelError("", "Vui lòng nhập đầy đủ các ngày khi chọn loại khóa học thời gian cố định.");
+            }
+            else
+            {
+                if (model.RegistrationStartDate >= model.RegistrationEndDate)
+                {
+                    ModelState.AddModelError("RegistrationEndDate", "Ngày kết thúc đăng ký phải sau ngày bắt đầu đăng ký.");
+                }
+                if (model.RegistrationEndDate >= model.StartDate)
+                {
+                    ModelState.AddModelError("StartDate", "Ngày bắt đầu học phải sau ngày kết thúc đăng ký.");
+                }
+                if (model.StartDate >= model.EndDate)
+                {
+                    ModelState.AddModelError("EndDate", "Ngày kết thúc học phải sau ngày bắt đầu học.");
+                }
+            }
+        }
+        
         if (!ModelState.IsValid)
         {
             ViewBag.Categories = await _categoryService.GetAllCategoriesAsync();
@@ -116,6 +141,11 @@ public class CoursesController : Controller
             CategoryId = category?.CategoryId,
             ThumbnailUrl = thumbnailUrl,
             CourseStatus = model.Status,
+            CourseType = model.CourseType,
+            RegistrationStartDate = model.CourseType == CourseType.Fixed_Time ? model.RegistrationStartDate : null,
+            RegistrationEndDate = model.CourseType == CourseType.Fixed_Time ? model.RegistrationEndDate : null,
+            StartDate = model.CourseType == CourseType.Fixed_Time ? model.StartDate : null,
+            EndDate = model.CourseType == CourseType.Fixed_Time ? model.EndDate : null,
             CreatedBy = instructorId
         };
 
@@ -124,6 +154,7 @@ public class CoursesController : Controller
         TempData["SuccessMessage"] = "Tạo khóa học mới thành công!";
         return RedirectToAction(nameof(Index));
     }
+
 
     private async Task<string> SaveImageAsync(IFormFile file)
     {
@@ -191,6 +222,11 @@ public class CoursesController : Controller
             Category = course.Category,
             ThumbnailUrl = course.ThumbnailUrl,
             Status = course.CourseStatus,
+            CourseType = course.CourseType,
+            RegistrationStartDate = course.RegistrationStartDate,
+            RegistrationEndDate = course.RegistrationEndDate,
+            StartDate = course.StartDate,
+            EndDate = course.EndDate,
             ShowInstructor = false, // Instructor doesn't need to see their own name
             TotalLessons = course.Lessons?.Count ?? 0,
             TotalStudents = enrollments.Count(),
@@ -205,6 +241,7 @@ public class CoursesController : Controller
             }) ?? Enumerable.Empty<LessonSummaryViewModel>(),
             Students = students
         };
+
 
         return View(viewModel);
     }
@@ -246,6 +283,11 @@ public class CoursesController : Controller
             Category = course.Category,
             ThumbnailUrl = course.ThumbnailUrl,
             Status = course.CourseStatus,
+            CourseType = course.CourseType,
+            RegistrationStartDate = course.RegistrationStartDate,
+            RegistrationEndDate = course.RegistrationEndDate,
+            StartDate = course.StartDate,
+            EndDate = course.EndDate,
             InstructorName = course.Instructor?.FullName ?? "",
             EnrollmentCount = course.Enrollments?.Count ?? 0,
             LessonCount = course.Lessons?.Count ?? 0
@@ -278,6 +320,31 @@ public class CoursesController : Controller
             return Forbid();
         }
 
+        // Validate dates if CourseType is Fixed_Time
+        if (model.CourseType == CourseType.Fixed_Time)
+        {
+            if (!model.RegistrationStartDate.HasValue || !model.RegistrationEndDate.HasValue ||
+                !model.StartDate.HasValue || !model.EndDate.HasValue)
+            {
+                ModelState.AddModelError("", "Vui lòng nhập đầy đủ các ngày khi chọn loại khóa học thời gian cố định.");
+            }
+            else
+            {
+                if (model.RegistrationStartDate >= model.RegistrationEndDate)
+                {
+                    ModelState.AddModelError("RegistrationEndDate", "Ngày kết thúc đăng ký phải sau ngày bắt đầu đăng ký.");
+                }
+                if (model.RegistrationEndDate >= model.StartDate)
+                {
+                    ModelState.AddModelError("StartDate", "Ngày bắt đầu học phải sau ngày kết thúc đăng ký.");
+                }
+                if (model.StartDate >= model.EndDate)
+                {
+                    ModelState.AddModelError("EndDate", "Ngày kết thúc học phải sau ngày bắt đầu học.");
+                }
+            }
+        }
+
         if (!ModelState.IsValid)
         {
             ViewBag.Categories = await _categoryService.GetAllCategoriesAsync();
@@ -293,6 +360,11 @@ public class CoursesController : Controller
         existingCourse.Category = model.Category;
         existingCourse.CategoryId = category?.CategoryId;
         existingCourse.CourseStatus = model.Status;
+        existingCourse.CourseType = model.CourseType;
+        existingCourse.RegistrationStartDate = model.CourseType == CourseType.Fixed_Time ? model.RegistrationStartDate : null;
+        existingCourse.RegistrationEndDate = model.CourseType == CourseType.Fixed_Time ? model.RegistrationEndDate : null;
+        existingCourse.StartDate = model.CourseType == CourseType.Fixed_Time ? model.StartDate : null;
+        existingCourse.EndDate = model.CourseType == CourseType.Fixed_Time ? model.EndDate : null;
 
         // Handle file upload
         if (thumbnailFile != null && thumbnailFile.Length > 0)

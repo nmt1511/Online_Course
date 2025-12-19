@@ -15,6 +15,13 @@ public class CourseDetailViewModel
     public CourseStatus Status { get; set; }
     public DateTime CreatedAt { get; set; }
     
+    // Course Type and Date fields
+    public CourseType CourseType { get; set; } = CourseType.Open_Always;
+    public DateTime? RegistrationStartDate { get; set; }
+    public DateTime? RegistrationEndDate { get; set; }
+    public DateTime? StartDate { get; set; }
+    public DateTime? EndDate { get; set; }
+    
     // Only Admin can see this
     public string? InstructorName { get; set; }
     public bool ShowInstructor { get; set; }
@@ -39,7 +46,22 @@ public class CourseDetailViewModel
         CourseStatus.Private => "bg-yellow-500",
         _ => "bg-gray-500"
     };
+    
+    public string CourseTypeText => CourseType switch
+    {
+        CourseType.Fixed_Time => "Thời gian cố định",
+        _ => "Mở xuyên suốt"
+    };
+    
+    public string CourseTypeIcon => CourseType switch
+    {
+        CourseType.Fixed_Time => "schedule",
+        _ => "all_inclusive"
+    };
+    
+    public bool IsFixedTime => CourseType == CourseType.Fixed_Time;
 }
+
 
 public class LessonSummaryViewModel
 {

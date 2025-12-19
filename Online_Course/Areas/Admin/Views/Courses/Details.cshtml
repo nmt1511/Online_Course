@@ -27,7 +27,7 @@
             <!-- Thumbnail Card -->
             <div class="bg-white dark:bg-[#1a222c] rounded-xl border border-gray-200 dark:border-[#283039] overflow-hidden flex flex-col h-full">
                 <div class="h-48 bg-cover bg-center bg-gray-200 dark:bg-slate-700 relative flex-shrink-0" style="background-image: url('@(string.IsNullOrEmpty(Model.ThumbnailUrl) ? "/images/default-course.png" : Model.ThumbnailUrl)');">
-                    <div class="absolute top-3 left-3 flex items-center gap-2">
+                    <div class="absolute top-3 left-3 flex items-center gap-2 flex-wrap">
                         <span class="@Model.StatusColor text-white text-xs font-bold px-2.5 py-1 rounded">@Model.StatusText</span>
                         @if (!string.IsNullOrEmpty(Model.Category))
                         {
@@ -47,6 +47,51 @@
                             <div>
                                 <p class="text-xs text-gray-500 dark:text-[#9dabb9]">Giảng viên</p>
                                 <p class="font-medium text-slate-900 dark:text-white">@Model.InstructorName</p>
+                            </div>
+                        </div>
+                    }
+                    
+                    <!-- Course Type Badge -->
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="flex items-center gap-1.5 px-3 py-1.5 @(Model.IsFixedTime ? "bg-orange-500/10 text-orange-600 dark:text-orange-400" : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400") rounded-lg">
+                            <span class="material-symbols-outlined text-[16px]">@Model.CourseTypeIcon</span>
+                            <span class="text-xs font-semibold">@Model.CourseTypeText</span>
+                        </div>
+                    </div>
+                    
+                    @if (Model.IsFixedTime)
+                    {
+                        <!-- Date Information -->
+                        <div class="space-y-3 mb-4 p-3 bg-gray-50 dark:bg-[#202934] rounded-lg">
+                            <h4 class="text-xs font-bold text-gray-500 dark:text-[#9dabb9] uppercase tracking-wider flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[14px]">calendar_month</span>
+                                Thời gian khóa học
+                            </h4>
+                            
+                            <!-- Registration Period -->
+                            <div class="flex items-start gap-2">
+                                <div class="size-6 rounded bg-blue-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <span class="material-symbols-outlined text-blue-500 text-[14px]">app_registration</span>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-medium text-gray-500 dark:text-[#9dabb9]">Đăng ký</p>
+                                    <p class="text-sm text-slate-900 dark:text-white">
+                                        @(Model.RegistrationStartDate?.ToString("dd/MM/yyyy") ?? "N/A") - @(Model.RegistrationEndDate?.ToString("dd/MM/yyyy") ?? "N/A")
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <!-- Course Period -->
+                            <div class="flex items-start gap-2">
+                                <div class="size-6 rounded bg-green-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <span class="material-symbols-outlined text-green-500 text-[14px]">school</span>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-medium text-gray-500 dark:text-[#9dabb9]">Học tập</p>
+                                    <p class="text-sm text-slate-900 dark:text-white">
+                                        @(Model.StartDate?.ToString("dd/MM/yyyy") ?? "N/A") - @(Model.EndDate?.ToString("dd/MM/yyyy") ?? "N/A")
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     }
@@ -75,6 +120,7 @@
             </div>
         </div>
 
+
         <!-- Right Column: Lessons -->
         <div class="lg:col-span-2">
             <div class="bg-white dark:bg-[#1a222c] rounded-xl border border-gray-200 dark:border-[#283039] overflow-hidden h-full">
@@ -88,7 +134,7 @@
                 
                 @if (Model.Lessons.Any())
                 {
-                    <div class="divide-y divide-gray-200 dark:divide-[#283039] max-h-[400px] overflow-y-auto">
+                    <div class="divide-y divide-gray-200 dark:divide-[#283039] max-h-[550px] overflow-y-auto">
                         @foreach (var lesson in Model.Lessons)
                         {
                             <div class="flex items-center gap-4 p-4 hover:bg-gray-50 dark:hover:bg-[#202934] transition-colors">

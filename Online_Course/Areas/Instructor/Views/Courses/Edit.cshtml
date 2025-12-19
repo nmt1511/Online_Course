@@ -163,7 +163,61 @@
                     <p class="text-gray-500 dark:text-slate-400 text-sm">Chọn trạng thái hiển thị của khóa học.</p>
                 </div>
 
+                <!-- Course Type -->
+                <div class="flex flex-col gap-2">
+                    <label asp-for="CourseType" class="text-slate-900 dark:text-white text-base font-semibold">Loại khóa học</label>
+                    <select asp-for="CourseType" id="courseTypeSelect" class="w-full h-14 px-4 rounded-lg bg-gray-50 dark:bg-surface-dark border border-gray-200 dark:border-slate-700 text-slate-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none">
+                        <option value="@Online_Course.Models.CourseType.Open_Always">Mở xuyên suốt</option>
+                        <option value="@Online_Course.Models.CourseType.Fixed_Time">Thời gian cố định</option>
+                    </select>
+                    <p class="text-gray-500 dark:text-slate-400 text-sm">Chọn "Thời gian cố định" nếu khóa học có thời gian đăng ký và học cụ thể.</p>
+                </div>
+
+                <!-- Date Fields (shown only for Fixed_Time) -->
+                <div id="dateFieldsSection" class="@(Model.CourseType == Online_Course.Models.CourseType.Fixed_Time ? "" : "hidden") flex flex-col gap-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                    <h3 class="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">calendar_month</span>
+                        Thời gian khóa học
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Registration Start Date -->
+                        <div class="flex flex-col gap-1">
+                            <label asp-for="RegistrationStartDate" class="text-slate-900 dark:text-white text-sm font-medium">Ngày bắt đầu đăng ký <span class="text-red-500">*</span></label>
+                            <input asp-for="RegistrationStartDate" type="date" class="w-full h-12 px-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-slate-700 text-slate-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none" />
+                            <span asp-validation-for="RegistrationStartDate" class="text-red-500 text-xs"></span>
+                        </div>
+
+                        <!-- Registration End Date -->
+                        <div class="flex flex-col gap-1">
+                            <label asp-for="RegistrationEndDate" class="text-slate-900 dark:text-white text-sm font-medium">Ngày kết thúc đăng ký <span class="text-red-500">*</span></label>
+                            <input asp-for="RegistrationEndDate" type="date" class="w-full h-12 px-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-slate-700 text-slate-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none" />
+                            <span asp-validation-for="RegistrationEndDate" class="text-red-500 text-xs"></span>
+                        </div>
+
+                        <!-- Start Date -->
+                        <div class="flex flex-col gap-1">
+                            <label asp-for="StartDate" class="text-slate-900 dark:text-white text-sm font-medium">Ngày bắt đầu học <span class="text-red-500">*</span></label>
+                            <input asp-for="StartDate" type="date" class="w-full h-12 px-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-slate-700 text-slate-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none" />
+                            <span asp-validation-for="StartDate" class="text-red-500 text-xs"></span>
+                        </div>
+
+                        <!-- End Date -->
+                        <div class="flex flex-col gap-1">
+                            <label asp-for="EndDate" class="text-slate-900 dark:text-white text-sm font-medium">Ngày kết thúc học <span class="text-red-500">*</span></label>
+                            <input asp-for="EndDate" type="date" class="w-full h-12 px-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-slate-700 text-slate-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none" />
+                            <span asp-validation-for="EndDate" class="text-red-500 text-xs"></span>
+                        </div>
+                    </div>
+                    
+                    <p class="text-xs text-gray-500 dark:text-slate-400">
+                        <span class="material-symbols-outlined text-xs align-middle mr-1">info</span>
+                        Thứ tự: Ngày bắt đầu đăng ký → Ngày kết thúc đăng ký → Ngày bắt đầu học → Ngày kết thúc học
+                    </p>
+                </div>
+
             </div>
+
 
             <!-- Right Column: Preview & Stats -->
             <div class="lg:col-span-1 flex flex-col gap-6">
@@ -264,6 +318,64 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
+        // CourseType toggle functionality
+        function toggleDateFields() {
+            const courseTypeSelect = document.getElementById('courseTypeSelect');
+            const dateFieldsSection = document.getElementById('dateFieldsSection');
+            
+            if (courseTypeSelect.value === '@((int)Online_Course.Models.CourseType.Fixed_Time)' || 
+                courseTypeSelect.value === 'Fixed_Time') {
+                dateFieldsSection.classList.remove('hidden');
+            } else {
+                dateFieldsSection.classList.add('hidden');
+                // Clear date fields when switching to Open_Always
+                document.getElementById('RegistrationStartDate').value = '';
+                document.getElementById('RegistrationEndDate').value = '';
+                document.getElementById('StartDate').value = '';
+                document.getElementById('EndDate').value = '';
+            }
+        }
+        
+        // Date validation
+        function validateDates() {
+            const courseTypeSelect = document.getElementById('courseTypeSelect');
+            if (courseTypeSelect.value !== '@((int)Online_Course.Models.CourseType.Fixed_Time)' && 
+                courseTypeSelect.value !== 'Fixed_Time') {
+                return true;
+            }
+            
+            const regStart = new Date(document.getElementById('RegistrationStartDate').value);
+            const regEnd = new Date(document.getElementById('RegistrationEndDate').value);
+            const startDate = new Date(document.getElementById('StartDate').value);
+            const endDate = new Date(document.getElementById('EndDate').value);
+            
+            let errors = [];
+            
+            if (!document.getElementById('RegistrationStartDate').value || 
+                !document.getElementById('RegistrationEndDate').value ||
+                !document.getElementById('StartDate').value || 
+                !document.getElementById('EndDate').value) {
+                errors.push('Vui lòng nhập đầy đủ các ngày khi chọn loại khóa học thời gian cố định.');
+            } else {
+                if (regStart >= regEnd) {
+                    errors.push('Ngày kết thúc đăng ký phải sau ngày bắt đầu đăng ký.');
+                }
+                if (regEnd >= startDate) {
+                    errors.push('Ngày bắt đầu học phải sau ngày kết thúc đăng ký.');
+                }
+                if (startDate >= endDate) {
+                    errors.push('Ngày kết thúc học phải sau ngày bắt đầu học.');
+                }
+            }
+            
+            if (errors.length > 0) {
+                alert(errors.join('\n'));
+                return false;
+            }
+            
+            return true;
+        }
+        
         // Live preview updates
         document.getElementById('Title').addEventListener('input', function() {
             document.getElementById('preview-title').textContent = this.value || 'Tiêu đề khóa học';
@@ -312,5 +424,23 @@
                 reader.readAsDataURL(input.files[0]);
             }
         }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const courseTypeSelect = document.getElementById('courseTypeSelect');
+            
+            // Add event listener for CourseType change
+            courseTypeSelect.addEventListener('change', toggleDateFields);
+            
+            // Form submission validation
+            form.addEventListener('submit', function(e) {
+                if (!validateDates()) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+        });
     </script>
 }
+

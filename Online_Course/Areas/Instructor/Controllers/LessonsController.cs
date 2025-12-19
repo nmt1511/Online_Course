@@ -67,7 +67,6 @@ public class LessonsController : Controller
         }
     }
 
-    // GET: Instructor/Lessons/Create/{courseId}
     public async Task<IActionResult> Create(int courseId)
     {
         var course = await _courseService.GetCourseByIdAsync(courseId);

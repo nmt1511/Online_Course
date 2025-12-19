@@ -125,6 +125,11 @@ public class CoursesController : Controller
             Category = course.Category,
             ThumbnailUrl = course.ThumbnailUrl,
             Status = course.CourseStatus,
+            CourseType = course.CourseType,
+            RegistrationStartDate = course.RegistrationStartDate,
+            RegistrationEndDate = course.RegistrationEndDate,
+            StartDate = course.StartDate,
+            EndDate = course.EndDate,
             InstructorName = course.Instructor?.FullName ?? "Chưa phân công",
             ShowInstructor = true, // Admin can see instructor name
             TotalLessons = course.Lessons?.Count ?? 0,
@@ -140,6 +145,7 @@ public class CoursesController : Controller
             }) ?? Enumerable.Empty<LessonSummaryViewModel>(),
             Students = students
         };
+
 
         return View(viewModel);
     }
