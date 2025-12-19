@@ -1,98 +1,360 @@
 @model Online_Course.ViewModels.LessonViewModel
+@using Online_Course.Models
 @{
     ViewData["Title"] = "Chỉnh sửa bài học";
     Layout = "~/Views/Shared/_InstructorLayout.cshtml";
 }
 
-<!-- Breadcrumbs -->
-<div class="flex items-center gap-2 text-sm mb-6">
-    <a asp-area="Instructor" asp-controller="Courses" asp-action="Index" class="text-gray-500 dark:text-slate-400 hover:text-primary transition-colors">Quản lý khóa học</a>
-    <span class="material-symbols-outlined text-gray-400 dark:text-slate-500 text-[16px]">chevron_right</span>
-    <a asp-area="Instructor" asp-controller="Courses" asp-action="Edit" asp-route-id="@Model.CourseId" class="text-gray-500 dark:text-slate-400 hover:text-primary transition-colors">@Model.CourseTitle</a>
-    <span class="material-symbols-outlined text-gray-400 dark:text-slate-500 text-[16px]">chevron_right</span>
-    <a asp-action="Index" asp-route-courseId="@Model.CourseId" class="text-gray-500 dark:text-slate-400 hover:text-primary transition-colors">Bài học</a>
-    <span class="material-symbols-outlined text-gray-400 dark:text-slate-500 text-[16px]">chevron_right</span>
-    <span class="text-primary font-medium">Chỉnh sửa</span>
-</div>
-
-<!-- Header -->
-<div class="flex flex-wrap justify-between items-center gap-4 mb-6">
-    <div>
-        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Chỉnh sửa bài học</h1>
-        <p class="text-gray-500 dark:text-slate-400 text-sm mt-1">Khóa học: @Model.CourseTitle</p>
-    </div>
-</div>
-
-<!-- Form -->
-<form asp-action="Edit" method="post" class="max-w-4xl">
-    @Html.AntiForgeryToken()
-    <input type="hidden" asp-for="LessonId" />
-    <input type="hidden" asp-for="CourseId" />
-    
-    <div class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-slate-700/50 p-6 space-y-6">
-        <!-- Title -->
-        <div>
-            <label asp-for="Title" class="block text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-2">
-                Tiêu đề bài học <span class="text-red-500 dark:text-red-400">*</span>
-            </label>
-            <input asp-for="Title" 
-                   class="w-full bg-gray-50 dark:bg-slate-800/50 text-slate-900 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary transition-colors placeholder-gray-400 dark:placeholder-slate-500"
-                   placeholder="Nhập tiêu đề bài học..." />
-            <span asp-validation-for="Title" class="text-red-500 dark:text-red-400 text-sm mt-1"></span>
-        </div>
-        
-        <!-- Description -->
-        <div>
-            <label asp-for="Description" class="block text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-2">
-                Mô tả bài học
-            </label>
-            <textarea asp-for="Description" rows="5"
-                      class="w-full bg-gray-50 dark:bg-slate-800/50 text-slate-900 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary transition-colors placeholder-gray-400 dark:placeholder-slate-500 resize-none"
-                      placeholder="Nhập mô tả chi tiết về nội dung bài học..."></textarea>
-            <span asp-validation-for="Description" class="text-red-500 dark:text-red-400 text-sm mt-1"></span>
-        </div>
-
-        <!-- Video URL -->
-        <div>
-            <label asp-for="VideoUrl" class="block text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-2">
-                <span class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-primary text-[18px]">smart_display</span>
-                    Video URL (YouTube/Vimeo)
-                </span>
-            </label>
-            <input asp-for="VideoUrl" 
-                   class="w-full bg-gray-50 dark:bg-slate-800/50 text-slate-900 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary transition-colors placeholder-gray-400 dark:placeholder-slate-500"
-                   placeholder="https://youtube.com/watch?v=..." />
-            <span asp-validation-for="VideoUrl" class="text-red-500 dark:text-red-400 text-sm mt-1"></span>
-            <p class="text-gray-400 dark:text-slate-500 text-xs mt-2">Hỗ trợ YouTube, Vimeo và các nền tảng video khác</p>
-        </div>
-        
-        <!-- Order Index -->
-        <div>
-            <label asp-for="OrderIndex" class="block text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-2">
-                Thứ tự bài học
-            </label>
-            <input asp-for="OrderIndex" type="number" min="1"
-                   class="w-32 bg-gray-50 dark:bg-slate-800/50 text-slate-900 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary transition-colors" />
-            <span asp-validation-for="OrderIndex" class="text-red-500 dark:text-red-400 text-sm mt-1"></span>
-        </div>
-    </div>
-    
-    <!-- Actions -->
-    <div class="flex items-center gap-4 mt-6">
-        <button type="submit" 
-                class="flex items-center gap-2 px-6 py-3 rounded-lg bg-primary text-white font-medium hover:bg-blue-600 transition-colors shadow-lg shadow-primary/20">
-            <span class="material-symbols-outlined text-[18px]">save</span>
-            <span>Lưu thay đổi</span>
-        </button>
-        <a asp-action="Index" asp-route-courseId="@Model.CourseId" 
-           class="flex items-center gap-2 px-6 py-3 rounded-lg border border-gray-300 dark:border-slate-700 text-gray-700 dark:text-slate-300 font-medium hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
-            <span class="material-symbols-outlined text-[18px]">close</span>
-            <span>Hủy</span>
+<div class="max-w-6xl mx-auto">
+    <!-- Page Header -->
+    <div class="flex items-center gap-4 mb-6">
+        <a asp-action="Index" asp-route-courseId="@Model.CourseId" class="p-2 text-gray-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+            <span class="material-symbols-outlined">arrow_back</span>
         </a>
+        <div>
+            <h1 class="text-slate-900 dark:text-white text-2xl font-bold">Chỉnh sửa bài học</h1>
+            <p class="text-gray-500 dark:text-slate-400 text-sm">Khóa học: @Model.CourseTitle</p>
+        </div>
     </div>
-</form>
+
+    <!-- Form Card -->
+    <div class="bg-white dark:bg-surface-dark border border-gray-200 dark:border-slate-800 rounded-xl overflow-hidden">
+        <form asp-action="Edit" method="post" enctype="multipart/form-data" id="editLessonForm">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="LessonId" />
+            <input type="hidden" asp-for="CourseId" />
+            <input type="hidden" asp-for="OrderIndex" />
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3">
+                <!-- Left Column - Main Info -->
+                <div class="lg:col-span-2 p-6 lg:p-8 space-y-6 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-slate-700">
+                    
+                    <!-- Validation Summary -->
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                            <div class="flex items-center gap-2 text-red-600 dark:text-red-400">
+                                <span class="material-symbols-outlined">error</span>
+                                <span class="font-medium">Vui lòng kiểm tra lại các trường bên dưới</span>
+                            </div>
+                            <div asp-validation-summary="All" class="text-red-500 dark:text-red-400 text-sm mt-2"></div>
+                        </div>
+                    }
+                    
+                    <!-- Title -->
+                    <div>
+                        <label asp-for="Title" class="block text-sm font-medium text-slate-900 dark:text-white mb-2">
+                            Tiêu đề bài học <span class="text-red-500">*</span>
+                        </label>
+                        <input asp-for="Title" 
+                               class="w-full h-12 px-4 bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                               placeholder="Nhập tiêu đề bài học..." />
+                        <span asp-validation-for="Title" class="text-red-500 dark:text-red-400 text-sm mt-1"></span>
+                    </div>
+                    
+                    <!-- Description -->
+                    <div>
+                        <label asp-for="Description" class="block text-sm font-medium text-slate-900 dark:text-white mb-2">
+                            Mô tả bài học
+                        </label>
+                        <textarea asp-for="Description" rows="4"
+                                  class="w-full px-4 py-3 bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-primary focus:border-primary transition-colors resize-none"
+                                  placeholder="Nhập mô tả chi tiết về nội dung bài học..."></textarea>
+                        <span asp-validation-for="Description" class="text-red-500 dark:text-red-400 text-sm mt-1"></span>
+                    </div>
+
+                    <!-- Lesson Type Selection -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-900 dark:text-white mb-3">
+                            Loại nội dung <span class="text-red-500">*</span>
+                        </label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <!-- Video Option -->
+                            <label class="lesson-type-card group relative cursor-pointer" data-type="Video">
+                                <input type="radio" asp-for="LessonType" value="Video" class="sr-only peer" />
+                                <div class="p-5 rounded-xl border-2 border-gray-200 dark:border-slate-700 peer-checked:border-primary peer-checked:bg-primary/5 hover:border-primary/50 transition-all">
+                                    <div class="flex items-center gap-4">
+                                        <div class="size-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                                            <span class="material-symbols-outlined text-white text-[28px]">smart_display</span>
+                                        </div>
+                                        <div>
+                                            <h3 class="font-semibold text-slate-900 dark:text-white">Video</h3>
+                                            <p class="text-gray-500 dark:text-slate-400 text-sm">YouTube, Vimeo...</p>
+                                        </div>
+                                    </div>
+                                    <div class="absolute top-3 right-3 size-6 rounded-full border-2 border-gray-300 dark:border-slate-600 peer-checked:border-primary peer-checked:bg-primary flex items-center justify-center transition-all">
+                                        <span class="material-symbols-outlined text-white text-[16px] opacity-0 peer-checked:opacity-100">check</span>
+                                    </div>
+                                </div>
+                            </label>
+                            
+                            <!-- PDF Option -->
+                            <label class="lesson-type-card group relative cursor-pointer" data-type="Pdf">
+                                <input type="radio" asp-for="LessonType" value="Pdf" class="sr-only peer" />
+                                <div class="p-5 rounded-xl border-2 border-gray-200 dark:border-slate-700 peer-checked:border-primary peer-checked:bg-primary/5 hover:border-primary/50 transition-all">
+                                    <div class="flex items-center gap-4">
+                                        <div class="size-14 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-lg shadow-red-500/30">
+                                            <span class="material-symbols-outlined text-white text-[28px]">picture_as_pdf</span>
+                                        </div>
+                                        <div>
+                                            <h3 class="font-semibold text-slate-900 dark:text-white">Tài liệu PDF</h3>
+                                            <p class="text-gray-500 dark:text-slate-400 text-sm">Upload file PDF</p>
+                                        </div>
+                                    </div>
+                                    <div class="absolute top-3 right-3 size-6 rounded-full border-2 border-gray-300 dark:border-slate-600 peer-checked:border-primary peer-checked:bg-primary flex items-center justify-center transition-all">
+                                        <span class="material-symbols-outlined text-white text-[16px] opacity-0 peer-checked:opacity-100">check</span>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Video Section -->
+                    <div id="videoSection" class="space-y-4" style="display: @(Model.LessonType == LessonType.Video ? "block" : "none");">
+                        <div>
+                            <label asp-for="VideoUrl" class="block text-sm font-medium text-slate-900 dark:text-white mb-2">
+                                <span class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-blue-500 text-[18px]">link</span>
+                                    URL Video <span class="text-red-500">*</span>
+                                </span>
+                            </label>
+                            <div class="relative">
+                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500">
+                                    <span class="material-symbols-outlined text-[20px]">smart_display</span>
+                                </span>
+                                <input asp-for="VideoUrl" 
+                                       class="w-full h-12 pl-12 pr-4 bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                                       placeholder="https://www.youtube.com/watch?v=..." />
+                            </div>
+                            <span asp-validation-for="VideoUrl" class="text-red-500 dark:text-red-400 text-sm mt-1"></span>
+                        </div>
+                        
+                        @if (Model.TotalDurationSeconds.HasValue)
+                        {
+                            var mins = Model.TotalDurationSeconds.Value / 60;
+                            var secs = Model.TotalDurationSeconds.Value % 60;
+                            <div class="flex items-center gap-3 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                                <div class="size-10 rounded-lg bg-green-500/20 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-green-500">timer</span>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500 dark:text-slate-400">Thời lượng hiện tại</p>
+                                    <p class="font-semibold text-green-700 dark:text-green-400">@mins phút @secs giây</p>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- PDF Section -->
+                    <div id="pdfSection" class="space-y-4" style="display: @(Model.LessonType == LessonType.Pdf ? "block" : "none");">
+                        <!-- Current PDF Info -->
+                        @if (!string.IsNullOrEmpty(Model.PdfUrl))
+                        {
+                            <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-700">
+                                <div class="flex items-center gap-4">
+                                    <div class="size-12 rounded-xl bg-red-100 dark:bg-red-500/20 flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-red-500 text-[24px]">picture_as_pdf</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-slate-900 dark:text-white">File PDF hiện tại</p>
+                                        <p class="text-sm text-gray-500 dark:text-slate-400">@Model.PdfUrl.Split('/').Last()</p>
+                                        @if (Model.TotalPages.HasValue)
+                                        {
+                                            <p class="text-sm font-medium text-green-600 dark:text-green-400">@Model.TotalPages trang</p>
+                                        }
+                                    </div>
+                                </div>
+                                <a href="@Model.PdfUrl" target="_blank" 
+                                   class="flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-blue-600 transition-colors">
+                                    <span class="material-symbols-outlined text-[18px]">visibility</span>
+                                    Xem
+                                </a>
+                            </div>
+                        }
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-slate-900 dark:text-white mb-2">
+                                <span class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-red-500 text-[18px]">upload_file</span>
+                                    @(string.IsNullOrEmpty(Model.PdfUrl) ? "File PDF *" : "Upload file mới (tùy chọn)")
+                                </span>
+                            </label>
+                            
+                            <!-- Dropzone -->
+                            <div id="pdfDropzone" 
+                                 class="border-2 border-dashed border-gray-300 dark:border-slate-600 rounded-xl p-6 text-center hover:border-primary hover:bg-primary/5 transition-all cursor-pointer">
+                                <input type="file" id="pdfFileInput" name="pdfFile" accept=".pdf" class="hidden" />
+                                
+                                <div id="pdfPlaceholder">
+                                    <div class="size-12 rounded-full bg-red-100 dark:bg-red-500/20 flex items-center justify-center mx-auto mb-3">
+                                        <span class="material-symbols-outlined text-red-500 text-[24px]">cloud_upload</span>
+                                    </div>
+                                    <p class="text-slate-900 dark:text-white font-medium text-sm mb-1">
+                                        @(string.IsNullOrEmpty(Model.PdfUrl) ? "Kéo thả file PDF vào đây" : "Kéo thả file PDF mới để thay thế")
+                                    </p>
+                                    <p class="text-gray-400 dark:text-slate-500 text-xs">Click để chọn file</p>
+                                </div>
+                                
+                                <div id="pdfPreview" class="hidden">
+                                    <div class="size-12 rounded-full bg-green-100 dark:bg-green-500/20 flex items-center justify-center mx-auto mb-3">
+                                        <span class="material-symbols-outlined text-green-500 text-[24px]">check_circle</span>
+                                    </div>
+                                    <p id="pdfFileName" class="text-slate-900 dark:text-white font-medium text-sm mb-1"></p>
+                                    <p id="pdfFileSize" class="text-gray-500 dark:text-slate-400 text-xs"></p>
+                                    <button type="button" id="removePdfBtn" class="mt-3 inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
+                                        <span class="material-symbols-outlined text-[14px]">delete</span>
+                                        Xóa
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column - Info & Actions -->
+                <div class="p-6 lg:p-8 bg-gray-50 dark:bg-background-dark">
+                    <div class="sticky top-6 space-y-6">
+                        <!-- Order Info Card -->
+                        <div class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
+                            <div class="p-4 bg-gradient-to-r from-primary/10 to-blue-500/10 border-b border-gray-200 dark:border-slate-700">
+                                <div class="flex items-center gap-3">
+                                    <div class="size-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-primary">format_list_numbered</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500 dark:text-slate-400">Thứ tự bài học</p>
+                                        <p class="text-2xl font-bold text-slate-900 dark:text-white">#@Model.OrderIndex</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <p class="text-gray-500 dark:text-slate-400 text-sm">
+                                    Để thay đổi thứ tự, sử dụng tính năng kéo thả trong danh sách bài học.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Lesson ID Info -->
+
+                        <!-- Action Buttons -->
+                        <div class="space-y-3">
+                            <button type="submit" class="w-full h-12 bg-primary hover:bg-blue-600 text-white font-bold rounded-lg transition-colors flex items-center justify-center gap-2 shadow-lg shadow-primary/30">
+                                <span class="material-symbols-outlined">save</span>
+                                Lưu thay đổi
+                            </button>
+                            <a asp-action="Index" asp-route-courseId="@Model.CourseId" 
+                               class="w-full h-12 bg-white dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-medium rounded-lg transition-colors flex items-center justify-center border border-gray-200 dark:border-slate-700">
+                                Hủy bỏ
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // === Lesson Type Toggle ===
+            const lessonTypeRadios = document.querySelectorAll('input[name="LessonType"]');
+            const videoSection = document.getElementById('videoSection');
+            const pdfSection = document.getElementById('pdfSection');
+            
+            function updateLessonTypeUI() {
+                const selectedType = document.querySelector('input[name="LessonType"]:checked').value;
+                console.log('[Edit.cshtml] Lesson type:', selectedType);
+                
+                if (selectedType === 'Video') {
+                    videoSection.style.display = 'block';
+                    pdfSection.style.display = 'none';
+                } else {
+                    videoSection.style.display = 'none';
+                    pdfSection.style.display = 'block';
+                }
+            }
+            
+            lessonTypeRadios.forEach(radio => {
+                radio.addEventListener('change', updateLessonTypeUI);
+            });
+            
+            // === PDF Upload ===
+            const pdfDropzone = document.getElementById('pdfDropzone');
+            const pdfFileInput = document.getElementById('pdfFileInput');
+            const pdfPlaceholder = document.getElementById('pdfPlaceholder');
+            const pdfPreview = document.getElementById('pdfPreview');
+            const pdfFileName = document.getElementById('pdfFileName');
+            const pdfFileSize = document.getElementById('pdfFileSize');
+            const removePdfBtn = document.getElementById('removePdfBtn');
+            
+            pdfDropzone.addEventListener('click', function(e) {
+                if (e.target !== removePdfBtn && !removePdfBtn.contains(e.target)) {
+                    pdfFileInput.click();
+                }
+            });
+            
+            pdfFileInput.addEventListener('change', function(e) {
+                handlePdfFile(e.target.files[0]);
+            });
+            
+            pdfDropzone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                pdfDropzone.classList.add('border-primary', 'bg-primary/10');
+            });
+            
+            pdfDropzone.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                pdfDropzone.classList.remove('border-primary', 'bg-primary/10');
+            });
+            
+            pdfDropzone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                pdfDropzone.classList.remove('border-primary', 'bg-primary/10');
+                
+                const file = e.dataTransfer.files[0];
+                if (file && file.type === 'application/pdf') {
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    pdfFileInput.files = dt.files;
+                    handlePdfFile(file);
+                } else {
+                    alert('Vui lòng chọn file PDF!');
+                }
+            });
+            
+            function handlePdfFile(file) {
+                if (!file) return;
+                
+                if (file.type !== 'application/pdf') {
+                    alert('Vui lòng chọn file có định dạng PDF!');
+                    return;
+                }
+                
+                console.log('[Edit.cshtml] PDF selected:', file.name, file.size);
+                
+                pdfPlaceholder.classList.add('hidden');
+                pdfPreview.classList.remove('hidden');
+                pdfFileName.textContent = file.name;
+                pdfFileSize.textContent = formatFileSize(file.size);
+            }
+            
+            removePdfBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                pdfFileInput.value = '';
+                pdfPlaceholder.classList.remove('hidden');
+                pdfPreview.classList.add('hidden');
+            });
+            
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+        });
+    </script>
 }

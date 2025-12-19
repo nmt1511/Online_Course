@@ -18,6 +18,10 @@ builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
 builder.Services.AddScoped<IProgressService, ProgressService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 
+// Register PDF and YouTube services for lesson creation
+builder.Services.AddScoped<IPdfService, PdfService>();
+builder.Services.AddHttpClient<IYouTubeApiService, YouTubeApiService>();
+
 // Configure Cookie Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
