@@ -35,9 +35,9 @@
                 <div class="h-48 bg-cover bg-center bg-gray-200 dark:bg-slate-700 relative flex-shrink-0" style="background-image: url('@(string.IsNullOrEmpty(Model.ThumbnailUrl) ? "/images/default-course.png" : Model.ThumbnailUrl)');">
                     <div class="absolute top-3 left-3 flex items-center gap-2 flex-wrap">
                         <span class="@Model.StatusColor text-white text-xs font-bold px-2.5 py-1 rounded">@Model.StatusText</span>
-                        @if (!string.IsNullOrEmpty(Model.Category))
+                        @if (!string.IsNullOrEmpty(Model.CategoryName))
                         {
-                            <span class="bg-white/90 dark:bg-slate-800/90 text-primary text-xs font-semibold px-2.5 py-1 rounded backdrop-blur-sm">@Model.Category</span>
+                            <span class="bg-white/90 dark:bg-slate-800/90 text-primary text-xs font-semibold px-2.5 py-1 rounded backdrop-blur-sm">@Model.CategoryName</span>
                         }
                     </div>
                 </div>

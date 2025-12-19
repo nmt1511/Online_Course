@@ -14,7 +14,8 @@ public class LearningLessonsViewModel
 {
     public int CourseId { get; set; }
     public string CourseTitle { get; set; } = string.Empty;
-    public string CourseCategory { get; set; } = string.Empty;
+    public int? CourseCategoryId { get; set; }
+    public string CourseCategoryName { get; set; } = string.Empty;
     public int TotalLessons { get; set; }
     public int CompletedLessons { get; set; }
     public double ProgressPercentage { get; set; }
@@ -32,7 +33,8 @@ public class LearningContentViewModel
     
     public int CourseId { get; set; }
     public string CourseTitle { get; set; } = string.Empty;
-    public string CourseCategory { get; set; } = string.Empty;
+    public int? CourseCategoryId { get; set; }
+    public string CourseCategoryName { get; set; } = string.Empty;
     public string InstructorName { get; set; } = string.Empty;
     
     public int TotalLessons { get; set; }

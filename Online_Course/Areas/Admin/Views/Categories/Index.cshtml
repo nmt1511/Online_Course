@@ -171,17 +171,50 @@
         </div>
         <form asp-action="Create" method="post">
             @Html.AntiForgeryToken()
-            <div class="mb-6">
-                <label for="categoryName" class="block text-sm font-medium text-gray-500 dark:text-[#9dabb9] mb-2">Tên danh mục</label>
-                <input type="text" id="categoryName" name="Name" required
-                    class="w-full px-4 py-3 bg-gray-50 dark:bg-[#283039] border border-gray-300 dark:border-[#3b4754] rounded-lg text-slate-900 dark:text-white placeholder-gray-400 dark:placeholder-[#9dabb9] focus:border-primary focus:ring-1 focus:ring-primary transition-all"
-                    placeholder="Nhập tên danh mục..."/>
+            <div class="space-y-4">
+                <!-- Tên danh mục -->
+                <div>
+                    <label for="categoryName" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                        Tên danh mục <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" id="categoryName" name="Name" required
+                        class="w-full px-4 py-3 bg-gray-50 dark:bg-[#283039] border border-gray-300 dark:border-[#3b4754] rounded-lg text-slate-900 dark:text-white placeholder-gray-400 dark:placeholder-[#9dabb9] focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                        placeholder="Ví dụ: Lập trình Web"
+                        oninput="generateSlugPreview(this.value)"/>
+                </div>
+                
+                <!-- Slug Preview -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                        Slug (tự động tạo)
+                    </label>
+                    <div class="flex items-center gap-2 px-4 py-3 bg-gray-100 dark:bg-[#1e2329] border border-gray-200 dark:border-[#3b4754] rounded-lg">
+                        <span class="material-symbols-outlined text-gray-400 text-[18px]">link</span>
+                        <span id="slugPreview" class="text-gray-500 dark:text-[#9dabb9] text-sm">slug-se-hien-thi-o-day</span>
+                    </div>
+                    <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">Slug được tạo tự động từ tên danh mục</p>
+                </div>
+                
+                <!-- Trạng thái -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                        Trạng thái
+                    </label>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" name="IsActive" value="true" checked class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-200 dark:bg-[#3b4754] peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                        <span class="ml-3 text-sm text-slate-700 dark:text-slate-300">Kích hoạt</span>
+                    </label>
+                    <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">Danh mục sẽ hiển thị khi được kích hoạt</p>
+                </div>
             </div>
-            <div class="flex gap-3 justify-end">
+            
+            <div class="flex gap-3 justify-end mt-6 pt-4 border-t border-gray-200 dark:border-[#3b4754]">
                 <button type="button" onclick="closeAddModal()" class="px-4 py-2.5 rounded-lg text-gray-500 dark:text-[#9dabb9] hover:text-slate-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-[#283039] transition-colors">
                     Hủy
                 </button>
-                <button type="submit" class="px-4 py-2.5 bg-primary hover:bg-primary/90 text-white rounded-lg font-medium transition-colors">
+                <button type="submit" class="px-4 py-2.5 bg-primary hover:bg-primary/90 text-white rounded-lg font-medium transition-colors flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">add</span>
                     Thêm danh mục
                 </button>
             </div>
@@ -201,6 +234,25 @@
             document.getElementById('addCategoryModal').classList.add('hidden');
             document.getElementById('addCategoryModal').classList.remove('flex');
             document.getElementById('categoryName').value = '';
+            document.getElementById('slugPreview').textContent = 'slug-se-hien-thi-o-day';
+        }
+        
+        function generateSlugPreview(name) {
+            if (!name || name.trim() === '') {
+                document.getElementById('slugPreview').textContent = 'slug-se-hien-thi-o-day';
+                return;
+            }
+            // Convert Vietnamese characters to ASCII
+            var slug = name.toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/đ/g, 'd')
+                .replace(/Đ/g, 'd')
+                .replace(/[^a-z0-9\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .replace(/^-|-$/g, '');
+            document.getElementById('slugPreview').textContent = slug || 'slug-se-hien-thi-o-day';
         }
 
         // Close modal when clicking outside

@@ -59,6 +59,8 @@ public class EnrollmentService : IEnrollmentService
         return await _context.Enrollments
             .Include(e => e.Course)
                 .ThenInclude(c => c.Lessons)
+            .Include(e => e.Course)
+                .ThenInclude(c => c.CategoryEntity)
             .Include(e => e.Student)
             .Where(e => e.StudentId == studentId)
             .OrderByDescending(e => e.EnrolledAt)

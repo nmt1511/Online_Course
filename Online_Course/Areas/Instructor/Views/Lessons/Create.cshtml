@@ -6,9 +6,9 @@
 
 <!-- Breadcrumbs -->
 <div class="flex items-center gap-2 text-sm mb-6">
-    <a asp-area="Instructor" asp-controller="Dashboard" asp-action="Index" class="text-gray-500 dark:text-slate-400 hover:text-primary transition-colors">Dashboard</a>
+    <a asp-area="Instructor" asp-controller="Courses" asp-action="Index" class="text-gray-500 dark:text-slate-400 hover:text-primary transition-colors">Quản lý khóa học</a>
     <span class="material-symbols-outlined text-gray-400 dark:text-slate-500 text-[16px]">chevron_right</span>
-    <span class="text-gray-500 dark:text-slate-400">@Model.CourseTitle</span>
+    <a asp-area="Instructor" asp-controller="Courses" asp-action="Edit" asp-route-id="@Model.CourseId" class="text-gray-500 dark:text-slate-400 hover:text-primary transition-colors">@Model.CourseTitle</a>
     <span class="material-symbols-outlined text-gray-400 dark:text-slate-500 text-[16px]">chevron_right</span>
     <a asp-action="Index" asp-route-courseId="@Model.CourseId" class="text-gray-500 dark:text-slate-400 hover:text-primary transition-colors">Bài học</a>
     <span class="material-symbols-outlined text-gray-400 dark:text-slate-500 text-[16px]">chevron_right</span>

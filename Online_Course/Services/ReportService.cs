@@ -25,12 +25,13 @@ public class ReportService : IReportService
     public async Task<IEnumerable<CoursePopularityReport>> GetPopularCoursesAsync(int topCount = 10)
     {
         return await _context.Courses
+            .Include(c => c.CategoryEntity)
             .Where(c => c.CourseStatus == CourseStatus.Public)
             .Select(c => new CoursePopularityReport
             {
                 CourseId = c.CourseId,
                 Title = c.Title,
-                Category = c.Category,
+                CategoryName = c.CategoryEntity != null ? c.CategoryEntity.Name : "Chưa phân loại",
                 InstructorName = c.Instructor.FullName,
                 EnrollmentCount = c.Enrollments.Count
             })

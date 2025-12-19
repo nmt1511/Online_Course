@@ -47,7 +47,8 @@ public class CoursesController : Controller
             CourseId = c.CourseId,
             Title = c.Title,
             Description = c.Description,
-            Category = c.Category,
+            CategoryId = c.CategoryId,
+            CategoryName = c.CategoryEntity?.Name ?? "Chưa phân loại",
             ThumbnailUrl = c.ThumbnailUrl,
             Status = c.CourseStatus,
             EnrollmentCount = c.Enrollments?.Count ?? 0,
@@ -129,16 +130,11 @@ public class CoursesController : Controller
             thumbnailUrl = "/images/default-course.png";
         }
 
-        // Find CategoryId from Category name
-        var categories = await _categoryService.GetAllCategoriesAsync();
-        var category = categories.FirstOrDefault(c => c.Name == model.Category);
-        
         var course = new Course
         {
             Title = model.Title,
             Description = model.Description,
-            Category = model.Category,
-            CategoryId = category?.CategoryId,
+            CategoryId = model.CategoryId,
             ThumbnailUrl = thumbnailUrl,
             CourseStatus = model.Status,
             CourseType = model.CourseType,
@@ -219,7 +215,8 @@ public class CoursesController : Controller
             CourseId = course.CourseId,
             Title = course.Title,
             Description = course.Description,
-            Category = course.Category,
+            CategoryId = course.CategoryId,
+            CategoryName = course.CategoryEntity?.Name ?? "Chưa phân loại",
             ThumbnailUrl = course.ThumbnailUrl,
             Status = course.CourseStatus,
             CourseType = course.CourseType,
@@ -280,7 +277,7 @@ public class CoursesController : Controller
             CourseId = course.CourseId,
             Title = course.Title,
             Description = course.Description,
-            Category = course.Category,
+            CategoryId = course.CategoryId,
             ThumbnailUrl = course.ThumbnailUrl,
             Status = course.CourseStatus,
             CourseType = course.CourseType,
@@ -351,14 +348,9 @@ public class CoursesController : Controller
             return View(model);
         }
 
-        // Find CategoryId from Category name
-        var categories = await _categoryService.GetAllCategoriesAsync();
-        var category = categories.FirstOrDefault(c => c.Name == model.Category);
-        
         existingCourse.Title = model.Title;
         existingCourse.Description = model.Description;
-        existingCourse.Category = model.Category;
-        existingCourse.CategoryId = category?.CategoryId;
+        existingCourse.CategoryId = model.CategoryId;
         existingCourse.CourseStatus = model.Status;
         existingCourse.CourseType = model.CourseType;
         existingCourse.RegistrationStartDate = model.CourseType == CourseType.Fixed_Time ? model.RegistrationStartDate : null;

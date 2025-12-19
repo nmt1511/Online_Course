@@ -167,9 +167,25 @@ public class AccountController : Controller
     }
 
     [HttpGet]
-    public IActionResult AccessDenied()
+    public IActionResult AccessDenied(string? returnUrl = null)
     {
-        return View();
+        // Nếu user đã đăng nhập, redirect về trang chính đúng role
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            // Xác định URL redirect đúng role
+            string redirectUrl;
+            if (User.IsInRole("Admin"))
+                redirectUrl = Url.Action("Index", "Dashboard", new { area = "Admin" }) ?? "/";
+            else if (User.IsInRole("Instructor"))
+                redirectUrl = Url.Action("Index", "Dashboard", new { area = "Instructor" }) ?? "/";
+            else
+                redirectUrl = Url.Action("Index", "Courses", new { area = "Student" }) ?? "/";
+            
+            return Redirect(redirectUrl);
+        }
+        
+        // Nếu chưa đăng nhập, redirect về trang login
+        return RedirectToAction(nameof(Login), new { returnUrl });
     }
 
     [HttpGet]

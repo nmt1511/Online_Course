@@ -59,11 +59,11 @@ public class CoursesController : Controller
     }
 
     [AllowAnonymous]
-    public async Task<IActionResult> Index(string? category)
+    public async Task<IActionResult> Index(int? categoryId)
     {
-        var courses = string.IsNullOrEmpty(category)
+        var courses = !categoryId.HasValue
             ? await _courseService.GetAllCoursesAsync()
-            : await _courseService.GetCoursesByCategoryAsync(category);
+            : await _courseService.GetCoursesByCategoryAsync(categoryId.Value);
 
         // Only show published courses to students
         var publishedCourses = courses.Where(c => c.CourseStatus == CourseStatus.Public).ToList();
@@ -77,14 +77,15 @@ public class CoursesController : Controller
                 CourseId = c.CourseId,
                 Title = c.Title,
                 Description = c.Description,
-                Category = c.Category,
+                CategoryId = c.CategoryId,
+                CategoryName = c.CategoryEntity?.Name ?? "Chưa phân loại",
                 ThumbnailUrl = c.ThumbnailUrl,
                 InstructorName = c.Instructor?.FullName ?? "Unknown",
                 EnrollmentCount = c.Enrollments?.Count ?? 0,
                 LessonCount = c.Lessons?.Count ?? 0
             }).ToList(),
-            Categories = categories.Where(c => c.IsActive).Select(c => c.Name).ToList(),
-            SelectedCategory = category
+            Categories = categories.Where(c => c.IsActive).ToList(),
+            SelectedCategoryId = categoryId
         };
 
         return View(viewModel);
@@ -115,7 +116,8 @@ public class CoursesController : Controller
             CourseId = course.CourseId,
             Title = course.Title,
             Description = course.Description,
-            Category = course.Category,
+            CategoryId = course.CategoryId,
+            CategoryName = course.CategoryEntity?.Name ?? "Chưa phân loại",
             ThumbnailUrl = course.ThumbnailUrl,
             InstructorName = course.Instructor?.FullName ?? "Unknown",
             EnrollmentCount = course.Enrollments?.Count ?? 0,

@@ -18,6 +18,7 @@ public class CourseService : ICourseService
         return await _context.Courses
             .Include(c => c.Instructor)
             .Include(c => c.Enrollments)
+            .Include(c => c.CategoryEntity)
             .OrderByDescending(c => c.CourseId)
             .ToListAsync();
     }
@@ -28,17 +29,19 @@ public class CourseService : ICourseService
             .Include(c => c.Instructor)
             .Include(c => c.Enrollments)
             .Include(c => c.Lessons)
+            .Include(c => c.CategoryEntity)
             .Where(c => c.CreatedBy == instructorId)
             .OrderByDescending(c => c.CourseId)
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<Course>> GetCoursesByCategoryAsync(string category)
+    public async Task<IEnumerable<Course>> GetCoursesByCategoryAsync(int categoryId)
     {
         return await _context.Courses
             .Include(c => c.Instructor)
             .Include(c => c.Enrollments)
-            .Where(c => c.Category == category)
+            .Include(c => c.CategoryEntity)
+            .Where(c => c.CategoryId == categoryId)
             .OrderByDescending(c => c.CourseId)
             .ToListAsync();
     }
@@ -49,6 +52,7 @@ public class CourseService : ICourseService
             .Include(c => c.Instructor)
             .Include(c => c.Lessons)
             .Include(c => c.Enrollments)
+            .Include(c => c.CategoryEntity)
             .FirstOrDefaultAsync(c => c.CourseId == id);
     }
 
@@ -68,7 +72,6 @@ public class CourseService : ICourseService
 
         existingCourse.Title = course.Title;
         existingCourse.Description = course.Description;
-        existingCourse.Category = course.Category;
         existingCourse.ThumbnailUrl = course.ThumbnailUrl;
         existingCourse.CreatedBy = course.CreatedBy;
         existingCourse.CourseStatus = course.CourseStatus;
@@ -116,13 +119,11 @@ public class CourseService : ICourseService
         return await _context.Courses.CountAsync(c => c.CourseStatus == CourseStatus.Public);
     }
 
-    public async Task<IEnumerable<string>> GetAllCategoriesAsync()
+    public async Task<IEnumerable<Category>> GetAllCategoriesAsync()
     {
-        return await _context.Courses
-            .Where(c => !string.IsNullOrEmpty(c.Category))
-            .Select(c => c.Category)
-            .Distinct()
-            .OrderBy(c => c)
+        return await _context.Categories
+            .Where(c => c.IsActive)
+            .OrderBy(c => c.Name)
             .ToListAsync();
     }
 }

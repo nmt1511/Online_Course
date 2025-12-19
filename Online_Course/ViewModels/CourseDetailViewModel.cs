@@ -10,7 +10,8 @@ public class CourseDetailViewModel
     public int CourseId { get; set; }
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public string Category { get; set; } = string.Empty;
+    public int? CategoryId { get; set; }
+    public string CategoryName { get; set; } = string.Empty;
     public string ThumbnailUrl { get; set; } = string.Empty;
     public CourseStatus Status { get; set; }
     public DateTime CreatedAt { get; set; }
