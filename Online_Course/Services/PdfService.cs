@@ -2,11 +2,9 @@ using iText.Kernel.Pdf;
 
 namespace Online_Course.Services;
 
-/// <summary>
-/// Service xử lý file PDF sử dụng thư viện iText7
-/// - Đếm số trang PDF
-/// - Lưu file PDF vào wwwroot/pdf_lessons
-/// </summary>
+// Service xử lý file PDF sử dụng thư viện iText7
+//- Đếm số trang PDF
+// - Lưu file PDF vào wwwroot/pdf_lessons
 public class PdfService : IPdfService
 {
     private readonly IWebHostEnvironment _webHostEnvironment;
@@ -21,7 +19,6 @@ public class PdfService : IPdfService
         _logger = logger;
     }
 
-    /// <inheritdoc/>
     public int? CountPages(string pdfFilePath)
     {
         if (string.IsNullOrEmpty(pdfFilePath))
@@ -61,7 +58,6 @@ public class PdfService : IPdfService
         }
     }
 
-    /// <inheritdoc/>
     public async Task<string> SavePdfAsync(IFormFile file)
     {
         if (file == null || file.Length == 0)

@@ -51,6 +51,7 @@ public class CoursesController : Controller
             CategoryName = c.CategoryEntity?.Name ?? "Chưa phân loại",
             ThumbnailUrl = c.ThumbnailUrl,
             Status = c.CourseStatus,
+            Type = c.CourseType,
             EnrollmentCount = c.Enrollments?.Count ?? 0,
             LessonCount = c.Lessons?.Count ?? 0,
             AverageRating = 4.5 // Placeholder - would come from ratings system
@@ -72,7 +73,7 @@ public class CoursesController : Controller
     {
         // Remove ThumbnailUrl from validation - it's optional
         ModelState.Remove("ThumbnailUrl");
-        
+
         // Validate dates if CourseType is Fixed_Time
         if (model.CourseType == CourseType.Fixed_Time)
         {
@@ -97,7 +98,7 @@ public class CoursesController : Controller
                 }
             }
         }
-        
+
         if (!ModelState.IsValid)
         {
             ViewBag.Categories = await _categoryService.GetAllCategoriesAsync();
@@ -234,7 +235,7 @@ public class CoursesController : Controller
                 Description = l.Description,
                 OrderIndex = l.OrderIndex,
                 ContentUrl = l.ContentUrl,
-                LessonType = DetectLessonType(l.ContentUrl)
+                LessonType = l.LessonType,
             }) ?? Enumerable.Empty<LessonSummaryViewModel>(),
             Students = students
         };
@@ -242,18 +243,6 @@ public class CoursesController : Controller
 
         return View(viewModel);
     }
-
-    private string DetectLessonType(string url)
-    {
-        if (string.IsNullOrEmpty(url)) return "video";
-        
-        var lowerUrl = url.ToLower();
-        if (lowerUrl.EndsWith(".pdf") || lowerUrl.Contains("pdf"))
-            return "pdf";
-        
-        return "video";
-    }
-
 
     [HttpGet]
     public async Task<IActionResult> Edit(int id)

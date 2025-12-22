@@ -47,11 +47,7 @@ public class LessonsController : Controller
         return userIdClaim != null ? int.Parse(userIdClaim.Value) : 0;
     }
 
-    #region Index - Danh sách bài học
-
-    /// <summary>
-    /// GET: Instructor/Lessons - Hiển thị danh sách bài học theo khóa học
-    /// </summary>
+    // GET: Instructor/Lessons - Hiển thị danh sách bài học theo khóa học
     public async Task<IActionResult> Index(int? courseId = null)
     {
         var instructorId = GetCurrentUserId();
@@ -97,14 +93,9 @@ public class LessonsController : Controller
         }
     }
 
-    #endregion
 
-    #region Create - Tạo bài học mới
-
-    /// <summary>
-    /// GET: Instructor/Lessons/Create/{courseId}
-    /// Hiển thị form tạo bài học mới
-    /// </summary>
+    // GET: Instructor/Lessons/Create/{courseId}
+    //Hiển thị form tạo bài học mới
     public async Task<IActionResult> Create(int courseId)
     {
         var course = await _courseService.GetCourseByIdAsync(courseId);
@@ -131,10 +122,8 @@ public class LessonsController : Controller
         return View(viewModel);
     }
 
-    /// <summary>
-    /// POST: Instructor/Lessons/Create
-    /// Xử lý tạo bài học mới (PDF hoặc Video)
-    /// </summary>
+    //POST: Instructor/Lessons/Create
+    //Xử lý tạo bài học mới (PDF hoặc Video)
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(LessonViewModel model, IFormFile? pdfFile)
@@ -253,13 +242,8 @@ public class LessonsController : Controller
         }
     }
 
-    #endregion
-
-    #region Edit - Chỉnh sửa bài học
-
-    /// <summary>
-    /// GET: Instructor/Lessons/Edit/{id}
-    /// </summary>
+    //Edit - Chỉnh sửa bài học
+    // GET: Instructor/Lessons/Edit/{id}
     public async Task<IActionResult> Edit(int id)
     {
         _logger.LogInformation("[LessonsController.Edit GET] LessonId: {LessonId}", id);
@@ -400,13 +384,8 @@ public class LessonsController : Controller
         }
     }
 
-    #endregion
 
-    #region Delete - Xóa bài học
-
-    /// <summary>
-    /// POST: Instructor/Lessons/Delete/{id}
-    /// </summary>
+    //POST: Instructor/Lessons/Delete/{id}
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id)
@@ -447,13 +426,8 @@ public class LessonsController : Controller
         return RedirectToAction(nameof(Index), new { courseId });
     }
 
-    #endregion
 
-    #region Reorder - Sắp xếp lại thứ tự bài học
-
-    /// <summary>
-    /// POST: Instructor/Lessons/Reorder
-    /// </summary>
+    // POST: Instructor/Lessons/Reorder
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Reorder(int courseId, [FromBody] int[] lessonIds)
@@ -465,6 +439,4 @@ public class LessonsController : Controller
         await _lessonService.ReorderLessonsAsync(courseId, lessonIds);
         return Ok();
     }
-
-    #endregion
 }

@@ -44,6 +44,7 @@
             </div>
 
             <!-- Filters (Category Chips) -->
+<<<<<<< HEAD
             <div class="flex flex-wrap gap-3 pb-2 border-b border-border-light dark:border-border-dark">
                 <a asp-action="Index" asp-route-categoryId="" 
                    class="flex h-9 items-center justify-center gap-x-2 rounded-full px-5 transition-colors @(!Model.SelectedCategoryId.HasValue ? "bg-primary text-white" : "bg-slate-200 dark:bg-surface-dark hover:bg-slate-300 dark:hover:bg-[#2a3441] text-slate-700 dark:text-text-secondary border border-transparent dark:border-border-dark")">
@@ -56,6 +57,40 @@
                         <span class="text-sm font-medium leading-normal @(Model.SelectedCategoryId != category.CategoryId ? "group-hover:text-slate-900 dark:group-hover:text-white" : "")">@category.Name</span>
                     </a>
                 }
+=======
+            <div class="flex flex-col gap-4 pb-4 border-b border-border-light dark:border-border-dark">
+                <div class="flex flex-wrap gap-3">
+                    <a asp-action="Index" asp-route-categoryId="" asp-route-type="@Model.SelectedCourseType"
+                       class="flex h-9 items-center justify-center gap-x-2 rounded-full px-5 transition-colors @(!Model.SelectedCategoryId.HasValue ? "bg-primary text-white" : "bg-slate-200 dark:bg-surface-dark hover:bg-slate-300 dark:hover:bg-[#2a3441] text-slate-700 dark:text-text-secondary border border-transparent dark:border-border-dark")">
+                        <span class="text-sm font-medium leading-normal">Tất cả danh mục</span>
+                    </a>
+                    @foreach (var category in Model.Categories)
+                    {
+                        <a asp-action="Index" asp-route-categoryId="@category.CategoryId" asp-route-type="@Model.SelectedCourseType"
+                           class="flex h-9 items-center justify-center gap-x-2 rounded-full px-5 transition-colors group @(Model.SelectedCategoryId == category.CategoryId ? "bg-primary text-white" : "bg-slate-200 dark:bg-surface-dark hover:bg-slate-300 dark:hover:bg-[#2a3441] text-slate-700 dark:text-text-secondary border border-transparent dark:border-border-dark")">
+                            <span class="text-sm font-medium leading-normal @(Model.SelectedCategoryId != category.CategoryId ? "group-hover:text-slate-900 dark:group-hover:text-white" : "")">@category.Name</span>
+                        </a>
+                    }
+                </div>
+
+                <!-- Course Type Filters -->
+                <div class="flex flex-wrap gap-3">
+                    <a asp-action="Index" asp-route-categoryId="@Model.SelectedCategoryId" asp-route-type=""
+                       class="flex h-8 items-center justify-center gap-x-2 rounded-full px-4 transition-colors @(!Model.SelectedCourseType.HasValue ? "bg-slate-600 text-white" : "bg-white dark:bg-background-dark hover:bg-slate-50 dark:hover:bg-[#1a202c] text-slate-600 dark:text-text-secondary border border-slate-200 dark:border-border-dark")">
+                        <span class="text-xs font-medium leading-normal">Tất cả loại</span>
+                    </a>
+                    <a asp-action="Index" asp-route-categoryId="@Model.SelectedCategoryId" asp-route-type="@Online_Course.Models.CourseType.Open_Always"
+                       class="flex h-8 items-center justify-center gap-x-2 rounded-full px-4 transition-colors @(Model.SelectedCourseType == Online_Course.Models.CourseType.Open_Always ? "bg-green-600 text-white" : "bg-white dark:bg-background-dark hover:bg-slate-50 dark:hover:bg-[#1a202c] text-slate-600 dark:text-text-secondary border border-slate-200 dark:border-border-dark")">
+                        <div class="w-2 h-2 rounded-full bg-green-400"></div>
+                        <span class="text-xs font-medium leading-normal">Xuyên suốt</span>
+                    </a>
+                    <a asp-action="Index" asp-route-categoryId="@Model.SelectedCategoryId" asp-route-type="@Online_Course.Models.CourseType.Fixed_Time"
+                       class="flex h-8 items-center justify-center gap-x-2 rounded-full px-4 transition-colors @(Model.SelectedCourseType == Online_Course.Models.CourseType.Fixed_Time ? "bg-blue-600 text-white" : "bg-white dark:bg-background-dark hover:bg-slate-50 dark:hover:bg-[#1a202c] text-slate-600 dark:text-text-secondary border border-slate-200 dark:border-border-dark")">
+                        <div class="w-2 h-2 rounded-full bg-blue-400"></div>
+                        <span class="text-xs font-medium leading-normal">Thời gian cố định</span>
+                    </a>
+                </div>
+>>>>>>> 5c5a66e87075261eba3e16383dcf33a802d900f6
             </div>
 
             <!-- Course Grid -->
@@ -79,12 +114,29 @@
                                 }
                             </div>
                             <div class="flex flex-col p-5 flex-1">
+<<<<<<< HEAD
                                 @if (!string.IsNullOrEmpty(course.CategoryName))
                                 {
                                     <div class="mb-2">
                                         <span class="inline-block px-2 py-1 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-semibold">@course.CategoryName</span>
                                     </div>
                                 }
+=======
+                                <div class="mb-3 flex flex-wrap gap-2">
+                                    @if (!string.IsNullOrEmpty(course.CategoryName))
+                                    {
+                                        <span class="inline-block px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-[10px] uppercase tracking-wider font-bold">@course.CategoryName</span>
+                                    }
+                                    @if (course.CourseType == Online_Course.Models.CourseType.Open_Always)
+                                    {
+                                        <span class="inline-block px-2 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-[10px] uppercase tracking-wider font-bold">Xuyên suốt</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="inline-block px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 text-[10px] uppercase tracking-wider font-bold">Có lịch trình</span>
+                                    }
+                                </div>
+>>>>>>> 5c5a66e87075261eba3e16383dcf33a802d900f6
                                 <h3 class="text-slate-900 dark:text-white text-lg font-bold leading-tight mb-2 line-clamp-2 group-hover:text-primary transition-colors">@course.Title</h3>
                                 <p class="text-slate-500 dark:text-text-secondary text-sm font-normal leading-relaxed mb-4 line-clamp-2">@course.Description</p>
                                 <div class="mt-auto flex flex-col gap-4">

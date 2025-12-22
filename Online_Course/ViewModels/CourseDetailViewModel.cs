@@ -75,17 +75,17 @@ public class LessonSummaryViewModel
     public string ContentUrl { get; set; } = string.Empty;
     
     // Lesson type: "video" or "pdf"
-    public string LessonType { get; set; } = "video";
+    public LessonType LessonType { get; set; } = LessonType.Video;
     
-    public string LessonTypeIcon => LessonType.ToLower() switch
+    public string LessonTypeIcon => LessonType switch
     {
-        "pdf" => "picture_as_pdf",
+        LessonType.Pdf => "picture_as_pdf",
         _ => "play_circle"
     };
     
-    public string LessonTypeText => LessonType.ToLower() switch
+    public string LessonTypeText => LessonType switch
     {
-        "pdf" => "PDF",
+        LessonType.Pdf => "PDF",
         _ => "Video"
     };
 }

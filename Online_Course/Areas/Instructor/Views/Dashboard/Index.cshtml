@@ -12,7 +12,7 @@
                 <h1 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-2">Chào mừng, @Model.InstructorName</h1>
                 <p class="text-gray-500 dark:text-slate-400">Đây là tổng quan về các khóa học của bạn hôm nay.</p>
             </div>
-            <a asp-area="Instructor" asp-controller="Courses" asp-action="Index" 
+            <a asp-area="Instructor" asp-controller="Courses" asp-action="Index"
                class="bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors w-fit">
                 <span class="material-symbols-outlined text-[20px]">school</span>
                 Quản lý khóa học
@@ -76,6 +76,9 @@
                 @foreach (var course in Model.Courses.Take(6))
                 {
                     <div class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden group hover:border-primary/50 transition-colors cursor-pointer relative">
+                        <div class="absolute top-3 left-3 z-10">
+                            <span class="@course.TypeColor backdrop-blur-md text-white text-xs font-bold px-2 py-1 rounded">@course.TypeText</span>
+                        </div>
                         <div class="absolute top-3 right-3 z-10">
                             <span class="@course.StatusColor backdrop-blur-md text-white text-xs font-bold px-2 py-1 rounded">@course.StatusText</span>
                         </div>

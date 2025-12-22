@@ -12,6 +12,7 @@ namespace Online_Course.Areas.Admin.Controllers;
 public class CoursesController : Controller
 {
     private readonly ICourseService _courseService;
+    private readonly IWebHostEnvironment _webHostEnvironment;
     private readonly IUserService _userService;
     private readonly IEnrollmentService _enrollmentService;
     private readonly IProgressService _progressService;
@@ -20,12 +21,14 @@ public class CoursesController : Controller
         ICourseService courseService, 
         IUserService userService,
         IEnrollmentService enrollmentService,
-        IProgressService progressService)
+        IProgressService progressService,
+        IWebHostEnvironment webHostEnvironment)
     {
         _courseService = courseService;
         _userService = userService;
         _enrollmentService = enrollmentService;
         _progressService = progressService;
+        _webHostEnvironment = webHostEnvironment;
     }
 
     // GET: Admin/Courses
@@ -143,7 +146,7 @@ public class CoursesController : Controller
                 Description = l.Description,
                 OrderIndex = l.OrderIndex,
                 ContentUrl = l.ContentUrl,
-                LessonType = DetectLessonType(l.ContentUrl)
+                LessonType = l.LessonType,
             }) ?? Enumerable.Empty<LessonSummaryViewModel>(),
             Students = students
         };
@@ -152,49 +155,97 @@ public class CoursesController : Controller
         return View(viewModel);
     }
 
-    private string DetectLessonType(string url)
-    {
-        if (string.IsNullOrEmpty(url)) return "video";
-        
-        var lowerUrl = url.ToLower();
-        if (lowerUrl.EndsWith(".pdf") || lowerUrl.Contains("pdf"))
-            return "pdf";
-        
-        return "video";
-    }
-
     // GET: Admin/Courses/Create
     public async Task<IActionResult> Create()
     {
         await PopulateInstructorsDropdown();
         await PopulateCategoriesDropdown();
-        return View();
+        return View(new CreateCourseViewModel());
     }
 
     // POST: Admin/Courses/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(CreateCourseViewModel model)
+    public async Task<IActionResult> Create(CreateCourseViewModel model, IFormFile? thumbnailFile)
     {
+        // Remove ThumbnailUrl from validation - it's optional
+        ModelState.Remove("ThumbnailUrl");
+
+        // Validate dates if CourseType is Fixed_Time
+        if (model.CourseType == CourseType.Fixed_Time)
+        {
+            if (!model.RegistrationStartDate.HasValue || !model.RegistrationEndDate.HasValue ||
+                !model.StartDate.HasValue || !model.EndDate.HasValue)
+            {
+                ModelState.AddModelError("", "Vui lòng nhập đầy đủ các ngày khi chọn loại khóa học thời gian cố định.");
+            }
+            else
+            {
+                if (model.RegistrationStartDate >= model.RegistrationEndDate)
+                {
+                    ModelState.AddModelError("RegistrationEndDate", "Ngày kết thúc đăng ký phải sau ngày bắt đầu đăng ký.");
+                }
+                if (model.RegistrationEndDate >= model.StartDate)
+                {
+                    ModelState.AddModelError("StartDate", "Ngày bắt đầu học phải sau ngày kết thúc đăng ký.");
+                }
+                if (model.StartDate >= model.EndDate)
+                {
+                    ModelState.AddModelError("EndDate", "Ngày kết thúc học phải sau ngày bắt đầu học.");
+                }
+            }
+        }
+
         if (ModelState.IsValid)
         {
+            string thumbnailUrl;
+
+            // Handle file upload first
+            if (thumbnailFile != null && thumbnailFile.Length > 0)
+            {
+                // Check file size (5MB max)
+                if (thumbnailFile.Length > 5 * 1024 * 1024)
+                {
+                    ModelState.AddModelError("thumbnailFile", "Kích thước file vượt quá 5MB");
+                    await PopulateInstructorsDropdown(model.InstructorId);
+                    await PopulateCategoriesDropdown(model.CategoryId);
+                    return View(model);
+                }
+                thumbnailUrl = await SaveImageAsync(thumbnailFile);
+            }
+            // Then check URL
+            else if (!string.IsNullOrWhiteSpace(model.ThumbnailUrl))
+            {
+                thumbnailUrl = model.ThumbnailUrl;
+            }
+            // Use default image if no thumbnail provided
+            else
+            {
+                thumbnailUrl = "/images/default-course.png";
+            }
+
             var course = new Course
             {
                 Title = model.Title,
                 Description = model.Description,
                 CategoryId = model.CategoryId,
-                ThumbnailUrl = model.ThumbnailUrl,
+                ThumbnailUrl = thumbnailUrl,
                 CreatedBy = model.InstructorId,
-                CourseStatus = model.Status
+                CourseStatus = model.Status,
+                CourseType = model.CourseType,
+                RegistrationStartDate = model.CourseType == CourseType.Fixed_Time ? model.RegistrationStartDate : null,
+                RegistrationEndDate = model.CourseType == CourseType.Fixed_Time ? model.RegistrationEndDate : null,
+                StartDate = model.CourseType == CourseType.Fixed_Time ? model.StartDate : null,
+                EndDate = model.CourseType == CourseType.Fixed_Time ? model.EndDate : null
             };
 
             await _courseService.CreateCourseAsync(course);
-            TempData["SuccessMessage"] = "Course created successfully!";
+            TempData["SuccessMessage"] = "Khóa học đã được tạo thành công!";
             return RedirectToAction(nameof(Index));
         }
 
-        await PopulateInstructorsDropdown();
-        await PopulateCategoriesDropdown();
+        await PopulateInstructorsDropdown(model.InstructorId);
+        await PopulateCategoriesDropdown(model.CategoryId);
         return View(model);
     }
 
@@ -216,7 +267,12 @@ public class CoursesController : Controller
             CategoryId = course.CategoryId,
             ThumbnailUrl = course.ThumbnailUrl,
             InstructorId = course.CreatedBy,
-            Status = course.CourseStatus
+            Status = course.CourseStatus,
+            CourseType = course.CourseType,
+            RegistrationStartDate = course.RegistrationStartDate,
+            RegistrationEndDate = course.RegistrationEndDate,
+            StartDate = course.StartDate,
+            EndDate = course.EndDate
         };
 
         await PopulateInstructorsDropdown(course.CreatedBy);
@@ -227,11 +283,36 @@ public class CoursesController : Controller
     // POST: Admin/Courses/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, EditCourseViewModel model)
+    public async Task<IActionResult> Edit(int id, EditCourseViewModel model, IFormFile? thumbnailFile)
     {
         if (id != model.CourseId)
         {
             return NotFound();
+        }
+
+        // Validate dates if CourseType is Fixed_Time
+        if (model.CourseType == CourseType.Fixed_Time)
+        {
+            if (!model.RegistrationStartDate.HasValue || !model.RegistrationEndDate.HasValue ||
+                !model.StartDate.HasValue || !model.EndDate.HasValue)
+            {
+                ModelState.AddModelError("", "Vui lòng nhập đầy đủ các ngày khi chọn loại khóa học thời gian cố định.");
+            }
+            else
+            {
+                if (model.RegistrationStartDate >= model.RegistrationEndDate)
+                {
+                    ModelState.AddModelError("RegistrationEndDate", "Ngày kết thúc đăng ký phải sau ngày bắt đầu đăng ký.");
+                }
+                if (model.RegistrationEndDate >= model.StartDate)
+                {
+                    ModelState.AddModelError("StartDate", "Ngày bắt đầu học phải sau ngày kết thúc đăng ký.");
+                }
+                if (model.StartDate >= model.EndDate)
+                {
+                    ModelState.AddModelError("EndDate", "Ngày kết thúc học phải sau ngày bắt đầu học.");
+                }
+            }
         }
 
         if (ModelState.IsValid)
@@ -245,12 +326,26 @@ public class CoursesController : Controller
             course.Title = model.Title;
             course.Description = model.Description;
             course.CategoryId = model.CategoryId;
-            course.ThumbnailUrl = model.ThumbnailUrl;
             course.CreatedBy = model.InstructorId;
             course.CourseStatus = model.Status;
+            course.CourseType = model.CourseType;
+            course.RegistrationStartDate = model.CourseType == CourseType.Fixed_Time ? model.RegistrationStartDate : null;
+            course.RegistrationEndDate = model.CourseType == CourseType.Fixed_Time ? model.RegistrationEndDate : null;
+            course.StartDate = model.CourseType == CourseType.Fixed_Time ? model.StartDate : null;
+            course.EndDate = model.CourseType == CourseType.Fixed_Time ? model.EndDate : null;
+
+            // Handle file upload
+            if (thumbnailFile != null && thumbnailFile.Length > 0)
+            {
+                course.ThumbnailUrl = await SaveImageAsync(thumbnailFile);
+            }
+            else if (!string.IsNullOrEmpty(model.ThumbnailUrl))
+            {
+                course.ThumbnailUrl = model.ThumbnailUrl;
+            }
 
             await _courseService.UpdateCourseAsync(course);
-            TempData["SuccessMessage"] = "Course updated successfully!";
+            TempData["SuccessMessage"] = "Khóa học đã được cập nhật thành công!";
             return RedirectToAction(nameof(Index));
         }
 
@@ -259,13 +354,36 @@ public class CoursesController : Controller
         return View(model);
     }
 
+    private async Task<string> SaveImageAsync(IFormFile file)
+    {
+        // Create images folder if not exists
+        var imagesFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images", "courses");
+        if (!Directory.Exists(imagesFolder))
+        {
+            Directory.CreateDirectory(imagesFolder);
+        }
+
+        // Generate unique filename
+        var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+        var filePath = Path.Combine(imagesFolder, fileName);
+
+        // Save file
+        using (var stream = new FileStream(filePath, FileMode.Create))
+        {
+            await file.CopyToAsync(stream);
+        }
+
+        // Return relative URL
+        return $"/images/courses/{fileName}";
+    }
+
     // POST: Admin/Courses/Delete/5
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id)
     {
         await _courseService.DeleteCourseAsync(id);
-        TempData["SuccessMessage"] = "Course deleted successfully!";
+        TempData["SuccessMessage"] = "Khóa học đã được xóa thành công!";
         return RedirectToAction(nameof(Index));
     }
 

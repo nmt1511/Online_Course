@@ -53,6 +53,25 @@ public class CreateCourseViewModel
 
     [Display(Name = "Trạng thái")]
     public CourseStatus Status { get; set; } = CourseStatus.Draft;
+
+    [Display(Name = "Loại khóa học")]
+    public CourseType CourseType { get; set; } = CourseType.Open_Always;
+
+    [Display(Name = "Ngày bắt đầu đăng ký")]
+    [DataType(DataType.Date)]
+    public DateTime? RegistrationStartDate { get; set; }
+
+    [Display(Name = "Ngày kết thúc đăng ký")]
+    [DataType(DataType.Date)]
+    public DateTime? RegistrationEndDate { get; set; }
+
+    [Display(Name = "Ngày bắt đầu học")]
+    [DataType(DataType.Date)]
+    public DateTime? StartDate { get; set; }
+
+    [Display(Name = "Ngày kết thúc học")]
+    [DataType(DataType.Date)]
+    public DateTime? EndDate { get; set; }
 }
 
 public class EditCourseViewModel
@@ -79,6 +98,25 @@ public class EditCourseViewModel
 
     [Display(Name = "Trạng thái")]
     public CourseStatus Status { get; set; } = CourseStatus.Draft;
+
+    [Display(Name = "Loại khóa học")]
+    public CourseType CourseType { get; set; } = CourseType.Open_Always;
+
+    [Display(Name = "Ngày bắt đầu đăng ký")]
+    [DataType(DataType.Date)]
+    public DateTime? RegistrationStartDate { get; set; }
+
+    [Display(Name = "Ngày kết thúc đăng ký")]
+    [DataType(DataType.Date)]
+    public DateTime? RegistrationEndDate { get; set; }
+
+    [Display(Name = "Ngày bắt đầu học")]
+    [DataType(DataType.Date)]
+    public DateTime? StartDate { get; set; }
+
+    [Display(Name = "Ngày kết thúc học")]
+    [DataType(DataType.Date)]
+    public DateTime? EndDate { get; set; }
 }
 
 public class CourseIndexViewModel

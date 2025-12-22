@@ -56,6 +56,7 @@ public class DashboardController : Controller
                 CategoryName = c.CategoryEntity?.Name ?? "Chưa phân loại",
                 ThumbnailUrl = c.ThumbnailUrl,
                 Status = c.CourseStatus,
+                Type = c.CourseType,
                 EnrollmentCount = c.Enrollments?.Count ?? 0,
                 LessonCount = c.Lessons?.Count ?? 0,
                 AverageRating = 4.5

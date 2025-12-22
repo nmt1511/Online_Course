@@ -19,42 +19,30 @@ public class LessonViewModel
     
     public string? Description { get; set; }
     
-    /// <summary>
-    /// URL của video (dùng khi LessonType = Video)
-    /// Hỗ trợ YouTube và các nền tảng video khác
-    /// </summary>
+    // URL của video (dùng khi LessonType = Video)
+    // Hỗ trợ YouTube và các nền tảng video khác
     [StringLength(500, ErrorMessage = "URL không được vượt quá 500 ký tự")]
     public string? VideoUrl { get; set; }
     
-    /// <summary>
-    /// Loại bài học: PDF hoặc Video
-    /// </summary>
+    // Loại bài học: PDF hoặc Video
     public LessonType LessonType { get; set; } = LessonType.Video;
     
-    /// <summary>
-    /// Tổng số trang (chỉ dùng cho PDF)
-    /// Tự động đếm khi upload file
-    /// </summary>
+    //Tổng số trang (chỉ dùng cho PDF)
+    // Tự động đếm khi upload file
     public int? TotalPages { get; set; }
     
-    /// <summary>
-    /// Tổng thời lượng video tính bằng giây (chỉ dùng cho Video)
-    /// Tự động lấy từ YouTube API nếu có API key
-    /// </summary>
+    //Tổng thời lượng video tính bằng giây (chỉ dùng cho Video)
+    //Tự động lấy từ YouTube API nếu có API key
     public int? TotalDurationSeconds { get; set; }
     
-    /// <summary>
-    /// Thứ tự bài học trong khóa học
-    /// Tự động tính = số bài học hiện có + 1
-    /// </summary>
+    //Thứ tự bài học trong khóa học
+    //Tự động tính = số bài học hiện có + 1
     public int OrderIndex { get; set; }
     
     // For display purposes
     public string? CourseTitle { get; set; }
     
-    /// <summary>
-    /// Đường dẫn đến file PDF (để hiển thị khi edit)
-    /// </summary>
+    //Đường dẫn đến file PDF (để hiển thị khi edit)
     public string? PdfUrl { get; set; }
 }
 

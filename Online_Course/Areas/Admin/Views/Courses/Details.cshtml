@@ -37,7 +37,7 @@
                 </div>
                 <div class="p-5 flex-1 flex flex-col">
                     <p class="text-gray-600 dark:text-[#9dabb9] text-sm mb-4 flex-1">@Model.Description</p>
-                    
+
                     @if (Model.ShowInstructor)
                     {
                         <div class="flex items-center gap-3 pb-4 mb-4 border-b border-gray-200 dark:border-[#283039]">
@@ -50,7 +50,7 @@
                             </div>
                         </div>
                     }
-                    
+
                     <!-- Course Type Badge -->
                     <div class="flex items-center gap-2 mb-4">
                         <div class="flex items-center gap-1.5 px-3 py-1.5 @(Model.IsFixedTime ? "bg-orange-500/10 text-orange-600 dark:text-orange-400" : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400") rounded-lg">
@@ -58,7 +58,7 @@
                             <span class="text-xs font-semibold">@Model.CourseTypeText</span>
                         </div>
                     </div>
-                    
+
                     @if (Model.IsFixedTime)
                     {
                         <!-- Date Information -->
@@ -67,7 +67,7 @@
                                 <span class="material-symbols-outlined text-[14px]">calendar_month</span>
                                 Thời gian khóa học
                             </h4>
-                            
+
                             <!-- Registration Period -->
                             <div class="flex items-start gap-2">
                                 <div class="size-6 rounded bg-blue-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -80,7 +80,7 @@
                                     </p>
                                 </div>
                             </div>
-                            
+
                             <!-- Course Period -->
                             <div class="flex items-start gap-2">
                                 <div class="size-6 rounded bg-green-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -95,7 +95,7 @@
                             </div>
                         </div>
                     }
-                    
+
                     <div class="flex items-center gap-6 pt-4 border-t border-gray-200 dark:border-[#283039]">
                         <div class="flex items-center gap-2">
                             <div class="size-9 rounded-lg bg-blue-500/10 flex items-center justify-center">
@@ -131,7 +131,7 @@
                     </h2>
                     <span class="bg-gray-100 dark:bg-[#283039] text-gray-600 dark:text-[#9dabb9] text-sm font-medium px-3 py-1 rounded-full">@Model.TotalLessons bài</span>
                 </div>
-                
+
                 @if (Model.Lessons.Any())
                 {
                     <div class="divide-y divide-gray-200 dark:divide-[#283039] max-h-[550px] overflow-y-auto">
@@ -149,15 +149,15 @@
                                     }
                                 </div>
                                 <div class="flex items-center gap-3">
-                                    <span class="flex items-center gap-1 text-xs font-medium @(lesson.LessonType == "pdf" ? "text-red-500" : "text-blue-500")">
+                                    <span class="flex items-center gap-1 text-xs font-medium @(lesson.LessonType == LessonType.Pdf ? "text-red-500" : "text-blue-500")">
                                         <span class="material-symbols-outlined text-[16px]">@lesson.LessonTypeIcon</span>
                                         @lesson.LessonTypeText
                                     </span>
                                     @if (!string.IsNullOrEmpty(lesson.ContentUrl))
                                     {
-                                        <a href="@lesson.ContentUrl" target="_blank" class="p-2 text-gray-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors" title="Mở nội dung">
-                                            <span class="material-symbols-outlined text-[18px]">open_in_new</span>
-                                        </a>
+                                        <button onclick="previewLesson('@lesson.ContentUrl', '@lesson.LessonType', '@lesson.Title')" class="p-2 text-gray-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors" title="Xem nội dung">
+                                            <span class="material-symbols-outlined text-[18px]">visibility</span>
+                                        </button>
                                     }
                                 </div>
                             </div>
@@ -184,7 +184,7 @@
             </h2>
             <span class="bg-gray-100 dark:bg-[#283039] text-gray-600 dark:text-[#9dabb9] text-sm font-medium px-3 py-1 rounded-full">@Model.TotalStudents học viên</span>
         </div>
-        
+
         @if (Model.Students.Any())
         {
             <div class="overflow-x-auto">
@@ -234,3 +234,133 @@
         }
     </div>
 </div>
+
+<!-- Lesson Content Modal -->
+<div id="lessonModal" class="fixed inset-0 z-[100] hidden">
+    <div class="absolute inset-0 bg-slate-900/90 backdrop-blur-md" onclick="closeLessonModal()"></div>
+    <div class="absolute inset-3 md:inset-6 lg:inset-10 bg-white dark:bg-[#1a222c] rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all transform scale-95 opacity-0 duration-300 border border-white/10" id="modalContent">
+        <!-- Modal Header: Premium Style -->
+        <div class="flex items-center justify-between px-6 h-16 border-b border-gray-200 dark:border-white/5 shrink-0 bg-white/80 dark:bg-[#1a222c]/80 backdrop-blur-md z-10">
+            <div class="flex items-center gap-4">
+                <div class="size-10 rounded-xl bg-primary/10 flex items-center justify-center shadow-inner">
+                    <span class="material-symbols-outlined text-primary text-[24px]" id="modalIcon">play_lesson</span>
+                </div>
+                <div class="flex flex-col">
+                    <h3 class="text-base font-bold text-slate-900 dark:text-white leading-tight" id="modalTitle">Tiêu đề bài học</h3>
+                    <span class="text-[11px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider" id="modalSubTitle">Đang xem bài học</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="closeLessonModal()" class="size-10 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+        </div>
+        <!-- Modal Body: Max Space -->
+        <div class="flex-1 bg-slate-100 dark:bg-[#0f172a] overflow-hidden relative" id="modalBody">
+            <!-- Content will be injected here -->
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function previewLesson(url, type, title) {
+            const modal = document.getElementById('lessonModal');
+            const modalContent = document.getElementById('modalContent');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            const modalIcon = document.getElementById('modalIcon');
+            const modalSubTitle = document.getElementById('modalSubTitle');
+
+            modalTitle.innerText = title;
+            modalBody.innerHTML = '';
+
+            // Loading state
+            modalBody.innerHTML = `
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="flex flex-col items-center gap-3">
+                        <div class="size-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+                        <p class="text-sm text-slate-500 font-medium">Đang tải nội dung...</p>
+                    </div>
+                </div>`;
+
+            // Set UI based on type and dynamic width
+            if (type === 'Pdf') {
+                modalIcon.innerText = 'description';
+                modalSubTitle.innerText = 'Tài liệu PDF';
+
+                // Narrower width for PDF to focus on single page readability
+                modalContent.classList.remove('md:inset-6', 'lg:inset-10');
+                modalContent.classList.add('md:max-w-4xl', 'md:mx-auto', 'md:h-[90vh]', 'md:relative', 'md:inset-auto', 'md:mt-10');
+            } else {
+                modalIcon.innerText = 'play_circle';
+                modalSubTitle.innerText = 'Video bài học';
+
+                // Wider for Video
+                modalContent.classList.add('md:inset-6', 'lg:inset-10');
+                modalContent.classList.remove('md:max-w-4xl', 'md:mx-auto', 'md:h-[90vh]', 'md:relative', 'md:inset-auto', 'md:mt-10');
+            }
+
+            // Inject Content after a tiny delay for smoother transition
+            setTimeout(() => {
+                if (type === 'Pdf') {
+                    // Optimized PDF view
+                    modalBody.innerHTML = `<iframe src="${url}#view=FitH&toolbar=1" class="w-full h-full border-none bg-slate-500" title="${title}"></iframe>`;
+                } else if (type === 'Video') {
+                    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                        let videoId = '';
+                        if (url.includes('watch?v=')) {
+                            videoId = url.split('v=')[1].split('&')[0];
+                        } else if (url.includes('youtu.be/')) {
+                            videoId = url.split('youtu.be/')[1].split('?')[0];
+                        }
+                        modalBody.innerHTML = `<iframe class="w-full h-full" src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+                    } else {
+                        modalBody.innerHTML = `
+                            <div class="w-full h-full flex items-center justify-center bg-black">
+                                <video class="max-w-full max-h-full" controls autoplay>
+                                    <source src="${url}" type="video/mp4">
+                                    Trình duyệt của bạn không hỗ trợ video.
+                                </video>
+                            </div>`;
+                    }
+                }
+            }, 100);
+
+            // Show Modal
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLessonModal() {
+            const modal = document.getElementById('lessonModal');
+            const modalContent = document.getElementById('modalContent');
+            const modalBody = document.getElementById('modalBody');
+
+            modalContent.classList.remove('scale-100', 'opacity-100');
+            modalContent.classList.add('scale-95', 'opacity-0');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modalBody.innerHTML = '';
+                document.body.style.overflow = '';
+
+                // Reset classes for next opening
+                modalContent.classList.add('md:inset-6', 'lg:inset-10');
+                modalContent.classList.remove('md:max-w-4xl', 'md:mx-auto', 'md:h-[90vh]', 'md:relative', 'md:inset-auto', 'md:mt-10');
+            }, 300);
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeLessonModal();
+            }
+        });
+    </script>
+}

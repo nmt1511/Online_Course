@@ -12,6 +12,7 @@ public class InstructorCourseListViewModel
     public string CategoryName { get; set; } = string.Empty;
     public string ThumbnailUrl { get; set; } = string.Empty;
     public CourseStatus Status { get; set; } = CourseStatus.Draft;
+    public CourseType Type { get; set; } = CourseType.Fixed_Time;
     public int EnrollmentCount { get; set; }
     public int LessonCount { get; set; }
     public double AverageRating { get; set; }
@@ -28,6 +29,18 @@ public class InstructorCourseListViewModel
         CourseStatus.Public => "bg-green-500/80",
         CourseStatus.Private => "bg-yellow-500/80",
         _ => "bg-slate-700/80"
+    };
+
+    public string TypeText => Type switch
+    {
+        CourseType.Fixed_Time => "Có thời gian",
+        _ => "Xuyên suốt"
+    };
+
+    public string TypeColor => Type switch
+    {
+        CourseType.Fixed_Time => "bg-green-500/80",
+        _ => "bg-yellow-500/80"
     };
 }
 
