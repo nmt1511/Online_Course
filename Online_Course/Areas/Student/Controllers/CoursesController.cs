@@ -59,11 +59,17 @@ public class CoursesController : Controller
     }
 
     [AllowAnonymous]
-    public async Task<IActionResult> Index(int? categoryId)
+    public async Task<IActionResult> Index(int? categoryId, CourseType? type)
     {
         var courses = !categoryId.HasValue
             ? await _courseService.GetAllCoursesAsync()
             : await _courseService.GetCoursesByCategoryAsync(categoryId.Value);
+
+        // Filter by CourseType if provided
+        if (type.HasValue)
+        {
+            courses = courses.Where(c => c.CourseType == type.Value);
+        }
 
         // Only show published courses to students
         var publishedCourses = courses.Where(c => c.CourseStatus == CourseStatus.Public).ToList();
@@ -82,10 +88,12 @@ public class CoursesController : Controller
                 ThumbnailUrl = c.ThumbnailUrl,
                 InstructorName = c.Instructor?.FullName ?? "Unknown",
                 EnrollmentCount = c.Enrollments?.Count ?? 0,
-                LessonCount = c.Lessons?.Count ?? 0
+                LessonCount = c.Lessons?.Count ?? 0,
+                CourseType = c.CourseType
             }).ToList(),
             Categories = categories.Where(c => c.IsActive).ToList(),
-            SelectedCategoryId = categoryId
+            SelectedCategoryId = categoryId,
+            SelectedCourseType = type
         };
 
         return View(viewModel);
@@ -128,7 +136,12 @@ public class CoursesController : Controller
                 Description = l.Description,
                 OrderIndex = l.OrderIndex
             }).ToList() ?? new List<StudentLessonViewModel>(),
-            IsEnrolled = isEnrolled
+            IsEnrolled = isEnrolled,
+            CourseType = course.CourseType,
+            StartDate = course.StartDate,
+            EndDate = course.EndDate,
+            RegistrationStartDate = course.RegistrationStartDate,
+            RegistrationEndDate = course.RegistrationEndDate
         };
 
         return View(viewModel);

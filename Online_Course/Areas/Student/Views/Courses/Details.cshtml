@@ -41,6 +41,13 @@
                                 <span>@Model.CategoryName</span>
                             </div>
                         }
+                        <span class="hidden sm:inline">•</span>
+                        <div class="flex items-center gap-1">
+                            <span class="material-symbols-outlined text-lg">@(Model.CourseType == Online_Course.Models.CourseType.Open_Always ? "all_inclusive" : "calendar_today")</span>
+                            <span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold @(Model.CourseType == Online_Course.Models.CourseType.Open_Always ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300" : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300")">
+                                @(Model.CourseType == Online_Course.Models.CourseType.Open_Always ? "Xuyên suốt" : "Có lịch trình")
+                            </span>
+                        </div>
                     </div>
                 </div>
 
@@ -157,10 +164,29 @@
                                     <span class="material-symbols-outlined text-gray-500 dark:text-[#9dabb9] text-xl">group</span>
                                     <span>@Model.EnrollmentCount học viên đã đăng ký</span>
                                 </div>
-                                <div class="flex items-center gap-3 text-gray-600 dark:text-[#d0d6dc] text-sm">
-                                    <span class="material-symbols-outlined text-gray-500 dark:text-[#9dabb9] text-xl">all_inclusive</span>
-                                    <span>Truy cập trọn đời</span>
-                                </div>
+                                @if (Model.CourseType == Online_Course.Models.CourseType.Open_Always)
+                                {
+                                    <div class="flex items-center gap-3 text-gray-600 dark:text-[#d0d6dc] text-sm">
+                                        <span class="material-symbols-outlined text-gray-500 dark:text-[#9dabb9] text-xl">all_inclusive</span>
+                                        <span>Truy cập trọn đời</span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="flex flex-col gap-2 pt-2 border-t border-gray-100 dark:border-gray-800 mt-1">
+                                        <p class="text-slate-900 dark:text-white font-bold text-xs uppercase tracking-wider">Lịch đăng ký</p>
+                                        <div class="flex items-center gap-3 text-gray-600 dark:text-[#d0d6dc] text-sm">
+                                            <span class="material-symbols-outlined text-gray-500 dark:text-[#9dabb9] text-xl">how_to_reg</span>
+                                            <span>@(Model.RegistrationStartDate?.ToString("dd/MM/yyyy") ?? "...") - @(Model.RegistrationEndDate?.ToString("dd/MM/yyyy") ?? "...")</span>
+                                        </div>
+                                        
+                                        <p class="text-slate-900 dark:text-white font-bold text-xs uppercase tracking-wider mt-2">Lịch học</p>
+                                        <div class="flex items-center gap-3 text-gray-600 dark:text-[#d0d6dc] text-sm">
+                                            <span class="material-symbols-outlined text-gray-500 dark:text-[#9dabb9] text-xl">calendar_today</span>
+                                            <span>@(Model.StartDate?.ToString("dd/MM/yyyy") ?? "...") - @(Model.EndDate?.ToString("dd/MM/yyyy") ?? "...")</span>
+                                        </div>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>
