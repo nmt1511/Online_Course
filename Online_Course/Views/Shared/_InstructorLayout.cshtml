@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Giảng viên</title>
+    
+    <!-- Google Fonts: Lexend -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    
+    <!-- Material Symbols Outlined -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    
+    <!-- Theme Config -->
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#18222c",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                },
+            },
+        }
+    </script>
+    
+    <style>
+        body { font-family: 'Lexend', sans-serif; }
+        
+        /* Sidebar collapse styles */
+        .sidebar-expanded { width: 18rem; }
+        .sidebar-collapsed { width: 4.5rem; }
+        .sidebar-collapsed .sidebar-text { display: none; }
+    </style>
+    
+    <script>
+        // Apply theme immediately to prevent flash (default: dark)
+        (function() {
+            var theme = localStorage.getItem('theme');
+            if (theme === null) {
+                theme = 'dark';
+                localStorage.setItem('theme', 'dark');
+            }
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            }
+        })();
+        // Apply sidebar state immediately to prevent flash
+        (function() {
+            var isCollapsed = localStorage.getItem('instructorSidebarCollapsed') === 'true';
+            document.write('<style>#sidebar{width:' + (isCollapsed ? '4.5rem' : '18rem') + ';}#sidebar .sidebar-text{display:' + (isCollapsed ? 'none' : 'block') + ';}</style>');
+        })();
+    </script>
+    
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white antialiased overflow-hidden">
+    <div class="flex h-screen w-full overflow-hidden">
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="flex-shrink-0 bg-white dark:bg-surface-dark border-r border-gray-200 dark:border-slate-800 flex flex-col hidden md:flex transition-all duration-300">
+            <div class="p-4 pb-2">
+                <div class="flex items-center gap-3 mb-6">
+                    <button id="sidebarToggle" class="size-10 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white font-bold text-xl flex-shrink-0 hover:opacity-90 transition-opacity cursor-pointer" title="Thu gọn/Mở rộng menu">
+                        <span class="material-symbols-outlined text-[20px]">menu</span>
+                    </button>
+                    <div class="sidebar-text overflow-hidden">
+                        <h1 class="text-slate-900 dark:text-white text-lg font-bold leading-tight whitespace-nowrap">EduDash</h1>
+                        <p class="text-gray-500 dark:text-slate-400 text-xs whitespace-nowrap">Giảng viên</p>
+                    </div>
+                </div>
+
+                <!-- User Profile -->
+                <div class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700/50 mb-6">
+                    <div class="size-10 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-primary">person</span>
+                    </div>
+                    <div class="flex flex-col overflow-hidden sidebar-text">
+                        <h2 class="text-slate-900 dark:text-white text-sm font-medium leading-normal truncate">@User.Identity?.Name</h2>
+                        <p class="text-gray-500 dark:text-slate-400 text-xs font-normal leading-normal truncate">Giảng viên</p>
+                    </div>
+                </div>
+                
+                @{
+                    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+                }
+                <!-- Navigation -->
+                <nav class="flex flex-col gap-2">
+                    <a asp-area="Instructor" asp-controller="Dashboard" asp-action="Index" class="flex items-center gap-3 px-3 py-2.5 rounded-lg @(controller == "Dashboard" ? "bg-primary/10 text-primary border border-primary/20" : "text-gray-600 dark:text-slate-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-slate-800") transition-colors" title="Tổng quan">
+                        <span class="material-symbols-outlined text-[20px] flex-shrink-0">dashboard</span>
+                        <p class="text-sm font-medium leading-normal sidebar-text whitespace-nowrap">Tổng quan</p>
+                    </a>
+                    <a asp-area="Instructor" asp-controller="Courses" asp-action="Index" class="flex items-center gap-3 px-3 py-2.5 rounded-lg @(controller == "Courses" || controller == "Lessons" ? "bg-primary/10 text-primary border border-primary/20" : "text-gray-600 dark:text-slate-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-slate-800") transition-colors" title="Quản lý khóa học">
+                        <span class="material-symbols-outlined text-[20px] flex-shrink-0">school</span>
+                        <p class="text-sm font-medium leading-normal sidebar-text whitespace-nowrap">Quản lý khóa học</p>
+                    </a>
+                    <a asp-area="Instructor" asp-controller="Students" asp-action="Index" class="flex items-center gap-3 px-3 py-2.5 rounded-lg @(controller == "Students" ? "bg-primary/10 text-primary border border-primary/20" : "text-gray-600 dark:text-slate-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-slate-800") transition-colors" title="Học viên & Tiến độ">
+                        <span class="material-symbols-outlined text-[20px] flex-shrink-0">group</span>
+                        <p class="text-sm font-medium leading-normal sidebar-text whitespace-nowrap">Học viên & Tiến độ</p>
+                    </a>
+                    <a asp-area="Instructor" asp-controller="Analytics" asp-action="Index" class="flex items-center gap-3 px-3 py-2.5 rounded-lg @(controller == "Analytics" ? "bg-primary/10 text-primary border border-primary/20" : "text-gray-600 dark:text-slate-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-slate-800") transition-colors" title="Thống kê">
+                        <span class="material-symbols-outlined text-[20px] flex-shrink-0">bar_chart</span>
+                        <p class="text-sm font-medium leading-normal sidebar-text whitespace-nowrap">Thống kê</p>
+                    </a>
+                </nav>
+            </div>
+            <div class="mt-auto p-4 pt-2 space-y-1">
+                <a asp-area="Instructor" asp-controller="Profile" asp-action="Index" class="flex items-center gap-3 px-3 py-2.5 rounded-lg @(controller == "Profile" ? "bg-primary/10 text-primary border border-primary/20" : "text-gray-600 dark:text-slate-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-slate-800") transition-colors" title="Hồ sơ cá nhân">
+                    <span class="material-symbols-outlined text-[20px] flex-shrink-0">account_circle</span>
+                    <p class="text-sm font-medium leading-normal sidebar-text whitespace-nowrap">Hồ sơ cá nhân</p>
+                </a>
+                <a asp-area="" asp-controller="Account" asp-action="Logout" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" title="Đăng xuất">
+                    <span class="material-symbols-outlined text-[20px] flex-shrink-0">logout</span>
+                    <p class="text-sm font-medium leading-normal sidebar-text whitespace-nowrap">Đăng xuất</p>
+                </a>
+            </div>
+        </aside>
+        
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col h-full overflow-hidden bg-background-light dark:bg-background-dark relative">
+            <!-- Top Header -->
+            <header class="h-16 flex items-center justify-between px-6 md:px-8 border-b border-gray-200 dark:border-slate-800 bg-white dark:bg-surface-dark shrink-0 z-10">
+                <div class="flex items-center gap-4">
+                    <button class="md:hidden text-gray-500 dark:text-slate-400">
+                        <span class="material-symbols-outlined">menu</span>
+                    </button>
+                    <h2 class="text-slate-900 dark:text-white text-lg font-bold">@ViewData["Title"]</h2>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="relative hidden sm:block">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 material-symbols-outlined text-[20px]">search</span>
+                        <input type="text" class="bg-gray-100 dark:bg-slate-800 text-slate-900 dark:text-white text-sm pl-10 pr-4 py-2 rounded-lg border border-gray-200 dark:border-slate-700 focus:outline-none focus:border-primary w-64" placeholder="Tìm kiếm khóa học..." />
+                    </div>
+                    <!-- Theme Toggle -->
+                    <button id="themeToggle" type="button" class="size-10 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400 hover:text-primary transition-colors border border-gray-200 dark:border-slate-700" title="Chuyển đổi giao diện">
+                        <span class="material-symbols-outlined text-[20px] dark:hidden">dark_mode</span>
+                        <span class="material-symbols-outlined text-[20px] hidden dark:block">light_mode</span>
+                    </button>
+                </div>
+            </header>
+            
+            <!-- Scrollable Page Content -->
+            <div class="flex-1 overflow-y-auto p-6 md:p-8 scroll-smooth">
+                <div class="max-w-7xl mx-auto flex flex-col gap-8">
+                    @RenderBody()
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- jQuery (required for validation) -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    
+    <script>
+        // Theme Toggle
+        document.getElementById('themeToggle')?.addEventListener('click', function() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        });
+        
+        // Sidebar Toggle
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        
+        function updateSidebar(collapsed) {
+            if (collapsed) {
+                sidebar.style.width = '4.5rem';
+                sidebar.querySelectorAll('.sidebar-text').forEach(el => el.style.display = 'none');
+            } else {
+                sidebar.style.width = '18rem';
+                sidebar.querySelectorAll('.sidebar-text').forEach(el => el.style.display = 'block');
+            }
+        }
+        
+        sidebarToggle?.addEventListener('click', function() {
+            const isCurrentlyCollapsed = localStorage.getItem('instructorSidebarCollapsed') === 'true';
+            const willCollapse = !isCurrentlyCollapsed;
+            localStorage.setItem('instructorSidebarCollapsed', willCollapse);
+            updateSidebar(willCollapse);
+        });
+    </script>
+    
+    @await RenderSectionAsync("Scripts", required: false)
+    
+    <partial name="_ConfirmDialog" />
+</body>
+</html>

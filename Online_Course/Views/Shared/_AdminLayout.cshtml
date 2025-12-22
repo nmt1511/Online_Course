@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Quản trị hệ thống</title>
+    
+    <!-- Google Fonts: Lexend -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet" />
+    
+    <!-- Material Symbols Outlined -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    
+    <!-- Theme Config -->
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                        "surface-dark": "#182430",
+                        "surface-light": "#ffffff",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"],
+                        "body": ["Lexend", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    
+    <style>
+        body { font-family: 'Lexend', sans-serif; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #101922; }
+        ::-webkit-scrollbar-thumb { background: #2d3b4e; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3e5066; }
+        
+        /* Sidebar collapse styles */
+        .sidebar-expanded { width: 16rem; }
+        .sidebar-collapsed { width: 4.5rem; }
+        .sidebar-collapsed .sidebar-text { display: none; }
+        /* Hide sidebar initially to prevent flash */
+        .sidebar-loading { visibility: hidden; }
+    </style>
+    
+    <script>
+        // Apply theme immediately to prevent flash (default: dark)
+        (function() {
+            var theme = localStorage.getItem('theme');
+            if (theme === null) {
+                theme = 'dark';
+                localStorage.setItem('theme', 'dark');
+            }
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            }
+        })();
+        // Apply sidebar state immediately to prevent flash
+        (function() {
+            var isCollapsed = localStorage.getItem('adminSidebarCollapsed') === 'true';
+            document.write('<style>#sidebar{width:' + (isCollapsed ? '4.5rem' : '16rem') + ';}#sidebar .sidebar-text{display:' + (isCollapsed ? 'none' : 'block') + ';}</style>');
+        })();
+    </script>
+    
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white overflow-hidden h-screen flex font-body">
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="flex-shrink-0 flex flex-col border-r border-gray-200 dark:border-gray-800 bg-surface-light dark:bg-[#111418] h-full transition-all duration-300">
+        <div class="flex items-center gap-3 p-4 h-16 border-b border-gray-200 dark:border-gray-800">
+            <button id="sidebarToggle" class="size-10 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white font-bold text-xl flex-shrink-0 hover:opacity-90 transition-opacity cursor-pointer" title="Thu gọn/Mở rộng menu">
+                <span class="material-symbols-outlined text-[20px] transition-transform duration-300" id="toggleIcon">menu</span>
+            </button>
+            <div class="flex flex-col sidebar-text overflow-hidden">
+                <h1 class="text-base font-bold leading-normal dark:text-white whitespace-nowrap">EduAdmin</h1>
+                <p class="text-gray-500 dark:text-[#9dabb9] text-xs font-normal whitespace-nowrap">Portal v2.0</p>
+            </div>
+        </div>
+        <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+            @{
+                var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+            }
+            <!-- Dashboard -->
+            <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="flex items-center gap-3 px-3 py-2.5 rounded-lg @(controller == "Dashboard" ? "bg-primary/10 text-primary dark:text-white dark:bg-[#283039]" : "text-gray-600 dark:text-[#9dabb9] hover:bg-gray-100 dark:hover:bg-[#283039]/50 hover:text-primary dark:hover:text-white") transition-colors" title="Tổng quan">
+                <span class="material-symbols-outlined flex-shrink-0">dashboard</span>
+                <span class="text-sm font-medium sidebar-text whitespace-nowrap">Tổng quan</span>
+            </a>
+            <!-- User Management -->
+            <a asp-area="Admin" asp-controller="Users" asp-action="Index" class="flex items-center gap-3 px-3 py-2.5 rounded-lg @(controller == "Users" ? "bg-primary/10 text-primary dark:text-white dark:bg-[#283039]" : "text-gray-600 dark:text-[#9dabb9] hover:bg-gray-100 dark:hover:bg-[#283039]/50 hover:text-primary dark:hover:text-white") transition-colors" title="Quản lý người dùng">
+                <span class="material-symbols-outlined flex-shrink-0">group</span>
+                <span class="text-sm font-medium sidebar-text whitespace-nowrap">Quản lý người dùng</span>
+            </a>
+            <!-- Course Management -->
+            <a asp-area="Admin" asp-controller="Courses" asp-action="Index" class="flex items-center gap-3 px-3 py-2.5 rounded-lg @(controller == "Courses" ? "bg-primary/10 text-primary dark:text-white dark:bg-[#283039]" : "text-gray-600 dark:text-[#9dabb9] hover:bg-gray-100 dark:hover:bg-[#283039]/50 hover:text-primary dark:hover:text-white") transition-colors" title="Quản lý khóa học">
+                <span class="material-symbols-outlined flex-shrink-0">school</span>
+                <span class="text-sm font-medium sidebar-text whitespace-nowrap">Quản lý khóa học</span>
+            </a>
+            <!-- Category Management -->
+            <a asp-area="Admin" asp-controller="Categories" asp-action="Index" class="flex items-center gap-3 px-3 py-2.5 rounded-lg @(controller == "Categories" ? "bg-primary/10 text-primary dark:text-white dark:bg-[#283039]" : "text-gray-600 dark:text-[#9dabb9] hover:bg-gray-100 dark:hover:bg-[#283039]/50 hover:text-primary dark:hover:text-white") transition-colors" title="Quản lý danh mục">
+                <span class="material-symbols-outlined flex-shrink-0">category</span>
+                <span class="text-sm font-medium sidebar-text whitespace-nowrap">Quản lý danh mục</span>
+            </a>
+            <!-- Reports & Statistics -->
+            <a asp-area="Admin" asp-controller="Reports" asp-action="Index" class="flex items-center gap-3 px-3 py-2.5 rounded-lg @(controller == "Reports" ? "bg-primary/10 text-primary dark:text-white dark:bg-[#283039]" : "text-gray-600 dark:text-[#9dabb9] hover:bg-gray-100 dark:hover:bg-[#283039]/50 hover:text-primary dark:hover:text-white") transition-colors" title="Báo cáo & Thống kê">
+                <span class="material-symbols-outlined flex-shrink-0">analytics</span>
+                <span class="text-sm font-medium sidebar-text whitespace-nowrap">Báo cáo & Thống kê</span>
+            </a>
+            
+            <div class="pt-4 pb-2 sidebar-text">
+                <p class="px-3 text-xs font-semibold text-gray-400 dark:text-gray-600 uppercase tracking-wider whitespace-nowrap">Hệ thống</p>
+            </div>
+            <!-- Profile -->
+            <a asp-area="Admin" asp-controller="Profile" asp-action="Index" class="flex items-center gap-3 px-3 py-2.5 rounded-lg @(controller == "Profile" ? "bg-primary/10 text-primary dark:text-white dark:bg-[#283039]" : "text-gray-600 dark:text-[#9dabb9] hover:bg-gray-100 dark:hover:bg-[#283039]/50 hover:text-primary dark:hover:text-white") transition-colors" title="Hồ sơ cá nhân">
+                <span class="material-symbols-outlined flex-shrink-0">account_circle</span>
+                <span class="text-sm font-medium sidebar-text whitespace-nowrap">Hồ sơ cá nhân</span>
+            </a>
+            <!-- Logout -->
+            <a asp-area="" asp-controller="Account" asp-action="Logout" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors" title="Đăng xuất">
+                <span class="material-symbols-outlined flex-shrink-0">logout</span>
+                <span class="text-sm font-medium sidebar-text whitespace-nowrap">Đăng xuất</span>
+            </a>
+        </nav>
+        <div class="p-3 border-t border-gray-200 dark:border-gray-800">
+            <a asp-area="Admin" asp-controller="Profile" asp-action="Index" class="flex items-center gap-3 hover:bg-gray-100 dark:hover:bg-[#283039]/50 p-2 rounded-lg transition-colors">
+                <div class="size-10 rounded-full bg-primary/20 flex items-center justify-center ring-2 ring-primary/20 flex-shrink-0">
+                    <span class="material-symbols-outlined text-primary">person</span>
+                </div>
+                <div class="flex flex-col overflow-hidden sidebar-text">
+                    <p class="text-sm font-bold truncate dark:text-white">@User.Identity?.Name</p>
+                    <p class="text-xs text-gray-500 truncate dark:text-[#9dabb9]">Quản trị viên</p>
+                </div>
+            </a>
+        </div>
+    </aside>
+
+    
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+        <!-- Top Navbar -->
+        <header class="h-20 flex-shrink-0 flex items-center justify-between px-8 border-b border-gray-200 dark:border-gray-800 bg-surface-light dark:bg-[#111418]">
+            <h2 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">@ViewData["Title"]</h2>
+            <div class="flex items-center gap-6">
+                <!-- Search -->
+                <div class="relative w-64 hidden sm:block">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                        <span class="material-symbols-outlined text-[20px]">search</span>
+                    </span>
+                    <input type="text" class="w-full h-10 pl-10 pr-4 text-sm bg-gray-100 dark:bg-[#283039] border-none rounded-lg focus:ring-2 focus:ring-primary text-gray-900 dark:text-white placeholder-gray-500" placeholder="Tìm kiếm..." />
+                </div>
+                <!-- Theme Toggle -->
+                <button id="themeToggle" type="button" class="p-2 text-gray-500 hover:text-primary dark:text-[#9dabb9] dark:hover:text-white transition-colors" title="Chuyển đổi giao diện">
+                    <span class="material-symbols-outlined dark:hidden">dark_mode</span>
+                    <span class="material-symbols-outlined hidden dark:block">light_mode</span>
+                </button>
+            </div>
+        </header>
+        
+        <!-- Scrollable Content -->
+        <div class="flex-1 overflow-y-auto p-8 space-y-8 bg-background-light dark:bg-background-dark">
+            @RenderBody()
+            
+            <!-- Footer for Content Area -->
+            <div class="flex justify-center py-6 text-xs text-gray-500 dark:text-gray-600">
+                © @DateTime.Now.Year Hệ thống quản lý khóa học trực tuyến. Bảo lưu mọi quyền.
+            </div>
+        </div>
+    </main>
+    
+    <!-- jQuery (required for validation) -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    
+    <script>
+        // Theme Toggle
+        document.getElementById('themeToggle')?.addEventListener('click', function() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        });
+        
+        // Sidebar Toggle
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        
+        function updateSidebar(collapsed) {
+            if (collapsed) {
+                sidebar.style.width = '4.5rem';
+                sidebar.querySelectorAll('.sidebar-text').forEach(el => el.style.display = 'none');
+            } else {
+                sidebar.style.width = '16rem';
+                sidebar.querySelectorAll('.sidebar-text').forEach(el => el.style.display = 'block');
+            }
+        }
+        
+        sidebarToggle?.addEventListener('click', function() {
+            const isCurrentlyCollapsed = localStorage.getItem('adminSidebarCollapsed') === 'true';
+            const willCollapse = !isCurrentlyCollapsed;
+            localStorage.setItem('adminSidebarCollapsed', willCollapse);
+            updateSidebar(willCollapse);
+        });
+    </script>
+    
+    @await RenderSectionAsync("Scripts", required: false)
+    
+    <partial name="_ConfirmDialog" />
+</body>
+</html>

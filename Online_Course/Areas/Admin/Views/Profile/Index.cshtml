@@ -1,0 +1,137 @@
+@model Online_Course.ViewModels.ProfileViewModel
+@{
+    ViewData["Title"] = "Thông tin cá nhân";
+}
+
+<div class="max-w-5xl mx-auto flex flex-col gap-6">
+    <!-- Page Heading -->
+    <div>
+        <h1 class="text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white mb-2">Thông tin cá nhân</h1>
+        <p class="text-slate-500 dark:text-[#9dabb9]">Quản lý thông tin hồ sơ của bạn để bảo mật tài khoản</p>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400 flex items-center gap-3">
+            <span class="material-symbols-outlined">check_circle</span>
+            <span>@TempData["SuccessMessage"]</span>
+        </div>
+    }
+
+    <!-- Layout Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Left Column: Avatar Card -->
+        <div class="lg:col-span-4 flex flex-col gap-6">
+            <div class="bg-white dark:bg-[#1a222c] border border-gray-200 dark:border-[#283039] rounded-xl p-6 flex flex-col items-center text-center shadow-sm">
+                <div class="relative group cursor-pointer">
+                    <div class="size-32 rounded-full bg-red-500/20 border-4 border-slate-50 dark:border-[#283039] flex items-center justify-center">
+                        <span class="material-symbols-outlined text-red-500 text-6xl">admin_panel_settings</span>
+                    </div>
+                </div>
+                <h2 class="mt-4 text-xl font-bold text-slate-900 dark:text-white">@Model.FullName</h2>
+                <p class="text-slate-500 dark:text-[#9dabb9]">@Model.Role</p>
+                <div class="mt-4 w-full">
+                    <div class="flex items-center justify-center gap-2 text-sm text-slate-500 dark:text-[#9dabb9]">
+                        <span class="material-symbols-outlined text-[18px]">calendar_today</span>
+                        <span>Tham gia: @Model.CreatedAt.ToString("dd/MM/yyyy")</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Status Card -->
+            <div class="bg-white dark:bg-[#1a222c] border border-gray-200 dark:border-[#283039] rounded-xl p-5 shadow-sm">
+                <h3 class="font-semibold mb-4 text-sm uppercase tracking-wider text-slate-500 dark:text-slate-400">Trạng thái tài khoản</h3>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-600 dark:text-slate-300 text-sm">Trạng thái</span>
+                        @if (Model.IsActive)
+                        {
+                            <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">Hoạt động</span>
+                        }
+                        else
+                        {
+                            <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400">Vô hiệu</span>
+                        }
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-600 dark:text-slate-300 text-sm">Vai trò</span>
+                        <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400">@Model.Role</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Info & Actions -->
+        <div class="lg:col-span-8 flex flex-col gap-6">
+            <!-- Basic Info Section -->
+            <div class="bg-white dark:bg-[#1a222c] border border-gray-200 dark:border-[#283039] rounded-xl p-6 lg:p-8 shadow-sm">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-primary">badge</span>
+                        <h3 class="text-lg font-bold">Thông tin cơ bản</h3>
+                    </div>
+                    <a asp-action="Edit" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary font-medium text-sm transition-colors">
+                        <span class="material-symbols-outlined text-[18px]">edit</span>
+                        Chỉnh sửa
+                    </a>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="flex flex-col gap-1.5 md:col-span-2">
+                        <label class="text-sm font-medium text-slate-500 dark:text-slate-400">Họ và tên</label>
+                        <div class="w-full h-11 rounded-lg bg-slate-50 dark:bg-[#111418] border border-gray-200 dark:border-transparent px-4 flex items-center text-slate-900 dark:text-white">
+                            @Model.FullName
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-sm font-medium text-slate-500 dark:text-slate-400">Email</label>
+                        <div class="relative">
+                            <div class="w-full h-11 rounded-lg bg-slate-100 dark:bg-[#111418] border border-gray-200 dark:border-transparent px-4 flex items-center text-slate-500 dark:text-[#9dabb9]">
+                                @Model.Email
+                            </div>
+                            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">lock</span>
+                        </div>
+                        <p class="text-xs text-slate-400 dark:text-slate-500">Email không thể thay đổi</p>
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-sm font-medium text-slate-500 dark:text-slate-400">Vai trò</label>
+                        <div class="w-full h-11 rounded-lg bg-slate-100 dark:bg-[#111418] border border-gray-200 dark:border-transparent px-4 flex items-center text-slate-500 dark:text-[#9dabb9]">
+                            @Model.Role
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Section -->
+            <div class="bg-white dark:bg-[#1a222c] border border-gray-200 dark:border-[#283039] rounded-xl p-6 lg:p-8 shadow-sm">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-primary">security</span>
+                        <h3 class="text-lg font-bold">Bảo mật</h3>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-4 rounded-lg bg-slate-50 dark:bg-[#111418] border border-gray-200 dark:border-[#283039]">
+                        <div class="flex items-center gap-3">
+                            <div class="size-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-primary text-[20px]">lock</span>
+                            </div>
+                            <div>
+                                <p class="font-medium text-slate-900 dark:text-white">Mật khẩu</p>
+                                <p class="text-sm text-slate-500 dark:text-[#9dabb9]">Thay đổi mật khẩu đăng nhập</p>
+                            </div>
+                        </div>
+                        <a asp-action="ChangePassword" class="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-[#283039] text-slate-600 dark:text-slate-300 font-medium text-sm hover:bg-slate-100 dark:hover:bg-[#283039] transition-colors">
+                            <span class="material-symbols-outlined text-[18px]">edit</span>
+                            Đổi mật khẩu
+                        </a>
+                    </div>
+                    
+                    <div class="text-xs text-slate-500 dark:text-[#9dabb9] bg-blue-50 dark:bg-primary/10 p-3 rounded-lg border border-blue-100 dark:border-primary/20 flex gap-2 items-start">
+                        <span class="material-symbols-outlined text-[16px] text-primary mt-0.5">info</span>
+                        <p>Để bảo mật tài khoản, hãy sử dụng mật khẩu mạnh với ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và số.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

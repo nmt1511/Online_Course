@@ -1,0 +1,82 @@
+<!-- Custom Confirm Dialog -->
+<div id="confirmDialog" class="fixed inset-0 z-50 hidden">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm" onclick="closeConfirmDialog()"></div>
+    
+    <!-- Dialog -->
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md">
+        <div class="bg-white dark:bg-surface-dark border border-gray-200 dark:border-slate-700 rounded-xl shadow-2xl overflow-hidden">
+            <!-- Header -->
+            <div class="p-6 pb-4">
+                <div class="flex items-center gap-4">
+                    <div id="dialogIcon" class="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-red-500 text-2xl">warning</span>
+                    </div>
+                    <div>
+                        <h3 id="dialogTitle" class="text-slate-900 dark:text-white text-lg font-bold">Xác nhận</h3>
+                        <p id="dialogMessage" class="text-gray-500 dark:text-slate-400 text-sm mt-1">Bạn có chắc chắn muốn thực hiện thao tác này?</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="flex gap-3 p-6 pt-2 border-t border-gray-200 dark:border-slate-800">
+                <button type="button" onclick="closeConfirmDialog()" 
+                        class="flex-1 px-4 py-2.5 bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 text-slate-900 dark:text-white text-sm font-medium rounded-lg transition-colors">
+                    Hủy bỏ
+                </button>
+                <button type="button" id="confirmBtn" onclick="confirmAction()"
+                        class="flex-1 px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg transition-colors">
+                    Xác nhận
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let pendingForm = null;
+    
+    function showConfirmDialog(form, title, message, confirmText = 'Xác nhận', type = 'danger') {
+        pendingForm = form;
+        document.getElementById('dialogTitle').textContent = title;
+        document.getElementById('dialogMessage').textContent = message;
+        document.getElementById('confirmBtn').textContent = confirmText;
+        
+        const icon = document.getElementById('dialogIcon');
+        const confirmBtn = document.getElementById('confirmBtn');
+        
+        if (type === 'danger') {
+            icon.className = 'w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center';
+            icon.innerHTML = '<span class="material-symbols-outlined text-red-500 text-2xl">warning</span>';
+            confirmBtn.className = 'flex-1 px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg transition-colors';
+        } else if (type === 'warning') {
+            icon.className = 'w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center';
+            icon.innerHTML = '<span class="material-symbols-outlined text-yellow-500 text-2xl">help</span>';
+            confirmBtn.className = 'flex-1 px-4 py-2.5 bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-medium rounded-lg transition-colors';
+        }
+        
+        document.getElementById('confirmDialog').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeConfirmDialog() {
+        document.getElementById('confirmDialog').classList.add('hidden');
+        document.body.style.overflow = '';
+        pendingForm = null;
+    }
+    
+    function confirmAction() {
+        if (pendingForm) {
+            pendingForm.submit();
+        }
+        closeConfirmDialog();
+    }
+    
+    // Close on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeConfirmDialog();
+        }
+    });
+</script>

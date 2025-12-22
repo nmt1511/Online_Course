@@ -1,0 +1,110 @@
+@model Online_Course.ViewModels.InstructorDashboardViewModel
+@{
+    ViewData["Title"] = "Bảng điều khiển";
+    Layout = "~/Views/Shared/_InstructorLayout.cshtml";
+}
+
+<div class="flex flex-col gap-8">
+    <!-- Welcome & Stats -->
+    <div class="flex flex-col gap-6">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+                <h1 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-2">Chào mừng, @Model.InstructorName</h1>
+                <p class="text-gray-500 dark:text-slate-400">Đây là tổng quan về các khóa học của bạn hôm nay.</p>
+            </div>
+            <a asp-area="Instructor" asp-controller="Courses" asp-action="Index" 
+               class="bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors w-fit">
+                <span class="material-symbols-outlined text-[20px]">school</span>
+                Quản lý khóa học
+            </a>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white dark:bg-surface-dark p-5 rounded-xl border border-gray-200 dark:border-slate-800 flex flex-col gap-1">
+                <div class="flex items-center justify-between">
+                    <p class="text-gray-500 dark:text-slate-400 text-sm font-medium">Tổng học viên</p>
+                    <span class="material-symbols-outlined text-primary bg-primary/10 p-1.5 rounded-lg text-[20px]">group</span>
+                </div>
+                <p class="text-3xl font-bold text-slate-900 dark:text-white mt-2">@Model.TotalStudents</p>
+                <p class="text-emerald-500 text-sm font-medium flex items-center gap-1 mt-1">
+                    <span class="material-symbols-outlined text-[16px]">trending_up</span>
+                    Đang hoạt động
+                </p>
+            </div>
+            <div class="bg-white dark:bg-surface-dark p-5 rounded-xl border border-gray-200 dark:border-slate-800 flex flex-col gap-1">
+                <div class="flex items-center justify-between">
+                    <p class="text-gray-500 dark:text-slate-400 text-sm font-medium">Khóa học đã xuất bản</p>
+                    <span class="material-symbols-outlined text-orange-400 bg-orange-400/10 p-1.5 rounded-lg text-[20px]">library_books</span>
+                </div>
+                <p class="text-3xl font-bold text-slate-900 dark:text-white mt-2">@Model.ActiveCourses</p>
+                <p class="text-gray-500 dark:text-slate-500 text-sm font-medium flex items-center gap-1 mt-1">
+                    @Model.DraftCourses bản nháp
+                </p>
+            </div>
+            <div class="bg-white dark:bg-surface-dark p-5 rounded-xl border border-gray-200 dark:border-slate-800 flex flex-col gap-1">
+                <div class="flex items-center justify-between">
+                    <p class="text-gray-500 dark:text-slate-400 text-sm font-medium">Tỷ lệ hoàn thành TB</p>
+                    <span class="material-symbols-outlined text-purple-400 bg-purple-400/10 p-1.5 rounded-lg text-[20px]">donut_large</span>
+                </div>
+                <p class="text-3xl font-bold text-slate-900 dark:text-white mt-2">@Model.AverageCompletion%</p>
+                <p class="text-emerald-500 text-sm font-medium flex items-center gap-1 mt-1">
+                    <span class="material-symbols-outlined text-[16px]">trending_up</span>
+                    Tốt
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Course List -->
+    <div class="flex flex-col gap-4">
+        <div class="flex items-center justify-between">
+            <h3 class="text-slate-900 dark:text-white text-lg font-bold">Khóa học của tôi</h3>
+            <a asp-area="Instructor" asp-controller="Courses" asp-action="Index" class="text-primary text-sm font-medium hover:underline">Xem tất cả</a>
+        </div>
+
+        @if (!Model.Courses.Any())
+        {
+            <div class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-slate-800 p-8 text-center">
+                <span class="material-symbols-outlined text-gray-400 dark:text-slate-500 text-5xl mb-4">school</span>
+                <p class="text-gray-500 dark:text-slate-400">Bạn chưa có khóa học nào.</p>
+            </div>
+        }
+        else
+        {
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                @foreach (var course in Model.Courses.Take(6))
+                {
+                    <div class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden group hover:border-primary/50 transition-colors cursor-pointer relative">
+                        <div class="absolute top-3 left-3 z-10">
+                            <span class="@course.TypeColor backdrop-blur-md text-white text-xs font-bold px-2 py-1 rounded">@course.TypeText</span>
+                        </div>
+                        <div class="absolute top-3 right-3 z-10">
+                            <span class="@course.StatusColor backdrop-blur-md text-white text-xs font-bold px-2 py-1 rounded">@course.StatusText</span>
+                        </div>
+                        <div class="h-32 bg-cover bg-center bg-gray-200 dark:bg-slate-700" style="background-image: url('@(string.IsNullOrEmpty(course.ThumbnailUrl) ? "https://via.placeholder.com/400x200?text=Course" : course.ThumbnailUrl)');"></div>
+                        <div class="p-4">
+                            <h4 class="text-slate-900 dark:text-white font-bold text-base mb-1 truncate">@course.Title</h4>
+                            <p class="text-gray-500 dark:text-slate-400 text-sm mb-3 line-clamp-2">@course.Description</p>
+                            <div class="flex items-center justify-between text-xs text-gray-500 dark:text-slate-500">
+                                <div class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[16px]">group</span>
+                                    @course.EnrollmentCount Học viên
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[16px]">play_lesson</span>
+                                    @course.LessonCount Bài học
+                                </div>
+                            </div>
+                            <a asp-area="Instructor" asp-controller="Courses" asp-action="Edit" asp-route-id="@course.CourseId"
+                               class="w-full mt-4 bg-primary/10 hover:bg-primary hover:text-white text-primary text-sm font-medium py-2 rounded-lg transition-colors border border-primary/20 flex items-center justify-center gap-2">
+                                <span class="material-symbols-outlined text-[18px]">edit</span>
+                                Quản lý khóa học
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>

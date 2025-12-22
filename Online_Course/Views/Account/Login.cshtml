@@ -1,0 +1,81 @@
+@model Online_Course.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Đăng nhập";
+    Layout = "_Layout";
+}
+
+<div class="flex min-h-[calc(100vh-200px)] items-center justify-center px-4 py-12">
+    <div class="w-full max-w-md">
+        <div class="bg-surface-light dark:bg-surface-dark rounded-2xl p-8 shadow-lg border border-border-light dark:border-border-dark">
+            <!-- Logo/Title -->
+            <div class="text-center mb-8">
+                <div class="flex items-center justify-center gap-2 mb-4">
+                    <span class="material-symbols-outlined text-primary text-4xl">school</span>
+                    <span class="text-2xl font-bold text-primary">EduTech</span>
+                </div>
+                <h1 class="text-xl font-semibold text-slate-900 dark:text-white">Đăng nhập</h1>
+                <p class="text-sm text-text-secondary mt-2">Chào mừng bạn quay trở lại</p>
+            </div>
+
+            <!-- Error Summary -->
+            <div asp-validation-summary="ModelOnly" class="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm"></div>
+
+            <form asp-action="Login" method="post" class="space-y-5">
+                <input type="hidden" asp-for="ReturnUrl" />
+                
+                <!-- Email -->
+                <div>
+                    <label asp-for="Email" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Email</label>
+                    <div class="relative">
+                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary text-xl">mail</span>
+                        <input asp-for="Email" type="email" 
+                               class="w-full pl-10 pr-4 py-3 bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark rounded-xl text-slate-900 dark:text-white placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                               placeholder="email@example.com" />
+                    </div>
+                    <span asp-validation-for="Email" class="text-red-400 text-xs mt-1"></span>
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label asp-for="Password" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Mật khẩu</label>
+                    <div class="relative">
+                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary text-xl">lock</span>
+                        <input asp-for="Password" type="password" 
+                               class="w-full pl-10 pr-4 py-3 bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark rounded-xl text-slate-900 dark:text-white placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                               placeholder="••••••••" />
+                    </div>
+                    <span asp-validation-for="Password" class="text-red-400 text-xs mt-1"></span>
+                </div>
+
+                <!-- Remember Me & Forgot Password -->
+                <div class="flex items-center justify-between">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input asp-for="RememberMe" type="checkbox" 
+                               class="w-4 h-4 rounded border-border-dark bg-background-dark text-primary focus:ring-primary focus:ring-offset-0" />
+                        <span class="text-sm text-text-secondary">Ghi nhớ đăng nhập</span>
+                    </label>
+                    <a asp-action="ForgotPassword" class="text-sm text-primary hover:underline">Quên mật khẩu?</a>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" 
+                        class="w-full py-3 px-4 bg-primary hover:bg-primary/90 text-white font-medium rounded-xl transition-all duration-200 flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-xl">login</span>
+                    Đăng nhập
+                </button>
+            </form>
+
+            <!-- Register Link -->
+            <div class="mt-6 text-center">
+                <p class="text-sm text-text-secondary">
+                    Chưa có tài khoản? 
+                    <a asp-action="Register" class="text-primary hover:underline font-medium">Đăng ký ngay</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

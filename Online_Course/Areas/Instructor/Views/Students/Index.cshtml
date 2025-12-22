@@ -1,0 +1,159 @@
+@model Online_Course.ViewModels.CourseStudentsViewModel
+
+@{
+    ViewData["Title"] = "Danh sách Học viên";
+    Layout = "~/Views/Shared/_InstructorLayout.cshtml";
+}
+
+<div class="flex-1 overflow-y-auto p-4 md:p-8">
+    <div class="max-w-[1200px] mx-auto flex flex-col gap-6">
+        <!-- Breadcrumbs -->
+        <div class="flex flex-wrap items-center gap-2 text-sm md:text-base">
+            <a asp-area="Instructor" asp-controller="Dashboard" asp-action="Index" class="text-text-secondary hover:text-primary transition-colors font-medium">Dashboard</a>
+            <span class="text-text-secondary font-medium">/</span>
+            <span class="text-slate-900 dark:text-white font-medium">@Model.CourseTitle</span>
+            <span class="text-text-secondary font-medium">/</span>
+            <span class="text-slate-900 dark:text-white font-medium">Danh sách học viên</span>
+        </div>
+
+        <!-- Page Heading & Actions -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div class="flex flex-col gap-2">
+                <h1 class="text-slate-900 dark:text-white text-3xl md:text-4xl font-bold tracking-tight">Danh sách Học viên</h1>
+                <p class="text-text-secondary text-base font-normal">Quản lý tiến độ và thông tin học viên trong khóa học này</p>
+            </div>
+            <div class="flex gap-3">
+                <a asp-area="Instructor" asp-controller="Lessons" asp-action="Index" asp-route-courseId="@Model.CourseId" 
+                   class="flex items-center justify-center gap-2 h-10 px-4 rounded-lg border border-surface-border bg-transparent text-slate-900 dark:text-white text-sm font-bold hover:bg-surface-border/50 transition-colors">
+                    <span class="material-symbols-outlined text-lg">arrow_back</span>
+                    <span class="hidden sm:inline">Quay lại</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="flex flex-col gap-1 rounded-xl p-5 bg-white dark:bg-[#1c252e] border border-gray-200 dark:border-surface-border shadow-sm">
+                <div class="flex justify-between items-start">
+                    <p class="text-slate-500 dark:text-text-secondary text-sm font-medium">Tổng số học viên</p>
+                    <span class="material-symbols-outlined text-primary bg-primary/10 p-1 rounded-md">group</span>
+                </div>
+                <div class="flex items-baseline gap-2 mt-2">
+                    <p class="text-slate-900 dark:text-white text-2xl font-bold">@Model.TotalStudents</p>
+                </div>
+            </div>
+            <div class="flex flex-col gap-1 rounded-xl p-5 bg-white dark:bg-[#1c252e] border border-gray-200 dark:border-surface-border shadow-sm">
+                <div class="flex justify-between items-start">
+                    <p class="text-slate-500 dark:text-text-secondary text-sm font-medium">Tỷ lệ hoàn thành TB</p>
+                    <span class="material-symbols-outlined text-purple-500 bg-purple-500/10 p-1 rounded-md">donut_large</span>
+                </div>
+                <div class="flex items-baseline gap-2 mt-2">
+                    <p class="text-slate-900 dark:text-white text-2xl font-bold">@Model.AverageProgress.ToString("F0")%</p>
+                </div>
+            </div>
+            <div class="flex flex-col gap-1 rounded-xl p-5 bg-white dark:bg-[#1c252e] border border-gray-200 dark:border-surface-border shadow-sm">
+                <div class="flex justify-between items-start">
+                    <p class="text-slate-500 dark:text-text-secondary text-sm font-medium">Đã hoàn thành</p>
+                    <span class="material-symbols-outlined text-emerald-500 bg-emerald-500/10 p-1 rounded-md">check_circle</span>
+                </div>
+                <div class="flex items-baseline gap-2 mt-2">
+                    <p class="text-slate-900 dark:text-white text-2xl font-bold">@Model.CompletedCount</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="bg-white dark:bg-[#1c252e] rounded-xl border border-gray-200 dark:border-surface-border shadow-sm overflow-hidden flex flex-col">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-surface-border">
+                    <thead class="bg-gray-50 dark:bg-[#283039]">
+                        <tr>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">Học viên</th>
+                            @if (Model.CourseId == 0)
+                            {
+                                <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">Khóa học</th>
+                            }
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">Ngày tham gia</th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider w-1/4">Tiến độ học tập</th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 dark:divide-surface-border bg-white dark:bg-[#1c252e]">
+                        @if (Model.Students.Any())
+                        {
+                            @foreach (var student in Model.Students)
+                            {
+                                var progressColor = student.ProgressPercentage >= 100 ? "emerald" : 
+                                                   student.ProgressPercentage >= 90 ? "amber" : "primary";
+                                var statusBgClass = student.Status switch
+                                {
+                                    "Đã hoàn thành" => "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
+                                    "Sắp xong" => "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
+                                    "Đang học" => "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+                                    _ => "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
+                                };
+                                var initials = string.Join("", student.FullName.Split(' ').Where(s => !string.IsNullOrEmpty(s)).Select(s => s[0])).ToUpper();
+                                if (initials.Length > 2) initials = initials.Substring(0, 2);
+                                
+                                <tr class="hover:bg-gray-50 dark:hover:bg-[#232d38] transition-colors group">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="h-10 w-10 flex-shrink-0">
+                                                <div class="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm">
+                                                    @initials
+                                                </div>
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-slate-900 dark:text-white">@student.FullName</div>
+                                                <div class="text-sm text-text-secondary">@student.Email</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    @if (Model.CourseId == 0)
+                                    {
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <a asp-action="Index" asp-route-courseId="@student.CourseId" class="text-sm text-primary hover:underline">@student.CourseName</a>
+                                        </td>
+                                    }
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-slate-900 dark:text-text-secondary">@student.EnrolledAt.ToString("dd/MM/yyyy")</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap align-middle">
+                                        <div class="w-full">
+                                            <div class="flex justify-between mb-1">
+                                                <span class="text-xs font-medium text-@(progressColor == "primary" ? "primary" : progressColor + "-500")">
+                                                    @student.ProgressPercentage.ToString("F0")%
+                                                </span>
+                                                <span class="text-xs text-text-secondary">@student.CompletedLessons/@student.TotalLessons bài</span>
+                                            </div>
+                                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                                <div class="bg-@(progressColor == "primary" ? "primary" : progressColor + "-500") h-2 rounded-full transition-all duration-500" 
+                                                     style="width: @student.ProgressPercentage%"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full @statusBgClass">
+                                            @student.Status
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="@(Model.CourseId == 0 ? 5 : 4)" class="px-6 py-12 text-center">
+                                    <div class="flex flex-col items-center gap-3">
+                                        <span class="material-symbols-outlined text-5xl text-text-secondary">group_off</span>
+                                        <p class="text-text-secondary">Chưa có học viên nào đăng ký khóa học này</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

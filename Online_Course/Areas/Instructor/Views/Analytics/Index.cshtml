@@ -1,0 +1,125 @@
+@model Online_Course.Areas.Instructor.Controllers.InstructorAnalyticsViewModel
+@{
+    ViewData["Title"] = "Thống kê & Phân tích";
+}
+
+<!-- Stats Overview -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white dark:bg-surface-dark rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+        <div class="flex items-center gap-4">
+            <div class="p-3 bg-primary/20 rounded-lg">
+                <span class="material-symbols-outlined text-primary text-2xl">school</span>
+            </div>
+            <div>
+                <p class="text-gray-500 dark:text-slate-400 text-sm">Tổng khóa học</p>
+                <p class="text-slate-900 dark:text-white text-2xl font-bold">@Model.TotalCourses</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white dark:bg-surface-dark rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+        <div class="flex items-center gap-4">
+            <div class="p-3 bg-green-500/20 rounded-lg">
+                <span class="material-symbols-outlined text-green-500 text-2xl">group</span>
+            </div>
+            <div>
+                <p class="text-gray-500 dark:text-slate-400 text-sm">Tổng học viên</p>
+                <p class="text-slate-900 dark:text-white text-2xl font-bold">@Model.TotalStudents</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white dark:bg-surface-dark rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+        <div class="flex items-center gap-4">
+            <div class="p-3 bg-orange-500/20 rounded-lg">
+                <span class="material-symbols-outlined text-orange-500 text-2xl">menu_book</span>
+            </div>
+            <div>
+                <p class="text-gray-500 dark:text-slate-400 text-sm">Tổng bài học</p>
+                <p class="text-slate-900 dark:text-white text-2xl font-bold">@Model.TotalLessons</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white dark:bg-surface-dark rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+        <div class="flex items-center gap-4">
+            <div class="p-3 bg-purple-500/20 rounded-lg">
+                <span class="material-symbols-outlined text-purple-500 text-2xl">emoji_events</span>
+            </div>
+            <div>
+                <p class="text-gray-500 dark:text-slate-400 text-sm">Tỷ lệ hoàn thành</p>
+                <p class="text-slate-900 dark:text-white text-2xl font-bold">@Model.AverageCompletionRate%</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Course Performance Table -->
+<div class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
+    <div class="p-6 border-b border-gray-200 dark:border-slate-700">
+        <h2 class="text-slate-900 dark:text-white text-lg font-bold">Hiệu suất khóa học</h2>
+        <p class="text-gray-500 dark:text-slate-400 text-sm mt-1">Chi tiết thống kê từng khóa học</p>
+    </div>
+    
+    @if (Model.Courses.Any())
+    {
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50 dark:bg-slate-800/50">
+                    <tr>
+                        <th class="text-left text-gray-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider px-6 py-4">Khóa học</th>
+                        <th class="text-center text-gray-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider px-4 py-4">Học viên</th>
+                        <th class="text-center text-gray-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider px-4 py-4">Bài học</th>
+                        <th class="text-center text-gray-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider px-4 py-4">Tiến độ TB</th>
+                        <th class="text-center text-gray-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider px-4 py-4">Hoàn thành</th>
+                        <th class="text-center text-gray-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider px-4 py-4">Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-slate-700">
+                    @foreach (var course in Model.Courses)
+                    {
+                        <tr class="hover:bg-gray-50 dark:hover:bg-slate-800/30 transition-colors">
+                            <td class="px-6 py-4">
+                                <div class="flex flex-col">
+                                    <span class="text-slate-900 dark:text-white font-medium">@course.Title</span>
+                                    <span class="text-gray-500 dark:text-slate-400 text-xs">@course.CategoryName</span>
+                                </div>
+                            </td>
+                            <td class="text-center px-4 py-4">
+                                <span class="text-slate-900 dark:text-white font-medium">@course.TotalStudents</span>
+                            </td>
+                            <td class="text-center px-4 py-4">
+                                <span class="text-slate-900 dark:text-white">@course.TotalLessons</span>
+                            </td>
+                            <td class="text-center px-4 py-4">
+                                <div class="flex items-center justify-center gap-2">
+                                    <div class="w-16 h-2 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                                        <div class="h-full bg-primary rounded-full" style="width: @course.AverageProgress%"></div>
+                                    </div>
+                                    <span class="text-slate-900 dark:text-white text-sm">@course.AverageProgress%</span>
+                                </div>
+                            </td>
+                            <td class="text-center px-4 py-4">
+                                <span class="text-green-600 dark:text-green-500 font-medium">@course.CompletedStudents</span>
+                            </td>
+                            <td class="text-center px-4 py-4">
+                                <span class="px-2 py-1 @(course.Status == Online_Course.Models.CourseStatus.Public ? "bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-500" : course.Status == Online_Course.Models.CourseStatus.Private ? "bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-500" : "bg-gray-100 dark:bg-slate-500/20 text-gray-600 dark:text-slate-400") text-xs font-medium rounded-full">@course.StatusText</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="p-12 text-center">
+            <span class="material-symbols-outlined text-5xl text-gray-400 dark:text-slate-600 mb-4">analytics</span>
+            <p class="text-gray-500 dark:text-slate-400">Chưa có dữ liệu thống kê</p>
+            <a asp-controller="Courses" asp-action="Create" class="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-primary hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors">
+                <span class="material-symbols-outlined text-sm">add</span>
+                Tạo khóa học đầu tiên
+            </a>
+        </div>
+    }
+</div>

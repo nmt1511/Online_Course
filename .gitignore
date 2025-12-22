@@ -1,0 +1,76 @@
+## Visual Studio / Visual Studio Code
+.vs/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## .NET Core / ASP.NET Core
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+*.cache
+*.dgspec.json
+*.nuget.g.props
+*.nuget.g.targets
+project.assets.json
+project.nuget.cache
+
+## Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+## User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## IDE folders
+.idea/
+.kiro/
+*.swp
+*.swo
+*~
+
+## Project-specific folders
+giaodien/
+Kho Khóa Học - Share chia sẻ hơn 5000 khóa học.html
+Kho Khóa Học - Share chia sẻ hơn 5000 khóa học_files/
+Online_Course.Tests/
+
+## Database
+*.db
+*.mdf
+*.ldf
+
+## App settings
+appsettings.json
+appsettings.Development.json
+
+## NuGet Packages
+*.nupkg
+**/packages/*
+!**/packages/build/
+
+## Others
+.DS_Store
+Thumbs.db
+*.bak
+*.tmp
+

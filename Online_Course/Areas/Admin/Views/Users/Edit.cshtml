@@ -1,0 +1,77 @@
+@model Online_Course.ViewModels.EditUserViewModel
+@{
+    ViewData["Title"] = "Chỉnh sửa người dùng";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="max-w-2xl mx-auto">
+    <!-- Page Header -->
+    <div class="flex items-center gap-4 mb-8">
+        <a asp-action="Index" class="p-2 text-gray-500 dark:text-[#9dabb9] hover:text-slate-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-[#283039] rounded-lg transition-colors">
+            <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <div>
+            <h1 class="text-slate-900 dark:text-white text-2xl font-bold">Chỉnh sửa người dùng</h1>
+            <p class="text-gray-500 dark:text-[#9dabb9] text-sm">Cập nhật thông tin người dùng</p>
+        </div>
+    </div>
+
+    <!-- Form Card -->
+    <div class="bg-white dark:bg-[#1a222c] border border-gray-200 dark:border-[#283039] rounded-xl p-6">
+        <form asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="UserId" />
+            
+            <div class="space-y-6">
+                <!-- Full Name -->
+                <div>
+                    <label asp-for="FullName" class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Họ và tên</label>
+                    <input asp-for="FullName" class="w-full h-12 px-4 bg-gray-50 dark:bg-[#111418] border border-gray-200 dark:border-[#283039] rounded-lg text-slate-900 dark:text-white placeholder-gray-400 dark:placeholder-[#586472] focus:ring-2 focus:ring-primary focus:border-primary transition-colors" placeholder="Nhập họ và tên" />
+                    <span asp-validation-for="FullName" class="text-red-400 text-sm mt-1"></span>
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label asp-for="Email" class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Địa chỉ Email</label>
+                    <input asp-for="Email" type="email" class="w-full h-12 px-4 bg-gray-50 dark:bg-[#111418] border border-gray-200 dark:border-[#283039] rounded-lg text-slate-900 dark:text-white placeholder-gray-400 dark:placeholder-[#586472] focus:ring-2 focus:ring-primary focus:border-primary transition-colors" placeholder="Nhập địa chỉ email" />
+                    <span asp-validation-for="Email" class="text-red-400 text-sm mt-1"></span>
+                </div>
+
+                <!-- Role -->
+                <div>
+                    <label asp-for="RoleId" class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Vai trò</label>
+                    <select asp-for="RoleId" asp-items="ViewBag.Roles" class="w-full h-12 px-4 bg-gray-50 dark:bg-[#111418] border border-gray-200 dark:border-[#283039] rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-colors cursor-pointer">
+                        <option value="">Chọn vai trò</option>
+                    </select>
+                    <span asp-validation-for="RoleId" class="text-red-400 text-sm mt-1"></span>
+                </div>
+
+                <!-- Status -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Trạng thái</label>
+                    <div class="flex items-center gap-3">
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" asp-for="IsActive" class="sr-only peer" />
+                            <div class="w-11 h-6 bg-gray-300 dark:bg-[#283039] peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                        </label>
+                        <span class="text-sm text-gray-600 dark:text-[#9dabb9]">@(Model.IsActive ? "Hoạt động" : "Vô hiệu")</span>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="flex items-center gap-4 pt-4">
+                    <button type="submit" class="flex-1 h-12 bg-primary hover:bg-blue-600 text-white font-bold rounded-lg transition-colors">
+                        Lưu thay đổi
+                    </button>
+                    <a asp-action="Index" class="flex-1 h-12 bg-gray-100 dark:bg-[#283039] hover:bg-gray-200 dark:hover:bg-[#3b4754] text-slate-900 dark:text-white font-medium rounded-lg transition-colors flex items-center justify-center">
+                        Hủy
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

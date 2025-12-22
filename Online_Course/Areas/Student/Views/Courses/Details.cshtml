@@ -1,0 +1,171 @@
+@model Online_Course.ViewModels.StudentCourseDetailsViewModel
+@{
+    ViewData["Title"] = Model.Title;
+    Layout = "~/Views/Shared/_StudentLayout.cshtml";
+}
+
+<main class="flex-grow flex flex-col items-center py-5 px-4 md:px-10 lg:px-20">
+    <div class="flex flex-col max-w-[1200px] w-full">
+        <!-- Breadcrumbs -->
+        <div class="flex flex-wrap gap-2 py-4">
+            <a asp-action="Index" class="text-gray-500 dark:text-[#9dabb9] text-sm font-medium leading-normal hover:text-slate-900 dark:hover:text-white">Khóa học</a>
+            <span class="text-gray-500 dark:text-[#9dabb9] text-sm font-medium leading-normal">/</span>
+            @if (!string.IsNullOrEmpty(Model.CategoryName))
+            {
+                <a asp-action="Index" asp-route-categoryId="@Model.CategoryId" class="text-gray-500 dark:text-[#9dabb9] text-sm font-medium leading-normal hover:text-slate-900 dark:hover:text-white">@Model.CategoryName</a>
+                <span class="text-gray-500 dark:text-[#9dabb9] text-sm font-medium leading-normal">/</span>
+            }
+            <span class="text-slate-900 dark:text-white text-sm font-medium leading-normal truncate">@Model.Title</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-2 relative">
+            <!-- Left Column: Content -->
+            <div class="lg:col-span-2 flex flex-col gap-8">
+                <!-- Header Info -->
+                <div class="flex flex-col gap-4">
+                    <h1 class="text-slate-900 dark:text-white text-3xl md:text-4xl lg:text-5xl font-black leading-tight tracking-[-0.033em]">@Model.Title</h1>
+                    <p class="text-gray-500 dark:text-[#9dabb9] text-lg font-normal leading-relaxed">@Model.Description</p>
+                    <div class="flex flex-wrap items-center gap-4 text-sm mt-2">
+                        <span class="text-slate-900 dark:text-white">@Model.EnrollmentCount học viên</span>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-[#9dabb9] border-t border-gray-200 dark:border-[#283039] pt-4 mt-2">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-lg">person</span>
+                            <span>Giảng viên: <span class="text-primary">@Model.InstructorName</span></span>
+                        </div>
+                        @if (!string.IsNullOrEmpty(Model.CategoryName))
+                        {
+                            <span class="hidden sm:inline">•</span>
+                            <div class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-lg">category</span>
+                                <span>@Model.CategoryName</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Course Curriculum -->
+                <div class="flex flex-col gap-4">
+                    <h3 class="text-slate-900 dark:text-white text-xl font-bold">Nội dung khóa học</h3>
+                    <div class="text-gray-500 dark:text-[#9dabb9] text-sm mb-2 flex gap-2">
+                        <span>@Model.Lessons.Count bài học</span>
+                    </div>
+                    @if (Model.Lessons.Any())
+                    {
+                        <div class="flex flex-col gap-2">
+                            @foreach (var lesson in Model.Lessons)
+                            {
+                                <div class="bg-white dark:bg-surface-dark border border-gray-200 dark:border-[#283039] rounded-lg overflow-hidden">
+                                    <div class="flex items-center justify-between p-4 text-slate-900 dark:text-white">
+                                        <div class="flex items-center gap-3">
+                                            <span class="material-symbols-outlined text-gray-500 dark:text-[#9dabb9]">play_circle</span>
+                                            <span>@lesson.Title</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="bg-white dark:bg-surface-dark border border-gray-200 dark:border-[#283039] rounded-lg p-6 text-center">
+                            <span class="material-symbols-outlined text-4xl text-gray-500 dark:text-[#9dabb9] mb-2">playlist_add</span>
+                            <p class="text-gray-500 dark:text-[#9dabb9]">Chưa có bài học nào trong khóa học này.</p>
+                        </div>
+                    }
+                </div>
+
+                <!-- Instructor -->
+                <div class="flex flex-col gap-4">
+                    <h3 class="text-slate-900 dark:text-white text-xl font-bold">Giảng viên</h3>
+                    <div class="flex flex-col sm:flex-row gap-6 p-6 bg-white dark:bg-surface-dark border border-gray-200 dark:border-[#283039] rounded-xl">
+                        <div class="w-24 h-24 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white text-3xl font-bold border-2 border-gray-200 dark:border-[#283039]">
+                            @(Model.InstructorName.Length > 0 ? Model.InstructorName[0].ToString().ToUpper() : "?")
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <span class="text-primary text-lg font-bold">@Model.InstructorName</span>
+                            <div class="flex gap-4 text-xs text-gray-500 dark:text-[#9dabb9] mb-2">
+                                <div class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-base">school</span>
+                                    <span>Giảng viên</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Sticky Sidebar -->
+            <div class="lg:col-span-1">
+                <div class="sticky top-24 flex flex-col gap-4">
+                    <!-- Preview Card -->
+                    <div class="bg-white dark:bg-surface-dark border border-gray-200 dark:border-[#283039] rounded-xl overflow-hidden shadow-xl shadow-black/10 dark:shadow-black/20">
+                        <!-- Thumbnail -->
+                        <div class="relative group cursor-pointer aspect-video">
+                            @if (!string.IsNullOrEmpty(Model.ThumbnailUrl))
+                            {
+                                <img class="w-full h-full object-cover" src="@Model.ThumbnailUrl" alt="@Model.Title" />
+                            }
+                            else
+                            {
+                                <div class="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-6xl text-primary/60">school</span>
+                                </div>
+                            }
+                        </div>
+                        <div class="p-6 flex flex-col gap-6">
+                            <div class="flex flex-col gap-3">
+                                @if (Model.IsEnrolled)
+                                {
+                                    <a asp-area="Student" asp-controller="Learning" asp-action="Lessons" asp-route-courseId="@Model.CourseId"
+                                       class="w-full bg-green-600 hover:bg-green-700 text-white font-bold h-12 rounded-lg transition-colors flex items-center justify-center gap-2 text-lg shadow-lg shadow-green-500/25">
+                                        <span class="material-symbols-outlined">play_arrow</span>
+                                        Tiếp tục học
+                                    </a>
+                                }
+                                else
+                                {
+                                    @if (User.Identity?.IsAuthenticated == true)
+                                    {
+                                        <form asp-area="Student" asp-controller="Courses" asp-action="Enroll" method="post">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="courseId" value="@Model.CourseId" />
+                                            <button type="submit" class="w-full bg-primary hover:bg-blue-600 text-white font-bold h-12 rounded-lg transition-colors flex items-center justify-center gap-2 text-lg shadow-lg shadow-primary/25">
+                                                <span class="material-symbols-outlined">school</span>
+                                                Đăng ký ngay
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <a asp-area="" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Context.Request.Path"
+                                           class="w-full bg-primary hover:bg-blue-600 text-white font-bold h-12 rounded-lg transition-colors flex items-center justify-center gap-2 text-lg shadow-lg shadow-primary/25">
+                                            <span class="material-symbols-outlined">login</span>
+                                            Đăng nhập để đăng ký
+                                        </a>
+                                    }
+                                }
+                            </div>
+                            <div class="border-t border-gray-200 dark:border-[#3b4754]"></div>
+                            <div class="flex flex-col gap-3">
+                                <p class="text-slate-900 dark:text-white font-bold text-sm mb-1">Khóa học bao gồm:</p>
+                                <div class="flex items-center gap-3 text-gray-600 dark:text-[#d0d6dc] text-sm">
+                                    <span class="material-symbols-outlined text-gray-500 dark:text-[#9dabb9] text-xl">play_lesson</span>
+                                    <span>@Model.Lessons.Count bài học</span>
+                                </div>
+                                <div class="flex items-center gap-3 text-gray-600 dark:text-[#d0d6dc] text-sm">
+                                    <span class="material-symbols-outlined text-gray-500 dark:text-[#9dabb9] text-xl">group</span>
+                                    <span>@Model.EnrollmentCount học viên đã đăng ký</span>
+                                </div>
+                                <div class="flex items-center gap-3 text-gray-600 dark:text-[#d0d6dc] text-sm">
+                                    <span class="material-symbols-outlined text-gray-500 dark:text-[#9dabb9] text-xl">all_inclusive</span>
+                                    <span>Truy cập trọn đời</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
