@@ -11,18 +11,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - EduTech</title>
     
-    <!-- Google Fonts: Lexend -->
+    <!-- Google Fonts: Lexend | Phông chữ Lexend từ Google -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     
-    <!-- Material Symbols Outlined -->
+    <!-- Material Symbols Outlined | Biểu tượng Material Outlined -->
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
     
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS | Thư viện CSS Tailwind -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     
-    <!-- Theme Config -->
+    <!-- Theme Config | Cấu hình chủ đề -->
     <script>
         tailwind.config = {
             darkMode: "class",
@@ -58,6 +58,12 @@
         .dark ::-webkit-scrollbar-track { background: #111418; }
         .dark ::-webkit-scrollbar-thumb { background: #3b4754; }
         .dark ::-webkit-scrollbar-thumb:hover { background: #4b5966; }
+        
+        /* Hiệu ứng bài học bị khóa | Locked lesson effects */
+        .lesson-item-locked {
+            opacity: 0.5;
+            cursor: not-allowed !important;
+        }
     </style>
     <script>
         if (localStorage.getItem('theme') === 'dark') {
@@ -67,7 +73,7 @@
 </head>
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display overflow-hidden h-screen flex flex-col">
 
-    <!-- Top Navigation Bar -->
+    <!-- Top Navigation Bar | Thanh điều hướng trên cùng -->
     <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-gray-200 dark:border-border-dark bg-white dark:bg-background-dark px-6 py-3 shrink-0 z-20">
         <div class="flex items-center gap-4">
             <a asp-area="Student" asp-controller="Learning" asp-action="Lessons" asp-route-courseId="@Model.CourseId" class="flex items-center gap-3 text-slate-900 dark:text-white hover:opacity-80 transition-opacity">
@@ -98,11 +104,11 @@
         </div>
     </header>
 
-    <!-- Main Layout -->
+    <!-- Main Layout | Bố cục chính -->
     <div class="flex flex-1 overflow-hidden relative">
-        <!-- Sidebar (Course Curriculum) -->
+        <!-- Sidebar (Course Curriculum) | Thanh bên (Nội dung khóa học) -->
         <aside class="w-80 flex flex-col border-r border-gray-200 dark:border-border-dark bg-white dark:bg-background-dark shrink-0 h-full overflow-hidden absolute md:relative z-10 -translate-x-full md:translate-x-0 transition-transform duration-300" id="courseSidebar">
-            <!-- Progress Summary -->
+            <!-- Progress Summary | Tóm tắt tiến độ -->
             <div class="p-5 border-b border-gray-200 dark:border-border-dark">
                 <div class="flex justify-between items-end mb-2">
                     <p class="text-sm font-medium text-slate-700 dark:text-white">Tiến độ khóa học</p>
@@ -114,13 +120,22 @@
                 <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">@Model.CompletedLessons/@Model.TotalLessons Bài học đã hoàn thành</p>
             </div>
             
-            <!-- Curriculum List -->
+            <!-- Curriculum List | Danh sách giáo trình -->
             <div class="flex-1 overflow-y-auto p-4 space-y-2">
                 @foreach (var lesson in Model.AllLessons)
                 {
                     var isCurrentLesson = lesson.LessonId == Model.LessonId;
                     
-                    if (lesson.IsCompleted)
+                    if (lesson.IsLocked)
+                    {
+                        @* Bài học bị khóa trong Sidebar | Locked lesson in Sidebar *@
+                        <div class="lesson-item-locked flex items-center gap-3 px-3 py-2.5 rounded-lg text-left w-full group transition-all"
+                             onclick="showLockAlert()">
+                            <span class="material-symbols-outlined text-slate-400 text-[20px] shrink-0">lock</span>
+                            <span class="text-sm text-slate-400 font-medium line-clamp-1">@lesson.Title</span>
+                        </div>
+                    }
+                    else if (lesson.IsCompleted)
                     {
                         <a asp-action="Content" asp-route-lessonId="@lesson.LessonId" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-surface-dark group transition-colors text-left w-full @(isCurrentLesson ? "bg-gray-100 dark:bg-surface-dark" : "")">
                             <span class="material-symbols-outlined text-green-500 text-[20px] shrink-0">check_circle</span>
@@ -148,9 +163,9 @@
             </div>
         </aside>
 
-        <!-- Main Content Area -->
+        <!-- Main Content Area | Khu vực nội dung chính -->
         <main class="flex-1 overflow-y-auto bg-gray-50 dark:bg-[#111418] relative scroll-smooth">
-            <!-- Mobile Toggle -->
+            <!-- Mobile Toggle | Nút bật thanh bên di động -->
             <div class="md:hidden p-4 pb-0">
                 <button class="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm font-medium" onclick="document.getElementById('courseSidebar').classList.toggle('-translate-x-full')">
                     <span class="material-symbols-outlined">menu_open</span>
@@ -159,7 +174,7 @@
             </div>
             
             <div class="max-w-[1000px] mx-auto p-4 md:p-8 flex flex-col gap-6">
-                <!-- Video Player Container -->
+                <!-- Video Player Container | Khung trình phát Video -->
                 <div class="flex flex-col gap-4">
                     <div class="relative w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl group">
                         @if (!string.IsNullOrEmpty(Model.VideoUrl))
@@ -187,7 +202,7 @@
                         }
                         else
                         {
-                            <!-- Placeholder when no video -->
+                            <!-- Placeholder when no video | Hiển thị khi không có video -->
                             <div class="absolute inset-0 flex items-center justify-center bg-slate-800">
                                 <div class="text-center">
                                     <span class="material-symbols-outlined text-[64px] text-slate-500">videocam_off</span>
@@ -198,7 +213,7 @@
                     </div>
                 </div>
 
-                <!-- Lesson Navigation & Action Bar -->
+                <!-- Lesson Navigation & Action Bar | Thanh điều hướng và hành động bài học -->
                 <div class="flex flex-col md:flex-row justify-between items-center gap-4 py-2 border-b border-gray-200 dark:border-border-dark pb-6">
                     <div class="flex flex-col gap-1 w-full md:w-auto">
                         <h1 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">Bài @Model.OrderIndex: @Model.LessonTitle</h1>
@@ -242,11 +257,11 @@
                     </div>
                 </div>
 
-                <!-- Content & Info -->
+                <!-- Content & Info | Nội dung và Thông tin -->
                 <div class="flex flex-col gap-6">
-                    <!-- Tab Content -->
+                    <!-- Tab Content | Nội dung Tab -->
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <!-- Main Text Content -->
+                        <!-- Main Text Content | Nội dung văn bản chính -->
                         <div class="lg:col-span-2 space-y-4 text-slate-600 dark:text-slate-300 leading-relaxed">
                             <h3 class="text-lg font-bold text-slate-900 dark:text-white">Nội dung bài học</h3>
                             @if (!string.IsNullOrEmpty(Model.LessonDescription))
@@ -261,7 +276,7 @@
                             }
                         </div>
                         
-                        <!-- Sidebar Info / Instructor -->
+                        <!-- Sidebar Info / Instructor | Thông tin thanh bên / Giảng viên -->
                         <div class="lg:col-span-1 space-y-6">
                             <div class="p-4 rounded-xl bg-white dark:bg-surface-dark border border-gray-100 dark:border-border-dark shadow-sm">
                                 <h4 class="text-sm font-bold text-slate-900 dark:text-white mb-4">Giảng viên</h4>
@@ -302,10 +317,22 @@
                     </div>
                 </div>
                 
-                <!-- Footer Spacer -->
+                <!-- Footer Spacer | Khoảng cách chân trang -->
                 <div class="h-20"></div>
             </div>
         </main>
     </div>
+    
+    @* Thông báo khi nhấn vào bài học bị khóa | Alert for locked lessons *@
+    <script>
+        function showLockAlert() {
+            // Sử dụng confirm dialog có sẵn của hệ thống nếu bạn đã triển khai | Use system's confirm dialog if implemented
+            if(window.showConfirmDialog) {
+                showConfirmDialog(null, 'Bài học bị khóa', 'Bạn cần hoàn thành bài học trước đó để có thể mở khóa bài học này.', 'Đã hiểu', 'info');
+            } else {
+                alert('Bài học này đang bị khóa. Bạn cần hoàn thành các bài học trước đó.');
+            }
+        }
+    </script>
 </body>
 </html>

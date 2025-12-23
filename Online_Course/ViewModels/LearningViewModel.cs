@@ -1,3 +1,5 @@
+using Online_Course.Models;
+
 namespace Online_Course.ViewModels;
 
 public class LearningLessonViewModel
@@ -8,6 +10,7 @@ public class LearningLessonViewModel
     public string VideoUrl { get; set; } = string.Empty;
     public int OrderIndex { get; set; }
     public bool IsCompleted { get; set; }
+    public bool IsLocked { get; set; } // Trạng thái khóa bài học
 }
 
 public class LearningLessonsViewModel
@@ -19,6 +22,7 @@ public class LearningLessonsViewModel
     public int TotalLessons { get; set; }
     public int CompletedLessons { get; set; }
     public double ProgressPercentage { get; set; }
+    public LearningStatus CourseStatus { get; set; } // Trạng thái học tập của khóa học
     public IList<LearningLessonViewModel> Lessons { get; set; } = new List<LearningLessonViewModel>();
 }
 
