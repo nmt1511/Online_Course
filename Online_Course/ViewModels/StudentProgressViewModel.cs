@@ -1,3 +1,5 @@
+using Online_Course.Models;
+
 namespace Online_Course.ViewModels;
 
 public class StudentProgressViewModel
@@ -36,6 +38,8 @@ public class StudentCourseProgressViewModel
     public int CompletedLessons { get; set; }
     public double ProgressPercentage { get; set; }
     public string Status { get; set; } = string.Empty;
+    public LearningStatus LearningStatus { get; set; } // Trạng thái học tập
+    public bool IsMandatory { get; set; } // Khóa học bắt buộc
     public DateTime EnrolledAt { get; set; }
     public string CurrentLessonTitle { get; set; } = string.Empty;
 }

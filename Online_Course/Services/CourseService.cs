@@ -19,6 +19,7 @@ public class CourseService : ICourseService
             .Include(c => c.Instructor)
             .Include(c => c.Enrollments)
             .Include(c => c.CategoryEntity)
+            .Include(c => c.Lessons)
             .OrderByDescending(c => c.CourseId)
             .ToListAsync();
     }

@@ -115,7 +115,8 @@
                         <div class="aspect-video bg-gradient-to-br from-primary/20 to-blue-500/20 relative overflow-hidden">
                             @if (!string.IsNullOrEmpty(course.ThumbnailUrl))
                             {
-                                <img src="@course.ThumbnailUrl" alt="@course.Title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                                <div class="w-full h-full bg-center bg-no-repeat bg-cover group-hover:scale-105 transition-transform duration-500"
+                                     style="background-image: url('@course.ThumbnailUrl');"></div>
                             }
                             else
                             {

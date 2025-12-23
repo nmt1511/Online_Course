@@ -1,295 +1,316 @@
 @model Online_Course.ViewModels.StudentProgressIndexViewModel
+@using Online_Course.Models
 @{
     ViewData["Title"] = "Tiến độ học tập";
     Layout = "~/Views/Shared/_StudentLayout.cshtml";
 }
 
-<div class="relative flex h-full w-full flex-row overflow-hidden">
-    <!-- Sidebar -->
-    <div class="hidden lg:flex w-72 flex-col border-r border-[#e5e7eb] dark:border-[#3b4754] bg-white dark:bg-[#111418]">
-        <div class="flex h-full flex-col justify-between p-4">
-            <div class="flex flex-col gap-4">
-                <!-- User Profile in Sidebar -->
-                <div class="flex gap-3 items-center px-2 py-2">
-                    <div class="bg-primary/20 rounded-full h-12 w-12 border-2 border-[#e5e7eb] dark:border-[#3b4754] flex items-center justify-center">
-                        <span class="material-symbols-outlined text-primary text-2xl">person</span>
-                    </div>
-                    <div class="flex flex-col">
-                        <h1 class="text-[#111418] dark:text-white text-base font-medium leading-normal">@User.Identity?.Name</h1>
-                        <p class="text-[#637588] dark:text-[#9dabb9] text-sm font-normal leading-normal">Học viên</p>
-                    </div>
-                </div>
-                <!-- Navigation Links -->
-                <nav class="flex flex-col gap-2 mt-4">
-                    <a asp-area="Student" asp-controller="Courses" asp-action="Index" class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-[#f3f4f6] dark:hover:bg-[#1e252b] group">
-                        <span class="material-symbols-outlined text-[#637588] dark:text-[#9dabb9] group-hover:text-primary">book</span>
-                        <p class="text-[#111418] dark:text-white text-sm font-medium leading-normal">Khóa học</p>
-                    </a>
-                    <!-- Active State -->
-                    <a asp-area="Student" asp-controller="Progress" asp-action="Index" class="flex items-center gap-3 px-3 py-3 rounded-lg bg-primary/10 dark:bg-[#283039]">
-                        <span class="material-symbols-outlined text-primary fill">bar_chart</span>
-                        <p class="text-[#111418] dark:text-white text-sm font-medium leading-normal">Tiến độ học tập</p>
-                    </a>
-                </nav>
-            </div>
-            <!-- Logout -->
-            <div class="px-3">
-                <a asp-area="" asp-controller="Account" asp-action="Logout" class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-[#f3f4f6] dark:hover:bg-[#1e252b] group w-full">
-                    <span class="material-symbols-outlined text-[#637588] dark:text-[#9dabb9] group-hover:text-red-500">logout</span>
-                    <p class="text-[#111418] dark:text-white text-sm font-medium leading-normal group-hover:text-red-500">Đăng xuất</p>
-                </a>
+@* CSS cho Tab và Hiển thị *@
+<style>
+    .tab-btn.active {
+        background-color: #3b82f6;
+        color: white;
+        box-shadow: 0 4px 6px -1px rgb(59 130 246 / 0.2);
+    }
+    .course-item.hidden {
+        display: none !important;
+    }
+</style>
+
+<div class="relative flex h-full w-full flex-row overflow-hidden bg-[#f9fafb] dark:bg-[#0f172a]">
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-full overflow-y-auto">
+        <!-- Header - Thu gọn padding -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 px-6 py-5 border-b border-gray-200 dark:border-slate-800 bg-white dark:bg-[#1e252b]">
+            <div class="flex flex-col">
+                <h1 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">Tiến độ học tập</h1>
+                <p class="text-xs md:text-sm text-slate-500 dark:text-slate-400">Tổng quan quá trình học tập của bạn</p>
             </div>
         </div>
-    </div>
 
-    <!-- Main Content -->
-    <main class="flex-1 flex flex-col h-full overflow-y-auto bg-background-light dark:bg-background-dark">
-        <!-- Header -->
-        <header class="flex items-center justify-between px-6 py-5 border-b border-[#e5e7eb] dark:border-[#3b4754] bg-white dark:bg-[#111418]">
-            <div class="flex flex-col gap-1">
-                <h1 class="text-[#111418] dark:text-white text-2xl lg:text-3xl font-black leading-tight tracking-[-0.033em]">Tiến độ học tập</h1>
-                <p class="text-[#637588] dark:text-[#9dabb9] text-sm lg:text-base font-normal leading-normal">Tổng quan quá trình học tập của bạn</p>
-            </div>
-            <div class="flex items-center gap-4">
-                <button class="relative rounded-full p-2 hover:bg-[#f3f4f6] dark:hover:bg-[#283039] transition-colors">
-                    <span class="material-symbols-outlined text-[#637588] dark:text-white">notifications</span>
-                </button>
-                <!-- Mobile Menu Button -->
-                <button class="lg:hidden rounded-full p-2 hover:bg-[#f3f4f6] dark:hover:bg-[#283039] transition-colors">
-                    <span class="material-symbols-outlined text-[#637588] dark:text-white">menu</span>
-                </button>
-            </div>
-        </header>
-
-        <div class="p-6 lg:p-10 max-w-[1200px] mx-auto w-full flex flex-col gap-8">
-            <!-- Stats Row -->
+        <div class="px-6 py-6 max-w-[1280px] mx-auto w-full flex flex-col gap-6">
+            <!-- Stats Row - Thu gọn khoảng cách -->
             <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-[#1e252b] border border-[#e5e7eb] dark:border-[#3b4754] shadow-sm">
-                    <div class="flex items-center gap-3 mb-2">
-                        <div class="p-2 rounded-lg bg-primary/20 text-primary">
-                            <span class="material-symbols-outlined fill">school</span>
+                <div class="flex flex-col gap-1 rounded-xl p-5 bg-white dark:bg-[#1e252b] border border-gray-100 dark:border-slate-800 shadow-sm transition-all hover:shadow-md">
+                    <div class="flex items-center gap-3 mb-1">
+                        <div class="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400">
+                            <span class="material-symbols-outlined text-[20px] fill">school</span>
                         </div>
-                        <p class="text-[#637588] dark:text-[#9dabb9] text-sm font-medium">Tổng số khóa học</p>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">Tổng khóa học</p>
                     </div>
-                    <p class="text-[#111418] dark:text-white tracking-light text-3xl font-bold leading-tight">@Model.TotalCourses</p>
+                    <p class="text-2xl font-black text-slate-900 dark:text-white pl-1">@Model.TotalCourses</p>
                 </div>
-                <div class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-[#1e252b] border border-[#e5e7eb] dark:border-[#3b4754] shadow-sm">
-                    <div class="flex items-center gap-3 mb-2">
-                        <div class="p-2 rounded-lg bg-green-500/20 text-green-500">
-                            <span class="material-symbols-outlined fill">check_circle</span>
+                <div class="flex flex-col gap-1 rounded-xl p-5 bg-white dark:bg-[#1e252b] border border-gray-100 dark:border-slate-800 shadow-sm transition-all hover:shadow-md">
+                    <div class="flex items-center gap-3 mb-1">
+                        <div class="p-2 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400">
+                            <span class="material-symbols-outlined text-[20px] fill">check_circle</span>
                         </div>
-                        <p class="text-[#637588] dark:text-[#9dabb9] text-sm font-medium">Đã hoàn thành</p>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">Đã hoàn thành</p>
                     </div>
-                    <p class="text-[#111418] dark:text-white tracking-light text-3xl font-bold leading-tight">@Model.CompletedCourses</p>
+                    <p class="text-2xl font-black text-slate-900 dark:text-white pl-1">@Model.CompletedCourses</p>
                 </div>
-                <div class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-[#1e252b] border border-[#e5e7eb] dark:border-[#3b4754] shadow-sm">
-                    <div class="flex items-center gap-3 mb-2">
-                        <div class="p-2 rounded-lg bg-orange-500/20 text-orange-500">
-                            <span class="material-symbols-outlined fill">trending_up</span>
+                <div class="flex flex-col gap-1 rounded-xl p-5 bg-white dark:bg-[#1e252b] border border-gray-100 dark:border-slate-800 shadow-sm transition-all hover:shadow-md">
+                    <div class="flex items-center gap-3 mb-1">
+                        <div class="p-2 rounded-lg bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400">
+                            <span class="material-symbols-outlined text-[20px] fill">trending_up</span>
                         </div>
-                        <p class="text-[#637588] dark:text-[#9dabb9] text-sm font-medium">Tiến độ trung bình</p>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">Tiến độ trung bình</p>
                     </div>
-                    <p class="text-[#111418] dark:text-white tracking-light text-3xl font-bold leading-tight">@Model.OverallProgress%</p>
+                    <p class="text-2xl font-black text-slate-900 dark:text-white pl-1">@Model.OverallProgress%</p>
                 </div>
             </section>
 
-            <!-- Main Content Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Left Column: Current Courses Progress (Span 2) -->
+            <!-- Main Content Grid - Thu gọn gap -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Left Column -->
                 <div class="lg:col-span-2 flex flex-col gap-6">
                     <!-- Overall Progress Card -->
-                    <div class="rounded-xl bg-white dark:bg-[#1e252b] border border-[#e5e7eb] dark:border-[#3b4754] p-6 shadow-sm">
-                        <div class="flex justify-between items-start mb-4">
+                    <div class="rounded-xl bg-white dark:bg-[#1e252b] border border-gray-100 dark:border-slate-800 p-5 shadow-sm">
+                        <div class="flex justify-between items-start mb-3">
                             <div>
-                                <h3 class="text-lg font-bold text-[#111418] dark:text-white">Tiến độ tổng thể</h3>
-                                <p class="text-sm text-[#637588] dark:text-[#9dabb9]">Dựa trên tất cả các khóa học hiện tại</p>
+                                <h3 class="text-base font-bold text-slate-900 dark:text-white">Tiến độ tổng thể</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">Dựa trên tất cả các khóa học</p>
                             </div>
                             @{
                                 var progressLabel = Model.OverallProgress >= 80 ? "Rất tốt!" : 
                                                    Model.OverallProgress >= 50 ? "Tốt!" : 
                                                    Model.OverallProgress >= 25 ? "Cố gắng!" : "Bắt đầu!";
-                                var progressColor = Model.OverallProgress >= 80 ? "bg-green-500/20 text-green-500" : 
-                                                   Model.OverallProgress >= 50 ? "bg-primary/20 text-primary" : 
-                                                   Model.OverallProgress >= 25 ? "bg-orange-500/20 text-orange-500" : "bg-gray-500/20 text-gray-500";
+                                var progressColor = Model.OverallProgress >= 80 ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : 
+                                                   Model.OverallProgress >= 50 ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400" : 
+                                                   Model.OverallProgress >= 25 ? "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400" : "bg-gray-100 text-gray-700";
                             }
-                            <span class="px-3 py-1 rounded-full @progressColor text-sm font-bold">@progressLabel</span>
+                            <span class="px-2.5 py-1 rounded-md @progressColor text-[10px] font-black uppercase tracking-widest">@progressLabel</span>
                         </div>
-                        <div class="flex flex-col gap-2 mt-2">
-                            <div class="flex justify-between items-end">
-                                <span class="text-3xl font-bold text-primary">@Model.OverallProgress%</span>
-                                <span class="text-sm text-[#637588] dark:text-[#9dabb9] mb-1">@Model.CompletedCourses / @Model.TotalCourses khóa học hoàn thành</span>
+                        <div class="flex flex-col gap-2">
+                            <div class="flex justify-between items-baseline">
+                                <span class="text-3xl font-black text-primary">@Model.OverallProgress%</span>
+                                <span class="text-xs font-medium text-slate-500 dark:text-slate-400">@Model.CompletedCourses / @Model.TotalCourses hoàn thành</span>
                             </div>
-                            <div class="h-4 w-full rounded-full bg-[#e5e7eb] dark:bg-[#3b4754] overflow-hidden">
-                                <div class="h-full rounded-full bg-primary transition-all duration-500" style="width: @Model.OverallProgress%"></div>
+                            <div class="h-3 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                                <div class="h-full rounded-full bg-primary transition-all duration-700 ease-out" style="width: @Model.OverallProgress%"></div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Course List -->
+                    <!-- Tabs Container - Hiện đại hơn, bỏ tiêu đề theo yêu cầu -->
                     <div class="flex flex-col gap-4">
-                        <h3 class="text-lg font-bold text-[#111418] dark:text-white">Khóa học đang diễn ra</h3>
-                        
-                        @if (Model.Courses.Count == 0)
-                        {
-                            <div class="flex flex-col items-center justify-center p-8 rounded-xl bg-white dark:bg-[#1e252b] border border-[#e5e7eb] dark:border-[#3b4754]">
-                                <span class="material-symbols-outlined text-6xl text-[#637588] dark:text-[#9dabb9] mb-4">school</span>
-                                <p class="text-[#637588] dark:text-[#9dabb9] text-center mb-4">Bạn chưa đăng ký khóa học nào</p>
-                                <a asp-area="Student" asp-controller="Courses" asp-action="Index" class="px-4 py-2 bg-primary hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors">
-                                    Khám phá khóa học
-                                </a>
+                        <div class="flex justify-start items-center">
+                            <!-- Tabs Phân Loại - Pill Style -->
+                            <div class="flex bg-white dark:bg-[#1e252b] p-1.5 rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm gap-1">
+                                <button onclick="filterCourses('all', this)" class="tab-btn active px-4 py-2 text-xs font-bold rounded-lg transition-all flex items-center gap-2">
+                                    Tất cả
+                                    <span class="opacity-70 text-[10px]">@Model.Courses.Count</span>
+                                </button>
+                                <button onclick="filterCourses('NOT_STARTED', this)" class="tab-btn px-4 py-2 text-xs font-bold text-slate-500 dark:text-slate-400 rounded-lg transition-all hover:bg-slate-50 dark:hover:bg-slate-800/50 flex items-center gap-2">
+                                    Chưa học
+                                    <span class="opacity-70 text-[10px]">@Model.Courses.Count(c => c.LearningStatus == LearningStatus.NOT_STARTED)</span>
+                                </button>
+                                <button onclick="filterCourses('IN_PROGRESS', this)" class="tab-btn px-4 py-2 text-xs font-bold text-slate-500 dark:text-slate-400 rounded-lg transition-all hover:bg-slate-50 dark:hover:bg-slate-800/50 flex items-center gap-2">
+                                    Đang học
+                                    <span class="opacity-70 text-[10px]">@Model.Courses.Count(c => c.LearningStatus == LearningStatus.IN_PROGRESS)</span>
+                                </button>
+                                <button onclick="filterCourses('COMPLETED', this)" class="tab-btn px-4 py-2 text-xs font-bold text-slate-500 dark:text-slate-400 rounded-lg transition-all hover:bg-slate-50 dark:hover:bg-slate-800/50 flex items-center gap-2">
+                                    Hoàn thành
+                                    <span class="opacity-70 text-[10px]">@Model.Courses.Count(c => c.LearningStatus == LearningStatus.COMPLETED)</span>
+                                </button>
                             </div>
-                        }
-                        else
-                        {
-                            @foreach (var course in Model.Courses)
+                        </div>
+                        
+                        <div id="course-container" class="flex flex-col gap-4">
+                            @if (Model.Courses.Count == 0)
                             {
-                                <div class="flex flex-col md:flex-row gap-4 p-4 rounded-xl bg-white dark:bg-[#1e252b] border border-[#e5e7eb] dark:border-[#3b4754] hover:border-primary/50 transition-colors shadow-sm">
-                                    <div class="w-full md:w-48 h-32 md:h-auto rounded-lg bg-cover bg-center shrink-0 bg-gradient-to-br from-primary/30 to-primary/10" 
-                                         style="@(string.IsNullOrEmpty(course.ThumbnailUrl) ? "" : $"background-image: url('{course.ThumbnailUrl}');")">
-                                        @if (string.IsNullOrEmpty(course.ThumbnailUrl))
-                                        {
-                                            <div class="w-full h-full flex items-center justify-center">
-                                                <span class="material-symbols-outlined text-4xl text-primary/50">play_circle</span>
-                                            </div>
-                                        }
-                                    </div>
-                                    <div class="flex flex-col flex-1 justify-between py-1">
-                                        <div>
-                                            <div class="flex justify-between items-start">
-                                                <div>
-                                                    <span class="text-xs font-bold uppercase tracking-wider text-primary mb-1 block">@course.CategoryName</span>
-                                                    <h4 class="text-base md:text-lg font-bold text-[#111418] dark:text-white leading-tight">@course.Title</h4>
-                                                </div>
-                                            </div>
-                                            @if (!string.IsNullOrEmpty(course.CurrentLessonTitle))
-                                            {
-                                                <p class="text-sm text-[#637588] dark:text-[#9dabb9] mt-1">@course.CurrentLessonTitle</p>
-                                            }
-                                            else if (course.Status == "Hoàn thành")
-                                            {
-                                                <p class="text-sm text-green-500 mt-1">Đã hoàn thành tất cả bài học!</p>
-                                            }
-                                        </div>
-                                        <div class="flex flex-col gap-2 mt-4 md:mt-0">
-                                            <div class="flex justify-between text-xs font-medium text-[#111418] dark:text-white">
-                                                <span>Tiến độ (@course.CompletedLessons/@course.TotalLessons bài)</span>
-                                                <span>@Math.Round(course.ProgressPercentage)%</span>
-                                            </div>
-                                            <div class="h-2 w-full rounded-full bg-[#e5e7eb] dark:bg-[#3b4754]">
-                                                @{
-                                                    var barColor = course.ProgressPercentage >= 100 ? "bg-green-500" : "bg-primary";
-                                                }
-                                                <div class="h-full rounded-full @barColor transition-all duration-500" style="width: @course.ProgressPercentage%"></div>
-                                            </div>
-                                            <div class="flex justify-end mt-2 gap-2">
-                                                @if (course.Status == "Hoàn thành")
-                                                {
-                                                    <span class="px-4 py-2 bg-green-500/20 text-green-500 text-sm font-medium rounded-lg flex items-center gap-2">
-                                                        <span class="material-symbols-outlined text-sm">check_circle</span>
-                                                        Hoàn thành
-                                                    </span>
-                                                }
-                                                else
-                                                {
-                                                    <a asp-area="Student" asp-controller="Learning" asp-action="Lessons" asp-route-courseId="@course.CourseId" 
-                                                       class="px-4 py-2 bg-primary hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors">
-                                                        Tiếp tục học
-                                                    </a>
-                                                }
-                                                <form asp-area="Student" asp-controller="Courses" asp-action="Unenroll" method="post" class="inline delete-form">
-                                                    <input type="hidden" name="courseId" value="@course.CourseId" />
-                                                    <button type="button" onclick="showConfirmDialog(this.closest('form'), 'Hủy đăng ký khóa học', 'Bạn có chắc chắn muốn hủy đăng ký khóa học này? Toàn bộ tiến độ học tập của bạn sẽ bị xóa vĩnh viễn.', 'Hủy đăng ký', 'danger')" class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-500 text-sm font-medium rounded-lg transition-colors flex items-center gap-1">
-                                                        <span class="material-symbols-outlined text-sm">cancel</span>
-                                                        Hủy đăng ký
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <div class="flex flex-col items-center justify-center p-12 rounded-xl bg-white dark:bg-[#1e252b] border border-dashed border-gray-200 dark:border-slate-800">
+                                    <span class="material-symbols-outlined text-5xl text-slate-300 mb-3">school</span>
+                                    <p class="text-slate-500 dark:text-slate-400 text-sm mb-4">Bạn chưa đăng ký khóa học nào</p>
+                                    <a asp-area="Student" asp-controller="Courses" asp-action="Index" class="px-5 py-2.5 bg-primary hover:bg-blue-600 text-white text-xs font-bold rounded-lg transition-all shadow-md active:scale-95">
+                                        Khám phá ngay
+                                    </a>
                                 </div>
                             }
-                        }
+                            else
+                            {
+                                @foreach (var course in Model.Courses)
+                                {
+                                    <div class="course-item flex flex-col md:flex-row gap-4 p-4 rounded-xl bg-white dark:bg-[#1e252b] border border-gray-100 dark:border-slate-800 hover:border-primary/50 transition-all shadow-sm relative group" 
+                                         data-status="@course.LearningStatus">
+                                        
+                                        <!-- Thumbnail -->
+                                        <div class="w-full md:w-52 h-36 md:h-auto rounded-lg bg-cover bg-center shrink-0 bg-slate-50 overflow-hidden relative" 
+                                             style="@(string.IsNullOrEmpty(course.ThumbnailUrl) ? "" : $"background-image: url('{course.ThumbnailUrl}');")">
+                                            @if (string.IsNullOrEmpty(course.ThumbnailUrl))
+                                            {
+                                                <div class="w-full h-full flex items-center justify-center">
+                                                    <span class="material-symbols-outlined text-4xl text-slate-200">image</span>
+                                                </div>
+                                            }
+                                            @if (course.IsMandatory)
+                                            {
+                                                <div class="absolute top-2 left-2 px-2 py-0.5 bg-red-600 text-white text-[9px] font-black uppercase tracking-tighter rounded shadow-sm">Bắt buộc</div>
+                                            }
+                                        </div>
+
+                                        <div class="flex flex-col flex-1 justify-between py-0.5">
+                                            <div>
+                                                <div class="flex justify-between items-start mb-1">
+                                                    <span class="text-[10px] font-black uppercase tracking-widest text-primary/80">@course.CategoryName</span>
+                                                    <span class="text-[10px] font-medium text-slate-400 italic">@course.EnrolledAt.ToString("dd/MM/yyyy")</span>
+                                                </div>
+                                                <h4 class="text-lg font-bold text-slate-900 dark:text-white leading-tight group-hover:text-primary transition-colors">@course.Title</h4>
+                                                
+                                                @if (course.LearningStatus == LearningStatus.COMPLETED)
+                                                {
+                                                    <div class="flex items-center gap-1.5 text-green-500 text-xs mt-1.5 font-bold">
+                                                        <span class="material-symbols-outlined text-sm fill">verified</span>
+                                                        Đã hoàn thành xuất sắc!
+                                                    </div>
+                                                }
+                                                else if (!string.IsNullOrEmpty(course.CurrentLessonTitle))
+                                                {
+                                                    <div class="flex items-center gap-1.5 text-slate-500 text-xs mt-1.5">
+                                                        <span class="material-symbols-outlined text-sm">play_circle</span>
+                                                        <span class="italic">Đang học: @course.CurrentLessonTitle</span>
+                                                    </div>
+                                                }
+                                            </div>
+
+                                            <div class="flex flex-col gap-2 mt-4">
+                                                <div class="flex justify-between text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-tighter">
+                                                    <div class="flex items-center gap-1">
+                                                        <span class="material-symbols-outlined text-[14px]">auto_stories</span>
+                                                        Tiến độ (@course.CompletedLessons/@course.TotalLessons bài)
+                                                    </div>
+                                                    <span class="text-primary font-black">@Math.Round(course.ProgressPercentage)%</span>
+                                                </div>
+                                                <div class="h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                                                    @{
+                                                        var barColor = course.ProgressPercentage >= 100 ? "bg-green-500" : "bg-primary";
+                                                    }
+                                                    <div class="h-full rounded-full @barColor transition-all duration-700 ease-out" style="width: @course.ProgressPercentage%"></div>
+                                                </div>
+
+                                                <div class="flex justify-end mt-2 gap-3">
+                                                    @* Hủy đăng ký *@
+                                                    @if (course.LearningStatus == LearningStatus.NOT_STARTED && !course.IsMandatory)
+                                                    {
+                                                        <form asp-area="Student" asp-controller="Courses" asp-action="Unenroll" method="post" class="inline delete-form">
+                                                            <input type="hidden" name="courseId" value="@course.CourseId" />
+                                                            <button type="button" onclick="showConfirmDialog(this.closest('form'), 'Hủy đăng ký', 'Bạn có chắc muốn hủy khóa học này?', 'Hủy đăng ký', 'danger')" 
+                                                                    class="px-4 py-2 hover:bg-red-50 text-red-500 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5">
+                                                                <span class="material-symbols-outlined text-sm">cancel</span>
+                                                                Hủy học
+                                                            </button>
+                                                        </form>
+                                                    }
+
+                                                    @if (course.LearningStatus == LearningStatus.COMPLETED)
+                                                    {
+                                                        <a asp-area="Student" asp-controller="Learning" asp-action="Lessons" asp-route-courseId="@course.CourseId" 
+                                                           class="px-5 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-bold rounded-xl transition-all shadow-sm flex items-center gap-1.5 active:scale-95">
+                                                            <span class="material-symbols-outlined text-sm">history</span>
+                                                            Xem lại bài học
+                                                        </a>
+                                                    }
+                                                    else if(course.LearningStatus == LearningStatus.NOT_STARTED)
+                                                    {
+                                                        <a asp-area="Student" asp-controller="Learning" asp-action="Lessons" asp-route-courseId="@course.CourseId"
+                                                           class="px-5 py-2 bg-primary hover:bg-green-600 text-white text-xs font-bold rounded-xl transition-all shadow-md flex items-center gap-1.5 active:scale-95">
+                                                            <span class="material-symbols-outlined text-sm">play_arrow</span>
+                                                            Bắt đầu ngay
+                                                        </a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <a asp-area="Student" asp-controller="Learning" asp-action="Lessons" asp-route-courseId="@course.CourseId" 
+                                                           class="px-5 py-2 bg-primary hover:bg-blue-600 text-white text-xs font-bold rounded-xl transition-all shadow-md flex items-center gap-1.5 active:scale-95">
+                                                            <span class="material-symbols-outlined text-sm">play_arrow</span>
+                                                            Tiếp tục ngay
+                                                        </a>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
                     </div>
                 </div>
 
-                <!-- Right Column: Summary & Tips -->
+                <!-- Right Column - Sidebar thu gọn gap -->
                 <div class="flex flex-col gap-6">
-                    <!-- Progress Summary -->
-                    <div class="rounded-xl bg-white dark:bg-[#1e252b] border border-[#e5e7eb] dark:border-[#3b4754] p-6 shadow-sm">
-                        <div class="flex flex-col gap-1 mb-6">
-                            <h3 class="text-lg font-bold text-[#111418] dark:text-white">Tóm tắt tiến độ</h3>
-                            <p class="text-sm text-[#637588] dark:text-[#9dabb9]">Chi tiết các khóa học</p>
+                    <!-- Progress Summary Card -->
+                    <div class="rounded-xl bg-white dark:bg-[#1e252b] border border-gray-100 dark:border-slate-800 p-5 shadow-sm">
+                        <div class="flex flex-col mb-4">
+                            <h3 class="text-base font-bold text-slate-900 dark:text-white">Tóm tắt tiến độ</h3>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400">Chi tiết theo danh mục</p>
                         </div>
-                        <div class="flex flex-col gap-4">
+                        <div class="flex flex-col gap-3">
                             @{
-                                var inProgressCourses = Model.Courses.Where(c => c.Status != "Hoàn thành").ToList();
-                                var completedCourses = Model.Courses.Where(c => c.Status == "Hoàn thành").ToList();
-                            }
-                            
-                            <div class="flex gap-3 items-center p-3 rounded-lg bg-[#f3f4f6] dark:bg-[#283039]">
-                                <div class="text-primary">
-                                    <span class="material-symbols-outlined text-[20px]">pending</span>
-                                </div>
-                                <div class="flex-1">
-                                    <p class="text-sm font-bold text-[#111418] dark:text-white">Đang học</p>
-                                    <p class="text-xs text-[#637588] dark:text-[#9dabb9] mt-1">@inProgressCourses.Count khóa học</p>
-                                </div>
-                            </div>
-                            
-                            <div class="flex gap-3 items-center p-3 rounded-lg bg-[#f3f4f6] dark:bg-[#283039]">
-                                <div class="text-green-500">
-                                    <span class="material-symbols-outlined text-[20px] fill">check_circle</span>
-                                </div>
-                                <div class="flex-1">
-                                    <p class="text-sm font-bold text-[#111418] dark:text-white">Hoàn thành</p>
-                                    <p class="text-xs text-[#637588] dark:text-[#9dabb9] mt-1">@completedCourses.Count khóa học</p>
-                                </div>
-                            </div>
-                            
-                            @{
+                                var inProgressCount = Model.Courses.Count(c => c.LearningStatus != LearningStatus.COMPLETED);
+                                var completedCount = Model.Courses.Count(c => c.LearningStatus == LearningStatus.COMPLETED);
                                 var totalLessons = Model.Courses.Sum(c => c.TotalLessons);
                                 var completedLessons = Model.Courses.Sum(c => c.CompletedLessons);
                             }
-                            <div class="flex gap-3 items-center p-3 rounded-lg bg-[#f3f4f6] dark:bg-[#283039]">
-                                <div class="text-orange-500">
-                                    <span class="material-symbols-outlined text-[20px]">menu_book</span>
+                            
+                            <div class="flex gap-3 items-center p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100/50 dark:border-slate-700/50">
+                                <div class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-[18px]">update</span>
                                 </div>
                                 <div class="flex-1">
-                                    <p class="text-sm font-bold text-[#111418] dark:text-white">Bài học</p>
-                                    <p class="text-xs text-[#637588] dark:text-[#9dabb9] mt-1">@completedLessons / @totalLessons bài đã hoàn thành</p>
+                                    <p class="text-[11px] font-black text-slate-500 uppercase tracking-tighter">Đang học</p>
+                                    <p class="text-sm font-bold text-slate-900 dark:text-white">@inProgressCount khóa học</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex gap-3 items-center p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100/50 dark:border-slate-700/50">
+                                <div class="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900/30 text-green-600 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-[18px] fill">check_circle</span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-[11px] font-black text-slate-500 uppercase tracking-tighter">Hoàn thành</p>
+                                    <p class="text-sm font-bold text-slate-900 dark:text-white">@completedCount khóa học</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex gap-3 items-center p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100/50 dark:border-slate-700/50">
+                                <div class="w-8 h-8 rounded-lg bg-orange-100 dark:bg-orange-900/30 text-orange-600 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-[18px]">menu_book</span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-[11px] font-black text-slate-500 uppercase tracking-tighter">Bài học</p>
+                                    <p class="text-sm font-bold text-slate-900 dark:text-white">@completedLessons / @totalLessons bài</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Motivation Quote -->
-                    <div class="rounded-xl bg-gradient-to-br from-primary/20 to-transparent p-6 border border-primary/20">
-                        <div class="flex gap-2 mb-2">
-                            <span class="material-symbols-outlined text-primary">format_quote</span>
+                    <!-- Motivation Quote - Modernize -->
+                    <div class="rounded-xl bg-gradient-to-br from-primary/10 to-transparent p-5 border border-primary/20 relative overflow-hidden group">
+                        <div class="absolute -right-2 -bottom-2 opacity-[0.05] group-hover:scale-110 transition-transform">
+                            <span class="material-symbols-outlined text-6xl">format_quote</span>
                         </div>
-                        <p class="text-sm italic font-medium text-[#111418] dark:text-white leading-relaxed">
+                        <div class="flex gap-2 mb-2">
+                            <span class="material-symbols-outlined text-primary text-xl">format_quote</span>
+                        </div>
+                        <p class="text-xs font-bold text-slate-800 dark:text-slate-200 leading-relaxed italic pr-4">
                             "Sự kiên trì là chìa khóa của thành công. Đừng bỏ cuộc ngay cả khi bạn gặp khó khăn."
                         </p>
                     </div>
 
-                    <!-- Quick Actions -->
-                    <div class="rounded-xl bg-white dark:bg-[#1e252b] border border-[#e5e7eb] dark:border-[#3b4754] p-6 shadow-sm">
-                        <h3 class="text-lg font-bold text-[#111418] dark:text-white mb-4">Hành động nhanh</h3>
-                        <div class="flex flex-col gap-3">
+                    <!-- Quick Actions - Thu gọn -->
+                    <div class="rounded-xl bg-white dark:bg-[#1e252b] border border-gray-100 dark:border-slate-800 p-5 shadow-sm">
+                        <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-3 uppercase tracking-wider">Hành động nhanh</h3>
+                        <div class="flex flex-col gap-2">
                             <a asp-area="Student" asp-controller="Courses" asp-action="Index" 
-                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-[#f3f4f6] dark:hover:bg-[#283039] transition-colors group">
-                                <span class="material-symbols-outlined text-primary">explore</span>
-                                <span class="text-sm font-medium text-[#111418] dark:text-white group-hover:text-primary">Khám phá khóa học mới</span>
+                               class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 hover:bg-primary/10 hover:text-primary transition-all group">
+                                <span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">explore</span>
+                                <span class="text-xs font-bold">Khám phá khóa học mới</span>
                             </a>
-                            @if (inProgressCourses.Any())
-                            {
-                                var firstInProgress = inProgressCourses.First();
-                                <a asp-area="Student" asp-controller="Learning" asp-action="Lessons" asp-route-courseId="@firstInProgress.CourseId"
-                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-[#f3f4f6] dark:hover:bg-[#283039] transition-colors group">
-                                    <span class="material-symbols-outlined text-primary">play_circle</span>
-                                    <span class="text-sm font-medium text-[#111418] dark:text-white group-hover:text-primary">Tiếp tục học</span>
-                                </a>
-                            }
+                            <a asp-area="Student" asp-controller="Progress" asp-action="Index" 
+                               class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 hover:bg-primary/10 hover:text-primary transition-all group">
+                                <span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">auto_stories</span>
+                                <span class="text-xs font-bold">Tiếp tục hành trình</span>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -297,3 +318,28 @@
         </div>
     </main>
 </div>
+
+@* JS Xử lý lọc *@
+<script>
+    function filterCourses(status, btn) {
+        // Cập nhật nút active
+        document.querySelectorAll('.tab-btn').forEach(b => {
+            b.classList.remove('active', 'font-bold', 'bg-white', 'dark:bg-[#1e252b]', 'shadow-sm');
+            b.classList.add('text-slate-500', 'dark:text-slate-400');
+            b.classList.remove('text-white');
+        });
+        
+        btn.classList.add('active', 'font-bold');
+        btn.classList.remove('text-slate-500', 'dark:text-slate-400');
+
+        // Lọc item
+        const items = document.querySelectorAll('.course-item');
+        items.forEach(item => {
+            if (status === 'all' || item.getAttribute('data-status') === status) {
+                item.classList.remove('hidden');
+            } else {
+                item.classList.add('hidden');
+            }
+        });
+    }
+</script>

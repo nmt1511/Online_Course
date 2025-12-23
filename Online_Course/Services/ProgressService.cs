@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Online_Course.Data;
 using Online_Course.Models;
 
@@ -47,6 +47,7 @@ public class ProgressService : IProgressService
             .ToListAsync();
     }
 
+    //Đếm số lượng bài học hoàn thành của 1 khóa học
     public async Task<int> GetCompletedLessonsCountAsync(int studentId, int courseId)
     {
         return await _context.Progresses
@@ -56,6 +57,7 @@ public class ProgressService : IProgressService
                 && p.IsCompleted);
     }
 
+    //Tính % hoàn thành khóa học
     public async Task<double> CalculateProgressPercentageAsync(int studentId, int courseId)
     {
         var totalLessons = await _context.Lessons
