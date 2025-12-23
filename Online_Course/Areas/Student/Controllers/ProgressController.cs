@@ -41,26 +41,51 @@ public class ProgressController : Controller
         var enrollments = await _enrollmentService.GetEnrollmentsByStudentAsync(userId.Value);
         
         var courseProgressList = new List<StudentCourseProgressViewModel>();
+
+        //Tổng khóa học hoàn thành
         int totalCompletedCourses = 0;
+
+        //Tổng % hoàn thành của sinh viên
         double overallProgressSum = 0;
 
+        // Duyệt qua danh sách đăng ký
         foreach (var enrollment in enrollments)
         {
+            // Lấy tổng số bài học và số bài học đã hoàn thành
             var totalLessons = enrollment.Course?.Lessons?.Count ?? 0;
             var completedLessons = await _progressService.GetCompletedLessonsCountAsync(userId.Value, enrollment.CourseId);
+            
+            // Tính toán phần trăm tiến độ
             var progressPercentage = await _progressService.CalculateProgressPercentageAsync(userId.Value, enrollment.CourseId);
             
-            var status = progressPercentage >= 100 ? "Hoàn thành" : "Đang học";
-            if (progressPercentage >= 100)
-                totalCompletedCourses++;
+            // Xác định trạng thái hiển thị dựa trên LearningStatus từ model
+            string status = "";
+            switch (enrollment.LearningStatus)
+            {
+                case Online_Course.Models.LearningStatus.NOT_STARTED:
+                    status = "Chưa học";
+                    break;
+                case Online_Course.Models.LearningStatus.IN_PROGRESS:
+                    status = "Đang học";
+                    break;
+                case Online_Course.Models.LearningStatus.COMPLETED:
+                    status = "Hoàn thành";
+                    totalCompletedCourses++; // Tăng số lượng khóa học đã hoàn thành
+                    break;
+                default:
+                    status = "Chưa học";
+                    break;
+            }
 
             overallProgressSum += progressPercentage;
 
-            // Get the current lesson (first incomplete lesson)
+            // Lấy bài học đang học trong khóa học
             var lessons = await _lessonService.GetLessonsByCourseAsync(enrollment.CourseId);
             string currentLessonTitle = "";
+            //Lấy từng bài học trong khóa học theo thứ tự để kiểm tra % hoàn thành
             foreach (var lesson in lessons.OrderBy(l => l.OrderIndex))
             {
+                //Kiểm tra bài học đã hoàn thành chưa? chưa thì dừng
                 var isCompleted = await _progressService.IsLessonCompletedAsync(userId.Value, lesson.LessonId);
                 if (!isCompleted)
                 {
@@ -69,6 +94,7 @@ public class ProgressController : Controller
                 }
             }
 
+            // Thêm thông tin vào danh sách hiển thị
             courseProgressList.Add(new StudentCourseProgressViewModel
             {
                 CourseId = enrollment.CourseId,
@@ -80,6 +106,8 @@ public class ProgressController : Controller
                 CompletedLessons = completedLessons,
                 ProgressPercentage = progressPercentage,
                 Status = status,
+                LearningStatus = enrollment.LearningStatus, // Gán trạng thái học tập
+                IsMandatory = enrollment.IsMandatory, // Gán thuộc tính bắt buộc
                 EnrolledAt = enrollment.EnrolledAt,
                 CurrentLessonTitle = currentLessonTitle
             });
