@@ -46,6 +46,18 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddControllersWithViews();
 
+// Thêm chính sách CORS cho trình xem PDF / Add CORS policy for PDF viewer
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowPdfViewer",
+        policy =>
+        {
+            policy.WithOrigins("https://mozilla.github.io")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
+
 var app = builder.Build();
 
 // Initialize database with seed data
@@ -61,9 +73,19 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
 }
-app.UseStaticFiles();
+// Cấu hình Static Files cho phép CORS | Configure Static Files to allow CORS
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Origin", "*");
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    }
+});
 
 app.UseRouting();
+
+app.UseCors("AllowPdfViewer");
 
 app.UseAuthentication();
 app.UseAuthorization();
