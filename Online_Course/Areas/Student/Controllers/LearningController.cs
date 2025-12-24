@@ -72,7 +72,8 @@ public class LearningController : Controller
                 LessonId = lesson.LessonId,
                 Title = lesson.Title,
                 Description = lesson.Description,
-                VideoUrl = lesson.ContentUrl,
+                ContentUrl = lesson.ContentUrl,
+                LessonType = lesson.LessonType,
                 OrderIndex = lesson.OrderIndex,
                 IsCompleted = isCompleted,
                 IsLocked = !previousLessonCompleted // Khóa nếu bài trước chưa xong | Lock if previous not completed
@@ -118,10 +119,12 @@ public class LearningController : Controller
 
         // Kiểm tra logic khóa bài học (Bảo mật) | Check lesson locking logic (Security)
         var allLessons = (await _lessonService.GetLessonsByCourseAsync(lesson.CourseId)).OrderBy(l => l.OrderIndex).ToList();
+        //index bài học vừa chọn
         var currentIndex = allLessons.FindIndex(l => l.LessonId == lessonId);
         
         if (currentIndex > 0)
         {
+            //Kiểm tra bài học trước đã hoàn thành chưa
             var previousLessonId = allLessons[currentIndex - 1].LessonId;
             var isPreviousCompleted = await _progressService.IsLessonCompletedAsync(userId.Value, previousLessonId);
             if (!isPreviousCompleted)
@@ -136,11 +139,11 @@ public class LearningController : Controller
         var progressPercentage = await _progressService.CalculateProgressPercentageAsync(userId.Value, lesson.CourseId);
         var completedCount = await _progressService.GetCompletedLessonsCountAsync(userId.Value, lesson.CourseId);
 
-        // Tìm bài học trước và sau | Find previous and next lessons
+        // Tìm bài học trước và sau
         var previousLesson = currentIndex > 0 ? allLessons[currentIndex - 1] : null;
         var nextLesson = currentIndex < allLessons.Count - 1 ? allLessons[currentIndex + 1] : null;
 
-        // Xây dựng danh sách sidebar với trạng thái khóa | Build sidebar list with locking status
+        // Xây dựng danh sách sidebar với trạng thái khóa 
         var sidebarLessons = new List<LearningLessonViewModel>();
         bool prevComp = true; 
         foreach (var l in allLessons)
@@ -151,7 +154,8 @@ public class LearningController : Controller
                 LessonId = l.LessonId,
                 Title = l.Title,
                 Description = l.Description,
-                VideoUrl = l.ContentUrl,
+                ContentUrl = l.ContentUrl,
+                LessonType = l.LessonType,
                 OrderIndex = l.OrderIndex,
                 IsCompleted = comp,
                 IsLocked = !prevComp
@@ -159,12 +163,17 @@ public class LearningController : Controller
             prevComp = comp;
         }
 
+        // Lấy tiến độ hiện tại 1m
+        var progress = (await _progressService.GetProgressByStudentAndCourseAsync(userId.Value, lesson.CourseId))
+                        .FirstOrDefault(p => p.LessonId == lessonId);
+
         var viewModel = new LearningContentViewModel
         {
             LessonId = lesson.LessonId,
             LessonTitle = lesson.Title,
             LessonDescription = lesson.Description,
-            VideoUrl = lesson.ContentUrl,
+            ContentUrl = lesson.ContentUrl,
+            LessonType = lesson.LessonType,
             OrderIndex = lesson.OrderIndex,
             IsCompleted = isCompleted,
             CourseId = lesson.CourseId,
@@ -177,46 +186,33 @@ public class LearningController : Controller
             ProgressPercentage = progressPercentage,
             PreviousLessonId = previousLesson?.LessonId,
             NextLessonId = nextLesson?.LessonId,
-            AllLessons = sidebarLessons
+            AllLessons = sidebarLessons,
+            
+            // Map tracking fields
+            CurrentTimeSeconds = progress?.CurrentTimeSeconds,
+            CurrentPage = progress?.CurrentPage,
+            TotalDurationSeconds = lesson.TotalDurationSeconds,
+            TotalPages = lesson.TotalPages
         };
 
         return View(viewModel);
     }
 
-    // POST: Student/Learning/MarkComplete
+    // POST: Student/Learning/SaveProgress
     [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> MarkComplete(int lessonId)
+    public async Task<IActionResult> SaveProgress(int lessonId, int? currentTime, int? currentPage, bool isCompleted)
     {
         var userId = GetCurrentUserId();
-        if (userId == null)
-            return RedirectToAction("Login", "Account", new { area = "" });
+        if (userId == null) return Unauthorized();
 
-        var lesson = await _lessonService.GetLessonByIdAsync(lessonId);
-        if (lesson == null)
-            return NotFound();
-
-        // Check enrollment
-        var isEnrolled = await _enrollmentService.IsEnrolledAsync(userId.Value, lesson.CourseId);
-        if (!isEnrolled)
+        try
         {
-            TempData["Error"] = "Bạn chưa đăng ký khóa học này.";
-            return RedirectToAction("Details", "Courses", new { area = "Student", id = lesson.CourseId });
+            await _progressService.UpdateProgressAsync(userId.Value, lessonId, currentTime, currentPage, isCompleted);
+            return Json(new { success = true });
         }
-
-        await _progressService.MarkLessonCompleteAsync(userId.Value, lessonId);
-        TempData["Success"] = "Đã hoàn thành bài học!";
-
-        // Find next lesson
-        var allLessons = (await _lessonService.GetLessonsByCourseAsync(lesson.CourseId)).ToList();
-        var currentIndex = allLessons.FindIndex(l => l.LessonId == lessonId);
-        var nextLesson = currentIndex < allLessons.Count - 1 ? allLessons[currentIndex + 1] : null;
-
-        if (nextLesson != null)
+        catch (Exception ex)
         {
-            return RedirectToAction(nameof(Content), new { lessonId = nextLesson.LessonId });
+            return Json(new { success = false, message = ex.Message });
         }
-
-        return RedirectToAction(nameof(Lessons), new { courseId = lesson.CourseId });
     }
 }

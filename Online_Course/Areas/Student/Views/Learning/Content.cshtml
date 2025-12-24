@@ -22,6 +22,13 @@
     <!-- Tailwind CSS | Thư viện CSS Tailwind -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     
+    <!-- PDF.js Library | Thư viện PDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        // Cấu hình worker cho PDF.js | Configure PDF.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+    
     <!-- Theme Config | Cấu hình chủ đề -->
     <script>
         tailwind.config = {
@@ -64,6 +71,22 @@
             opacity: 0.5;
             cursor: not-allowed !important;
         }
+
+        /* Custom PDF Viewer Styles | Kiểu trình xem PDF tùy chỉnh */
+        .pdf-canvas {
+            max-width: 100%;
+            height: auto !important;
+        }
+        #pdf-scroll-container::-webkit-scrollbar {
+            width: 10px;
+        }
+        #pdf-scroll-container::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        #pdf-scroll-container::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 5px;
+        }
     </style>
     <script>
         if (localStorage.getItem('theme') === 'dark') {
@@ -73,7 +96,7 @@
 </head>
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display overflow-hidden h-screen flex flex-col">
 
-    <!-- Top Navigation Bar | Thanh điều hướng trên cùng -->
+    <!--Thanh điều hướng trên cùng -->
     <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-gray-200 dark:border-border-dark bg-white dark:bg-background-dark px-6 py-3 shrink-0 z-20">
         <div class="flex items-center gap-4">
             <a asp-area="Student" asp-controller="Learning" asp-action="Lessons" asp-route-courseId="@Model.CourseId" class="flex items-center gap-3 text-slate-900 dark:text-white hover:opacity-80 transition-opacity">
@@ -104,11 +127,11 @@
         </div>
     </header>
 
-    <!-- Main Layout | Bố cục chính -->
+    <!-- Bố cục chính -->
     <div class="flex flex-1 overflow-hidden relative">
-        <!-- Sidebar (Course Curriculum) | Thanh bên (Nội dung khóa học) -->
+        <!-- Thanh bên (Nội dung khóa học) -->
         <aside class="w-80 flex flex-col border-r border-gray-200 dark:border-border-dark bg-white dark:bg-background-dark shrink-0 h-full overflow-hidden absolute md:relative z-10 -translate-x-full md:translate-x-0 transition-transform duration-300" id="courseSidebar">
-            <!-- Progress Summary | Tóm tắt tiến độ -->
+            <!--Tóm tắt tiến độ -->
             <div class="p-5 border-b border-gray-200 dark:border-border-dark">
                 <div class="flex justify-between items-end mb-2">
                     <p class="text-sm font-medium text-slate-700 dark:text-white">Tiến độ khóa học</p>
@@ -120,7 +143,7 @@
                 <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">@Model.CompletedLessons/@Model.TotalLessons Bài học đã hoàn thành</p>
             </div>
             
-            <!-- Curriculum List | Danh sách giáo trình -->
+            <!--Danh sách giáo trình -->
             <div class="flex-1 overflow-y-auto p-4 space-y-2">
                 @foreach (var lesson in Model.AllLessons)
                 {
@@ -145,7 +168,7 @@
                     else if (isCurrentLesson)
                     {
                         <div class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 dark:bg-primary/20 border-l-4 border-primary text-left w-full shadow-sm">
-                            <span class="material-symbols-outlined filled text-primary text-[20px] shrink-0">play_circle</span>
+                            <span class="material-symbols-outlined filled text-primary text-[20px] shrink-0">@(lesson.LessonType == Online_Course.Models.LessonType.Video ? "play_circle" : "description")</span>
                             <div class="flex flex-col">
                                 <span class="text-sm text-primary font-bold line-clamp-1">@lesson.Title</span>
                                 <span class="text-[10px] text-slate-500 dark:text-slate-400">Bài @lesson.OrderIndex</span>
@@ -155,7 +178,7 @@
                     else
                     {
                         <a asp-action="Content" asp-route-lessonId="@lesson.LessonId" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-surface-dark group transition-colors text-left w-full">
-                            <span class="material-symbols-outlined text-slate-400 text-[20px] shrink-0">play_circle</span>
+                            <span class="material-symbols-outlined text-slate-400 text-[20px] shrink-0">@(lesson.LessonType == Online_Course.Models.LessonType.Video ? "play_circle" : "description")</span>
                             <span class="text-sm text-slate-600 dark:text-slate-300 font-medium group-hover:text-primary line-clamp-1">@lesson.Title</span>
                         </a>
                     }
@@ -163,9 +186,9 @@
             </div>
         </aside>
 
-        <!-- Main Content Area | Khu vực nội dung chính -->
+        <!--Khu vực nội dung chính -->
         <main class="flex-1 overflow-y-auto bg-gray-50 dark:bg-[#111418] relative scroll-smooth">
-            <!-- Mobile Toggle | Nút bật thanh bên di động -->
+            <!-- Nút bật thanh bên di động -->
             <div class="md:hidden p-4 pb-0">
                 <button class="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm font-medium" onclick="document.getElementById('courseSidebar').classList.toggle('-translate-x-full')">
                     <span class="material-symbols-outlined">menu_open</span>
@@ -174,46 +197,80 @@
             </div>
             
             <div class="max-w-[1000px] mx-auto p-4 md:p-8 flex flex-col gap-6">
-                <!-- Video Player Container | Khung trình phát Video -->
+                <!--Khung trình phát Video -->
                 <div class="flex flex-col gap-4">
                     <div class="relative w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl group">
-                        @if (!string.IsNullOrEmpty(Model.VideoUrl))
+                        @if (!string.IsNullOrEmpty(Model.ContentUrl))
                         {
-                            @if (Model.VideoUrl.Contains("youtube.com") || Model.VideoUrl.Contains("youtu.be"))
+                            @if (Model.LessonType == Online_Course.Models.LessonType.Video)
                             {
-                                var videoId = "";
-                                if (Model.VideoUrl.Contains("youtube.com/watch?v="))
+                                @if (Model.ContentUrl.Contains("youtube.com") || Model.ContentUrl.Contains("youtu.be"))
                                 {
-                                    videoId = Model.VideoUrl.Split("v=")[1].Split("&")[0];
+                                    var videoId = "";
+                                    if (Model.ContentUrl.Contains("youtube.com/watch?v="))
+                                    {
+                                        videoId = Model.ContentUrl.Split("v=")[1].Split("&")[0];
+                                    }
+                                    else if (Model.ContentUrl.Contains("youtu.be/"))
+                                    {
+                                        videoId = Model.ContentUrl.Split("youtu.be/")[1].Split("?")[0];
+                                    }
+                                    <iframe id="youtube-player" class="absolute inset-0 w-full h-full" src="https://www.youtube.com/embed/@videoId?enablejsapi=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                                 }
-                                else if (Model.VideoUrl.Contains("youtu.be/"))
+                                else
                                 {
-                                    videoId = Model.VideoUrl.Split("youtu.be/")[1].Split("?")[0];
+                                    <video id="html5-player" class="absolute inset-0 w-full h-full" controls>
+                                        <source src="@Model.ContentUrl" type="video/mp4">
+                                        Trình duyệt của bạn không hỗ trợ video.
+                                    </video>
                                 }
-                                <iframe class="absolute inset-0 w-full h-full" src="https://www.youtube.com/embed/@videoId" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                             }
-                            else
+                            else if (Model.LessonType == Online_Course.Models.LessonType.Pdf)
                             {
-                                <video class="absolute inset-0 w-full h-full" controls>
-                                    <source src="@Model.VideoUrl" type="video/mp4">
-                                    Trình duyệt của bạn không hỗ trợ video.
-                                </video>
+                                @* Trình xem PDF nội bộ để tránh lỗi CORS trên Localhost *@
+                                <div id="pdf-viewer-container" class="absolute inset-0 w-full h-full overflow-hidden flex flex-col bg-[#333]">
+                                    <!-- Toolbar -->
+                                    <div class="bg-slate-900/90 backdrop-blur text-white p-2 flex justify-between items-center text-xs shrink-0 z-10 border-b border-white/10">
+                                        <div class="flex items-center gap-4 ml-2">
+                                            <span id="pdf-page-num" class="font-medium">Đang tải tài liệu...</span>
+                                        </div>
+                                        <div class="flex items-center gap-3 mr-2">
+                                            <button onclick="changeZoom(-0.2)" class="p-1.5 hover:bg-white/10 rounded-lg transition-colors">
+                                                <span class="material-symbols-outlined text-[18px]">remove_circle</span>
+                                            </button>
+                                            <span id="pdf-zoom" class="w-10 text-center font-bold">100%</span>
+                                            <button onclick="changeZoom(0.2)" class="p-1.5 hover:bg-white/10 rounded-lg transition-colors">
+                                                <span class="material-symbols-outlined text-[18px]">add_circle</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <!-- Scroll Container -->
+                                    <div id="pdf-scroll-container" class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth">
+                                        <div id="pdf-pages-list" class="flex flex-col items-center gap-6">
+                                            @* Canvases will be rendered here *@
+                                            <div id="pdf-loader" class="flex flex-col items-center gap-3 py-20">
+                                                <div class="size-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+                                                <p class="text-slate-400 text-sm">Đang xử lý PDF...</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             }
                         }
                         else
                         {
-                            <!-- Placeholder when no video | Hiển thị khi không có video -->
+                            <!-- Hiển thị khi không có nội dung -->
                             <div class="absolute inset-0 flex items-center justify-center bg-slate-800">
                                 <div class="text-center">
-                                    <span class="material-symbols-outlined text-[64px] text-slate-500">videocam_off</span>
-                                    <p class="text-slate-400 mt-2">Chưa có video cho bài học này</p>
+                                    <span class="material-symbols-outlined text-[64px] text-slate-500">@(Model.LessonType == Online_Course.Models.LessonType.Video ? "videocam_off" : "document_scanner")</span>
+                                    <p class="text-slate-400 mt-2">Chưa có nội dung cho bài học này</p>
                                 </div>
                             </div>
                         }
                     </div>
                 </div>
 
-                <!-- Lesson Navigation & Action Bar | Thanh điều hướng và hành động bài học -->
+                <!-- Thanh điều hướng và hành động bài học -->
                 <div class="flex flex-col md:flex-row justify-between items-center gap-4 py-2 border-b border-gray-200 dark:border-border-dark pb-6">
                     <div class="flex flex-col gap-1 w-full md:w-auto">
                         <h1 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">Bài @Model.OrderIndex: @Model.LessonTitle</h1>
@@ -232,19 +289,8 @@
                         {
                             <span class="px-6 py-2 rounded-lg bg-green-500/10 text-green-600 dark:text-green-500 text-sm font-bold flex items-center gap-2 ring-1 ring-green-500/20">
                                 <span class="material-symbols-outlined text-[18px]">check_circle</span>
-                                <span>Đã hoàn thành</span>
+                                <span>Đã học xong</span>
                             </span>
-                        }
-                        else
-                        {
-                            <form asp-action="MarkComplete" method="post" class="inline">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="lessonId" value="@Model.LessonId" />
-                                <button type="submit" class="px-6 py-2 rounded-lg bg-primary hover:bg-blue-600 text-white text-sm font-bold shadow-lg shadow-blue-500/20 transition-all flex items-center gap-2">
-                                    <span>Hoàn thành bài học</span>
-                                    <span class="material-symbols-outlined text-[18px]">check_circle</span>
-                                </button>
-                            </form>
                         }
                         
                         @if (Model.NextLessonId.HasValue)
@@ -257,11 +303,11 @@
                     </div>
                 </div>
 
-                <!-- Content & Info | Nội dung và Thông tin -->
+                <!-- Nội dung và Thông tin -->
                 <div class="flex flex-col gap-6">
-                    <!-- Tab Content | Nội dung Tab -->
+                    <!-- Nội dung Tab -->
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <!-- Main Text Content | Nội dung văn bản chính -->
+                        <!-- Nội dung văn bản chính -->
                         <div class="lg:col-span-2 space-y-4 text-slate-600 dark:text-slate-300 leading-relaxed">
                             <h3 class="text-lg font-bold text-slate-900 dark:text-white">Nội dung bài học</h3>
                             @if (!string.IsNullOrEmpty(Model.LessonDescription))
@@ -276,7 +322,7 @@
                             }
                         </div>
                         
-                        <!-- Sidebar Info / Instructor | Thông tin thanh bên / Giảng viên -->
+                        <!-- Thông tin thanh bên / Giảng viên -->
                         <div class="lg:col-span-1 space-y-6">
                             <div class="p-4 rounded-xl bg-white dark:bg-surface-dark border border-gray-100 dark:border-border-dark shadow-sm">
                                 <h4 class="text-sm font-bold text-slate-900 dark:text-white mb-4">Giảng viên</h4>
@@ -317,16 +363,274 @@
                     </div>
                 </div>
                 
-                <!-- Footer Spacer | Khoảng cách chân trang -->
+                <!-- Khoảng cách chân trang -->
                 <div class="h-20"></div>
             </div>
         </main>
     </div>
     
-    @* Thông báo khi nhấn vào bài học bị khóa | Alert for locked lessons *@
+    @* Script theo dõi tiến độ  *@
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+        const lessonId = @Model.LessonId;
+        const lessonType = '@Model.LessonType';
+        const isCompleted = @Model.IsCompleted.ToString().ToLower();
+        const resumeTime = @(Model.CurrentTimeSeconds ?? 0);
+        const resumePage = @(Model.CurrentPage ?? 1);
+        const totalDuration = @(Model.TotalDurationSeconds ?? 0);
+        const totalPages = @(Model.TotalPages ?? 1);
+
+        let currentTime = resumeTime;
+        let currentPage = resumePage;
+        let trackingCompleted = isCompleted;
+
+        // --- THEO DÕI VIDEO (YOUTUBE) ---
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        var player;
+        function onYouTubeIframeAPIReady() {
+            if (document.getElementById('youtube-player')) {
+                player = new YT.Player('youtube-player', {
+                    events: {
+                        'onReady': onPlayerReady,
+                        'onStateChange': onPlayerStateChange
+                    }
+                });
+            }
+        }
+
+        function onPlayerReady(event) {
+            if (resumeTime > 0) {
+                event.target.seekTo(resumeTime);
+            }
+            startHeartbeat();
+        }
+
+        function onPlayerStateChange(event) {
+            if (event.data == YT.PlayerState.PLAYING) {
+                // Video đang chạy
+            } else if (event.data == YT.PlayerState.ENDED) {
+                if (!trackingCompleted) {
+                    markComplete();
+                }
+            }
+        }
+
+        // --- THEO DÕI VIDEO (HTML5) ---
+        const html5Player = document.getElementById('html5-player');
+        if (html5Player) {
+            html5Player.currentTime = resumeTime;
+            html5Player.addEventListener('ended', () => {
+                if (!trackingCompleted) markComplete();
+            });
+            startHeartbeat();
+        }
+
+        // --- THEO DÕI PDF (CUSTOM VIEWER) ---
+        let pdfDoc = null;
+        let pdfScale = 1.2;
+        const pdfContainer = document.getElementById('pdf-pages-list');
+        const pdfScrollContainer = document.getElementById('pdf-scroll-container');
+
+        if (lessonType === 'Pdf' && pdfContainer) {
+            initLocalPdfViewer('@Model.ContentUrl');
+        }
+
+        async function initLocalPdfViewer(url) {
+            try {
+                const loadingTask = pdfjsLib.getDocument(url);
+                pdfDoc = await loadingTask.promise;
+                
+                // Xóa loader
+                const loader = document.getElementById('pdf-loader');
+                if (loader) loader.remove();
+
+                // Render tất cả các trang
+                for (let i = 1; i <= pdfDoc.numPages; i++) {
+                    await renderPdfPage(i);
+                }
+
+                // Cuộn đến trang cũ nếu có
+                if (resumePage > 1) {
+                    setTimeout(() => {
+                        const targetPage = document.getElementById(`pdf-page-${resumePage}`);
+                        if (targetPage) {
+                            targetPage.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    }, 1000);
+                }
+
+                updatePageIndicator(resumePage);
+
+                // Lắng nghe sự kiện cuộn để cập nhật trang hiện tại
+                pdfScrollContainer.addEventListener('scroll', throttle(() => {
+                    const pages = document.querySelectorAll('.pdf-page-wrapper');
+                    let currentInView = currentPage;
+                    
+                    const containerTop = pdfScrollContainer.getBoundingClientRect().top;
+                    const containerMid = containerTop + (pdfScrollContainer.clientHeight / 2);
+
+                    pages.forEach(p => {
+                        const rect = p.getBoundingClientRect();
+                        if (rect.top <= containerMid && rect.bottom >= containerMid) {
+                            currentInView = parseInt(p.dataset.page);
+                        }
+                    });
+
+                    if (currentInView !== currentPage) {
+                        currentPage = currentInView;
+                        updatePageIndicator(currentPage);
+                        
+                        if (currentPage >= pdfDoc.numPages && !trackingCompleted) {
+                            markComplete();
+                        }
+                    }
+                }, 100));
+
+                startHeartbeat();
+            } catch (error) {
+                console.error('Error loading PDF:', error);
+                pdfContainer.innerHTML = `<div class="text-red-400 p-10 text-center flex flex-col items-center gap-4">
+                    <span class="material-symbols-outlined text-4xl">error</span>
+                    <p>Không thể tải tệp PDF. Vui lòng kiểm tra lại đường dẫn.</p>
+                    <a href="${url}" target="_blank" class="px-4 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors">Tải xuống thủ công</a>
+                </div>`;
+            }
+        }
+
+        async function renderPdfPage(num) {
+            const page = await pdfDoc.getPage(num);
+            const viewport = page.getViewport({ scale: pdfScale });
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'pdf-page-wrapper relative bg-white shadow-2xl ring-1 ring-black/10';
+            wrapper.id = `pdf-page-${num}`;
+            wrapper.dataset.page = num;
+            
+            const canvas = document.createElement('canvas');
+            canvas.className = 'pdf-canvas';
+            const context = canvas.getContext('2d');
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+            
+            wrapper.appendChild(canvas);
+            pdfContainer.appendChild(wrapper);
+            
+            await page.render({ canvasContext: context, viewport: viewport }).promise;
+        }
+
+        function updatePageIndicator(num) {
+            const indicator = document.getElementById('pdf-page-num');
+            if (indicator && pdfDoc) {
+                indicator.textContent = `Trang ${num} / ${pdfDoc.numPages}`;
+            }
+        }
+
+        function changeZoom(delta) {
+            pdfScale = Math.min(Math.max(0.5, pdfScale + delta), 3.0);
+            document.getElementById('pdf-zoom').textContent = `${Math.round(pdfScale * 100)}%`;
+            
+            // Re-render
+            const loader = document.createElement('div');
+            loader.id = 'pdf-loader';
+            loader.className = 'flex flex-col items-center gap-3 py-20 w-full';
+            loader.innerHTML = '<div class="size-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div><p class="text-slate-400 text-sm">Đang tải lại...</p>';
+            
+            const prevScroll = pdfScrollContainer.scrollTop;
+            pdfContainer.innerHTML = '';
+            pdfContainer.appendChild(loader);
+
+            async function refresh() {
+                for (let i = 1; i <= pdfDoc.numPages; i++) {
+                    await renderPdfPage(i);
+                }
+                loader.remove();
+                pdfScrollContainer.scrollTop = prevScroll;
+            }
+            refresh();
+        }
+
+        // Hàm throttle để tối ưu hiệu suất cuộn
+        function throttle(func, limit) {
+            let lastFunc;
+            let lastRan;
+            return function() {
+                const context = this;
+                const args = arguments;
+                if (!lastRan) {
+                    func.apply(context, args);
+                    lastRan = Date.now();
+                } else {
+                    clearTimeout(lastFunc);
+                    lastFunc = setTimeout(function() {
+                        if ((Date.now() - lastRan) >= limit) {
+                            func.apply(context, args);
+                            lastRan = Date.now();
+                        }
+                    }, limit - (Date.now() - lastRan));
+                }
+            }
+        }
+
+        // --- LOGIC ĐỒNG BỘ TIẾN ĐỘ ---
+        function startHeartbeat() {
+            setInterval(() => {
+                syncProgress();
+            }, 10000); // Mỗi 10 giây
+        }
+
+        function syncProgress() {
+            if (trackingCompleted) return;
+
+            let data = {
+                lessonId: lessonId,
+                isCompleted: trackingCompleted
+            };
+
+            if (lessonType === 'Video') {
+                if (player && player.getCurrentTime) {
+                    currentTime = Math.floor(player.getCurrentTime());
+                } else if (html5Player) {
+                    currentTime = Math.floor(html5Player.currentTime);
+                }
+                data.currentTime = currentTime;
+            } else if (lessonType === 'Pdf') {
+                data.currentPage = currentPage;
+            }
+
+            $.ajax({
+                url: '@Url.Action("SaveProgress", "Learning")',
+                type: 'POST',
+                data: data,
+                headers: {
+                    "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val()
+                }
+            });
+        }
+
+        function markComplete() {
+            trackingCompleted = true;
+            syncProgress();
+            
+            // Reload page hoặc thông báo hoàn thành
+            if (window.showConfirmDialog) {
+                showConfirmDialog(null, 'Chúc mừng!', 'Bạn đã hoàn thành bài học này.', 'Tiếp tục', 'success', () => {
+                    location.reload();
+                });
+            } else {
+                if(confirm('Bạn đã hoàn thành bài học! Nhấn OK để tải lại trang.')) {
+                    location.reload();
+                }
+            }
+        }
+
+        // Lưu trước khi thoát
+        window.addEventListener('beforeunload', syncProgress);
+
         function showLockAlert() {
-            // Sử dụng confirm dialog có sẵn của hệ thống nếu bạn đã triển khai | Use system's confirm dialog if implemented
             if(window.showConfirmDialog) {
                 showConfirmDialog(null, 'Bài học bị khóa', 'Bạn cần hoàn thành bài học trước đó để có thể mở khóa bài học này.', 'Đã hiểu', 'info');
             } else {
