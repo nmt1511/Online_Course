@@ -83,4 +83,10 @@ public class EnrollmentService : IEnrollmentService
         return await _context.Enrollments
             .CountAsync(e => e.CourseId == courseId);
     }
+
+    public async Task EnrollStudentAsync(Enrollment enrollment)
+    {
+        _context.Enrollments.Add(enrollment);
+        await _context.SaveChangesAsync();
+    }
 }
