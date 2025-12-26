@@ -19,4 +19,7 @@ public interface IEnrollmentService
     //Lấy ds sinh viên đăng ký khóa học
     Task<IEnumerable<Enrollment>> GetEnrollmentsByCourseAsync(int courseId);
     Task<int> GetEnrollmentCountByCourseAsync(int courseId);
+
+    //Lưu học viên được chỉ định vào khóa học
+    Task EnrollStudentAsync(Enrollment enrollment);
 }

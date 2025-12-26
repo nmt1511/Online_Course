@@ -90,6 +90,9 @@ public class InstructorEditCourseViewModel
     public string InstructorName { get; set; } = string.Empty;
     public int EnrollmentCount { get; set; }
     public int LessonCount { get; set; }
+
+    // Danh sách ID học viên được chọn cho khóa học riêng tư
+    public List<int> SelectedStudentIds { get; set; } = new List<int>();
 }
 
 public class InstructorDashboardViewModel
@@ -141,5 +144,8 @@ public class InstructorCreateCourseViewModel
     [Display(Name = "Ngày kết thúc học")]
     [DataType(DataType.Date)]
     public DateTime? EndDate { get; set; }
+
+    // Danh sách ID học viên được chọn cho khóa học riêng tư
+    public List<int> SelectedStudentIds { get; set; } = new List<int>();
 }
 

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Online_Course.Helper;
 using Online_Course.Models;
 using Online_Course.Services;
 using Online_Course.ViewModels;
@@ -15,6 +16,7 @@ public class CoursesController : Controller
     private readonly IEnrollmentService _enrollmentService;
     private readonly ICategoryService _categoryService;
     private readonly IProgressService _progressService;
+    private readonly IUserService _userService;
     private readonly IWebHostEnvironment _webHostEnvironment;
 
     public CoursesController(
@@ -22,12 +24,14 @@ public class CoursesController : Controller
         IEnrollmentService enrollmentService,
         ICategoryService categoryService,
         IProgressService progressService,
+        IUserService userService,
         IWebHostEnvironment webHostEnvironment)
     {
         _courseService = courseService;
         _enrollmentService = enrollmentService;
         _categoryService = categoryService;
         _progressService = progressService;
+        _userService = userService;
         _webHostEnvironment = webHostEnvironment;
     }
 
@@ -64,6 +68,10 @@ public class CoursesController : Controller
     public async Task<IActionResult> Create()
     {
         ViewBag.Categories = await _categoryService.GetAllCategoriesAsync();
+        // Lấy danh sách học viên để chọn cho khóa học riêng tư
+        var users = await _userService.GetAllUsersAsync();
+        ViewBag.Students = users.Where(u => u.UserRoles.Any(ur => ur.Role.Name == "Student")).ToList();
+        
         return View(new InstructorCreateCourseViewModel());
     }
 
@@ -102,6 +110,9 @@ public class CoursesController : Controller
         if (!ModelState.IsValid)
         {
             ViewBag.Categories = await _categoryService.GetAllCategoriesAsync();
+            // Lấy danh sách học viên để chọn cho khóa học riêng tư
+            var users_create = await _userService.GetAllUsersAsync();
+            ViewBag.Students = users_create.Where(u => u.UserRoles.Any(ur => ur.Role.Name == "Student")).ToList();
             return View(model);
         }
 
@@ -147,6 +158,23 @@ public class CoursesController : Controller
         };
 
         await _courseService.CreateCourseAsync(course);
+
+        // Xử lý ghi danh học viên nếu là khóa học riêng tư
+        if (course.CourseStatus == CourseStatus.Private && model.SelectedStudentIds != null && model.SelectedStudentIds.Any())
+        {
+            foreach (var studentId in model.SelectedStudentIds)
+            {
+                var enrollment = new Enrollment
+                {
+                    CourseId = course.CourseId,
+                    StudentId = studentId,
+                    IsMandatory = true,
+                    LearningStatus = LearningStatus.NOT_STARTED,
+                    EnrolledAt = DateTimeHelper.GetVietnamTimeNow(),
+                };
+                await _enrollmentService.EnrollStudentAsync(enrollment);
+            }
+        }
 
         TempData["SuccessMessage"] = "Tạo khóa học mới thành công!";
         return RedirectToAction(nameof(Index));
@@ -276,10 +304,16 @@ public class CoursesController : Controller
             EndDate = course.EndDate,
             InstructorName = course.Instructor?.FullName ?? "",
             EnrollmentCount = course.Enrollments?.Count ?? 0,
-            LessonCount = course.Lessons?.Count ?? 0
+            LessonCount = course.Lessons?.Count ?? 0,
+            // Lấy danh sách ID học viên đã được ghi danh bắt buộc
+            SelectedStudentIds = course.Enrollments?.Where(e => e.IsMandatory).Select(e => e.StudentId).ToList() ?? new List<int>()
         };
 
         ViewBag.Categories = await _categoryService.GetAllCategoriesAsync();
+        // Lấy danh sách học viên để chọn
+        var users = await _userService.GetAllUsersAsync();
+        ViewBag.Students = users.Where(u => u.UserRoles.Any(ur => ur.Role.Name == "Student")).ToList();
+        
         return View(viewModel);
     }
 
@@ -334,6 +368,9 @@ public class CoursesController : Controller
         if (!ModelState.IsValid)
         {
             ViewBag.Categories = await _categoryService.GetAllCategoriesAsync();
+            // Lấy danh sách học viên để chọn cho khóa học riêng tư
+            var users_edit = await _userService.GetAllUsersAsync();
+            ViewBag.Students = users_edit.Where(u => u.UserRoles.Any(ur => ur.Role.Name == "Student")).ToList();
             return View(model);
         }
 
@@ -358,6 +395,40 @@ public class CoursesController : Controller
         }
 
         await _courseService.UpdateCourseAsync(existingCourse);
+
+        // Xử lý ghi danh học viên nếu là khóa học riêng tư
+        if (existingCourse.CourseStatus == CourseStatus.Private)
+        {
+            var currentEnrollments = await _enrollmentService.GetEnrollmentsByCourseAsync(id);
+            var selectedIds = model.SelectedStudentIds ?? new List<int>();
+
+            // 1. Thêm mới các học viên chưa có trong danh sách ghi danh
+            foreach (var studentId in selectedIds)
+            {
+                if (!currentEnrollments.Any(e => e.StudentId == studentId))
+                {
+                    var enrollment = new Enrollment
+                    {
+                        CourseId = id,
+                        StudentId = studentId,
+                        IsMandatory = true,
+                        LearningStatus = LearningStatus.NOT_STARTED,
+                        EnrolledAt = DateTimeHelper.GetVietnamTimeNow(),
+                    };
+                    await _enrollmentService.EnrollStudentAsync(enrollment);
+                }
+            }
+            
+            // 2. Xóa các học viên KHÔNG còn được chọn (chỉ xóa những enrollment Mandatory để không ảnh hưởng ghi danh tự do nếu có)
+            var enrollmentsToRemove = currentEnrollments
+                .Where(e => e.IsMandatory && !selectedIds.Contains(e.StudentId))
+                .ToList();
+                
+            foreach (var enrollment in enrollmentsToRemove)
+            {
+                await _enrollmentService.UnenrollAsync(enrollment.StudentId, id);
+            }
+        }
 
         TempData["SuccessMessage"] = "Cập nhật khóa học thành công!";
         return RedirectToAction(nameof(Index));
