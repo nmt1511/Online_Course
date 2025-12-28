@@ -17,9 +17,12 @@ public class UserService : IUserService
 
     public async Task<IEnumerable<User>> GetAllUsersAsync()
     {
+        // Exclude users with Admin role from the list
+        // Loại bỏ các user có vai trò Admin khỏi danh sách
         return await _context.Users
             .Include(u => u.UserRoles)
             .ThenInclude(ur => ur.Role)
+            .Where(u => !u.UserRoles.Any(ur => ur.Role != null && ur.Role.Name == "Admin"))
             .OrderByDescending(u => u.CreatedAt)
             .ToListAsync();
     }
@@ -110,7 +113,11 @@ public class UserService : IUserService
 
     public async Task<int> GetTotalUsersCountAsync()
     {
-        return await _context.Users.CountAsync();
+        // Count only non-Admin users
+        // Chỉ đếm các user không phải Admin
+        return await _context.Users
+            .Where(u => !u.UserRoles.Any(ur => ur.Role != null && ur.Role.Name == "Admin"))
+            .CountAsync();
     }
 
     public async Task<int> GetUserCountByRoleAsync(string roleName)
@@ -123,10 +130,24 @@ public class UserService : IUserService
     public async Task<IEnumerable<Course>> GetCoursesByUserAsync(int userId)
     {
         return await _context.Courses
+            .Include(c => c.CategoryEntity)
             .Include(c => c.Lessons)
             .Include(c => c.Enrollments)
             .Where(c => c.CreatedBy == userId)
             .OrderByDescending(c => c.CourseId)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Enrollment>> GetStudentEnrollmentsAsync(int studentId)
+    {
+        // Lấy danh sách đăng ký học của sinh viên kèm thông tin khóa học và bài học
+        return await _context.Enrollments
+            .Include(e => e.Course)
+                .ThenInclude(c => c.Lessons)
+            .Include(e => e.Course)
+                .ThenInclude(c => c.CategoryEntity)
+            .Where(e => e.StudentId == studentId)
+            .OrderByDescending(e => e.EnrolledAt)
             .ToListAsync();
     }
 

@@ -53,7 +53,7 @@
 
     @if (Model.RoleName == "Instructor")
     {
-        <!-- Stats Cards -->
+        <!-- Stats Cards for Instructor -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-slate-700 p-5">
                 <div class="flex items-center gap-4">
@@ -61,7 +61,7 @@
                         <span class="material-symbols-outlined text-primary">school</span>
                     </div>
                     <div>
-                        <p class="text-gray-500 dark:text-slate-400 text-sm">Khóa học</p>
+                        <p class="text-gray-500 dark:text-slate-400 text-sm">Khóa học đảm nhận</p>
                         <p class="text-slate-900 dark:text-white text-2xl font-bold">@Model.Courses.Count</p>
                     </div>
                 </div>
@@ -72,7 +72,7 @@
                         <span class="material-symbols-outlined text-green-500">group</span>
                     </div>
                     <div>
-                        <p class="text-gray-500 dark:text-slate-400 text-sm">Học viên</p>
+                        <p class="text-gray-500 dark:text-slate-400 text-sm">Tổng học viên</p>
                         <p class="text-slate-900 dark:text-white text-2xl font-bold">@Model.TotalStudents</p>
                     </div>
                 </div>
@@ -83,17 +83,17 @@
                         <span class="material-symbols-outlined text-orange-500">menu_book</span>
                     </div>
                     <div>
-                        <p class="text-gray-500 dark:text-slate-400 text-sm">Bài học</p>
+                        <p class="text-gray-500 dark:text-slate-400 text-sm">Tổng bài học</p>
                         <p class="text-slate-900 dark:text-white text-2xl font-bold">@Model.TotalLessons</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Courses Table -->
+        <!-- Courses Table for Instructor -->
         <div class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
             <div class="p-6 border-b border-gray-200 dark:border-slate-700">
-                <h2 class="text-slate-900 dark:text-white text-lg font-bold">Danh sách khóa học</h2>
+                <h2 class="text-slate-900 dark:text-white text-lg font-bold">Danh sách khóa học giảng dạy</h2>
             </div>
             @if (Model.Courses.Any())
             {
@@ -113,7 +113,9 @@
                             {
                                 <tr class="hover:bg-gray-50 dark:hover:bg-slate-800/30 transition-colors">
                                     <td class="px-6 py-4">
-                                        <span class="text-slate-900 dark:text-white font-medium">@course.Title</span>
+                                        <a asp-controller="Courses" asp-action="Details" asp-route-id="@course.CourseId" class="text-primary hover:text-blue-600 font-medium transition-colors">
+                                            @course.Title
+                                        </a>
                                     </td>
                                     <td class="text-center px-4 py-4">
                                         <span class="text-gray-600 dark:text-slate-300">@course.CategoryName</span>
@@ -142,4 +144,111 @@
             }
         </div>
     }
+    else if (Model.RoleName == "Student")
+    {
+        <!-- Stats Cards for Student -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-slate-700 p-5">
+                <div class="flex items-center gap-4">
+                    <div class="p-3 bg-primary/20 rounded-lg">
+                        <span class="material-symbols-outlined text-primary">menu_book</span>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 dark:text-slate-400 text-sm">Khóa học đăng ký</p>
+                        <p class="text-slate-900 dark:text-white text-2xl font-bold">@Model.TotalEnrolledCourses</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-slate-700 p-5">
+                <div class="flex items-center gap-4">
+                    <div class="p-3 bg-green-500/20 rounded-lg">
+                        <span class="material-symbols-outlined text-green-500">task_alt</span>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 dark:text-slate-400 text-sm">Đã hoàn thành</p>
+                        <p class="text-slate-900 dark:text-white text-2xl font-bold">@Model.CompletedCoursesCount</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-slate-700 p-5">
+                <div class="flex items-center gap-4">
+                    <div class="p-3 bg-orange-500/20 rounded-lg">
+                        <span class="material-symbols-outlined text-orange-500">trending_up</span>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 dark:text-slate-400 text-sm">Tiến độ trung bình</p>
+                        <p class="text-slate-900 dark:text-white text-2xl font-bold">@Model.AverageProgress.ToString("F1")%</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enrollments Table for Student -->
+        <div class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
+            <div class="p-6 border-b border-gray-200 dark:border-slate-700">
+                <h2 class="text-slate-900 dark:text-white text-lg font-bold">Danh sách khóa học đã đăng ký</h2>
+            </div>
+            @if (Model.Enrollments.Any())
+            {
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50 dark:bg-slate-800/50">
+                            <tr>
+                                <th class="text-left text-gray-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider px-6 py-4">Khóa học</th>
+                                <th class="text-center text-gray-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider px-4 py-4">Danh mục</th>
+                                <th class="text-center text-gray-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider px-4 py-4">Tiến độ</th>
+                                <th class="text-center text-gray-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider px-4 py-4">Bài học</th>
+                                <th class="text-center text-gray-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider px-4 py-4">Trạng thái</th>
+                                <th class="text-center text-gray-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider px-4 py-4">Ngày đăng ký</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 dark:divide-slate-700">
+                            @foreach (var enroll in Model.Enrollments)
+                            {
+                                <tr class="hover:bg-gray-50 dark:hover:bg-slate-800/30 transition-colors">
+                                    <td class="px-6 py-4">
+                                        <a asp-controller="Courses" asp-action="Details" asp-route-id="@enroll.CourseId" class="text-primary hover:text-blue-600 font-medium transition-colors">
+                                            @enroll.Title
+                                        </a>
+                                    </td>
+                                    <td class="text-center px-4 py-4">
+                                        <span class="text-gray-600 dark:text-slate-300">@enroll.CategoryName</span>
+                                    </td>
+                                    <td class="px-4 py-4">
+                                        <div class="flex flex-col gap-1 w-32 mx-auto">
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-500">@enroll.ProgressText</span>
+                                            </div>
+                                            <div class="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-1.5">
+                                                <div class="bg-primary h-1.5 rounded-full" style="width: @enroll.ProgressPercent%"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center px-4 py-4">
+                                        <span class="text-slate-900 dark:text-white">@enroll.CompletedLessons/@enroll.TotalLessons</span>
+                                    </td>
+                                    <td class="text-center px-4 py-4">
+                                        <span class="px-2 py-1 @(enroll.LearningStatus == Online_Course.Models.LearningStatus.COMPLETED ? "bg-green-500/20 text-green-600 dark:text-green-400" : enroll.LearningStatus == Online_Course.Models.LearningStatus.IN_PROGRESS ? "bg-blue-500/20 text-blue-600 dark:text-blue-400" : "bg-gray-200 dark:bg-slate-500/20 text-gray-600 dark:text-slate-400") text-xs font-medium rounded-full">
+                                            @enroll.StatusText
+                                        </span>
+                                    </td>
+                                    <td class="text-center px-4 py-4 text-sm text-gray-500 dark:text-slate-400">
+                                        @enroll.EnrolledAt.ToString("dd/MM/yyyy")
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="p-12 text-center">
+                    <span class="material-symbols-outlined text-5xl text-gray-400 dark:text-slate-600 mb-4">school</span>
+                    <p class="text-gray-500 dark:text-slate-400">Học viên chưa đăng ký khóa học nào</p>
+                </div>
+            }
+        </div>
+    }
 </div>
+
