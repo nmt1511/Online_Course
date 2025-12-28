@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Online_Course.Helper;
 using Online_Course.Models;
 using Online_Course.Services;
 using Online_Course.ViewModels;
@@ -32,12 +33,10 @@ public class CoursesController : Controller
     }
 
     // GET: Admin/Courses
-    public async Task<IActionResult> Index(int? category, string? status, string? search)
+    public async Task<IActionResult> Index(int? category, string? status, string? search, int page = 1)
     {
         var courses = await _courseService.GetAllCoursesAsync();
-        var totalCourses = await _courseService.GetTotalCoursesCountAsync();
-        var publishedCourses = await _courseService.GetPublishedCoursesCountAsync();
-
+        
         // Apply filters
         if (category.HasValue)
         {
@@ -61,10 +60,26 @@ public class CoursesController : Controller
                 c.Description.Contains(search, StringComparison.OrdinalIgnoreCase));
         }
 
+        // Pagination logic
+        int pageSize = 10;
+        int totalItems = courses.Count();
+        int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+        
+        // Ensure page is within valid range
+        page = Math.Max(1, Math.Min(page, totalPages > 0 ? totalPages : 1));
+
+        var pagedCourses = courses
+            .OrderByDescending(c => c.CourseId)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize);
+
+        var totalCoursesCount = await _courseService.GetTotalCoursesCountAsync();
+        var publishedCoursesCount = await _courseService.GetPublishedCoursesCountAsync();
+        var draftCourseCount = await _courseService.GetDraftCoursesCountAsync();
 
         var viewModel = new CourseIndexViewModel
         {
-            Courses = courses.Select(c => new CourseListViewModel
+            Courses = pagedCourses.Select(c => new CourseListViewModel
             {
                 CourseId = c.CourseId,
                 Title = c.Title,
@@ -77,12 +92,14 @@ public class CoursesController : Controller
                 Status = c.CourseStatus,
                 EnrollmentCount = c.Enrollments?.Count ?? 0
             }),
-            TotalCourses = totalCourses,
-            PublishedCourses = publishedCourses,
-            DraftCourses = totalCourses - publishedCourses,
+            TotalCourses = totalCoursesCount,
+            PublishedCourses = publishedCoursesCount,
+            DraftCourses = draftCourseCount,
             CategoryFilter = category,
             StatusFilter = status,
-            SearchQuery = search
+            SearchQuery = search,
+            CurrentPage = page,
+            TotalPages = totalPages
         };
 
         // Get categories for filter dropdown
@@ -160,6 +177,7 @@ public class CoursesController : Controller
     {
         await PopulateInstructorsDropdown();
         await PopulateCategoriesDropdown();
+        await PopulateStudentsViewBag();
         return View(new CreateCourseViewModel());
     }
 
@@ -240,12 +258,31 @@ public class CoursesController : Controller
             };
 
             await _courseService.CreateCourseAsync(course);
+
+            // Process mandatory enrollments for private courses
+            if (course.CourseStatus == CourseStatus.Private && model.SelectedStudentIds != null && model.SelectedStudentIds.Any())
+            {
+                foreach (var studentId in model.SelectedStudentIds)
+                {
+                    var enrollment = new Enrollment
+                    {
+                        CourseId = course.CourseId,
+                        StudentId = studentId,
+                        IsMandatory = true,
+                        LearningStatus = LearningStatus.NOT_STARTED,
+                        EnrolledAt = DateTimeHelper.GetVietnamTimeNow(),
+                    };
+                    await _enrollmentService.EnrollStudentAsync(enrollment);
+                }
+            }
+
             TempData["SuccessMessage"] = "Khóa học đã được tạo thành công!";
             return RedirectToAction(nameof(Index));
         }
 
         await PopulateInstructorsDropdown(model.InstructorId);
         await PopulateCategoriesDropdown(model.CategoryId);
+        await PopulateStudentsViewBag();
         return View(model);
     }
 
@@ -272,11 +309,13 @@ public class CoursesController : Controller
             RegistrationStartDate = course.RegistrationStartDate,
             RegistrationEndDate = course.RegistrationEndDate,
             StartDate = course.StartDate,
-            EndDate = course.EndDate
+            EndDate = course.EndDate,
+            SelectedStudentIds = course.Enrollments?.Where(e => e.IsMandatory).Select(e => e.StudentId).ToList() ?? new List<int>()
         };
 
         await PopulateInstructorsDropdown(course.CreatedBy);
         await PopulateCategoriesDropdown(course.CategoryId);
+        await PopulateStudentsViewBag();
         return View(viewModel);
     }
 
@@ -345,12 +384,48 @@ public class CoursesController : Controller
             }
 
             await _courseService.UpdateCourseAsync(course);
+
+            // Process mandatory enrollments for private courses
+            if (course.CourseStatus == CourseStatus.Private)
+            {
+                var currentEnrollments = await _enrollmentService.GetEnrollmentsByCourseAsync(id);
+                var selectedIds = model.SelectedStudentIds ?? new List<int>();
+
+                // Add new enrollments
+                foreach (var studentId in selectedIds)
+                {
+                    if (!currentEnrollments.Any(e => e.StudentId == studentId))
+                    {
+                        var enrollment = new Enrollment
+                        {
+                            CourseId = id,
+                            StudentId = studentId,
+                            IsMandatory = true,
+                            LearningStatus = LearningStatus.NOT_STARTED,
+                            EnrolledAt = DateTimeHelper.GetVietnamTimeNow(),
+                        };
+                        await _enrollmentService.EnrollStudentAsync(enrollment);
+                    }
+                }
+
+                // Remove unselected mandatory enrollments
+                var enrollmentsToRemove = currentEnrollments
+                    .Where(e => e.IsMandatory && !selectedIds.Contains(e.StudentId))
+                    .ToList();
+
+                foreach (var enrollment in enrollmentsToRemove)
+                {
+                    await _enrollmentService.UnenrollAsync(enrollment.StudentId, id);
+                }
+            }
+
             TempData["SuccessMessage"] = "Khóa học đã được cập nhật thành công!";
             return RedirectToAction(nameof(Index));
         }
 
         await PopulateInstructorsDropdown(model.InstructorId);
         await PopulateCategoriesDropdown(model.CategoryId);
+        await PopulateStudentsViewBag();
         return View(model);
     }
 
@@ -398,6 +473,13 @@ public class CoursesController : Controller
     {
         var categories = await _courseService.GetAllCategoriesAsync();
         ViewBag.CategoriesList = new SelectList(categories, "CategoryId", "Name", selectedId);
+        ViewBag.Categories = categories; // Also store as list for raw iteration
+    }
+
+    private async Task PopulateStudentsViewBag()
+    {
+        var users = await _userService.GetAllUsersAsync();
+        ViewBag.Students = users.Where(u => u.UserRoles.Any(ur => ur.Role.Name == "Student")).ToList();
     }
 }
 

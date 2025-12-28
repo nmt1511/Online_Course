@@ -72,6 +72,9 @@ public class CreateCourseViewModel
     [Display(Name = "Ngày kết thúc học")]
     [DataType(DataType.Date)]
     public DateTime? EndDate { get; set; }
+
+    [Display(Name = "Chọn học viên (cho khóa học riêng tư)")]
+    public List<int>? SelectedStudentIds { get; set; }
 }
 
 public class EditCourseViewModel
@@ -117,6 +120,9 @@ public class EditCourseViewModel
     [Display(Name = "Ngày kết thúc học")]
     [DataType(DataType.Date)]
     public DateTime? EndDate { get; set; }
+
+    [Display(Name = "Chọn học viên (cho khóa học riêng tư)")]
+    public List<int>? SelectedStudentIds { get; set; }
 }
 
 public class CourseIndexViewModel
@@ -128,4 +134,10 @@ public class CourseIndexViewModel
     public int? CategoryFilter { get; set; }
     public string? StatusFilter { get; set; }
     public string? SearchQuery { get; set; }
+
+    // Pagination properties
+    public int CurrentPage { get; set; }
+    public int TotalPages { get; set; }
+    public bool HasPreviousPage => CurrentPage > 1;
+    public bool HasNextPage => CurrentPage < TotalPages;
 }

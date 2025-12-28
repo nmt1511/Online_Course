@@ -13,5 +13,6 @@ public interface ICourseService
     Task DeleteCourseAsync(int id);
     Task<int> GetTotalCoursesCountAsync();
     Task<int> GetPublishedCoursesCountAsync();
+    Task<int> GetDraftCoursesCountAsync();
     Task<IEnumerable<Category>> GetAllCategoriesAsync();
 }
