@@ -68,7 +68,7 @@
                         <!-- Status -->
                         <div>
                             <label asp-for="Status" class="block text-sm font-medium text-slate-900 dark:text-white mb-2">Trạng thái</label>
-                            <select asp-for="Status" class="w-full h-12 px-4 bg-gray-50 dark:bg-[#111418] border border-gray-300 dark:border-[#283039] rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-colors cursor-pointer">
+                            <select asp-for="Status" id="statusSelect" class="w-full h-12 px-4 bg-gray-50 dark:bg-[#111418] border border-gray-300 dark:border-[#283039] rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary transition-colors cursor-pointer">
                                 <option value="@Online_Course.Models.CourseStatus.Draft">Nháp</option>
                                 <option value="@Online_Course.Models.CourseStatus.Private">Riêng tư</option>
                                 <option value="@Online_Course.Models.CourseStatus.Public">Công khai</option>
@@ -82,6 +82,48 @@
                                 <option value="@Online_Course.Models.CourseType.Open_Always">Mở xuyên suốt</option>
                                 <option value="@Online_Course.Models.CourseType.Fixed_Time">Thời gian cố định</option>
                             </select>
+                        </div>
+                    </div>
+
+                    <!-- Lựa chọn học viên cho khóa học Riêng tư -->
+                    <div id="studentSelectionSection" class="hidden space-y-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                        <h3 class="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                            <span class="material-symbols-outlined text-amber-500">group</span>
+                            Chọn học viên cho khóa học riêng tư
+                        </h3>
+                        <p class="text-xs text-gray-500 dark:text-slate-400 mb-3">
+                            Học viên được chọn sẽ tự động được ghi danh vào khóa học này.
+                        </p>
+
+                        <!-- Ô tìm kiếm học viên -->
+                        <div class="mb-3 relative">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                                <span class="material-symbols-outlined text-[20px]">search</span>
+                            </span>
+                            <input type="text" id="studentSearch" placeholder="Tìm kiếm tên hoặc email..." 
+                                   class="w-full h-10 pl-10 pr-4 text-sm bg-white dark:bg-[#111418] border border-gray-200 dark:border-[#283039] rounded-lg focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none text-slate-900 dark:text-white" />
+                        </div>
+                        
+                        <div id="studentListContainer" class="max-h-60 overflow-y-auto border border-gray-200 dark:border-[#283039] rounded-lg bg-white dark:bg-[#111418] p-2">
+                            @if (ViewBag.Students != null)
+                            {
+                                foreach (var student in (IEnumerable<Online_Course.Models.User>)ViewBag.Students)
+                                {
+                                    <div class="student-item flex items-center p-2 hover:bg-gray-50 dark:hover:bg-[#202934] rounded transition-colors">
+                                        <input type="checkbox" name="SelectedStudentIds" value="@student.UserId" id="student_@student.UserId" 
+                                               class="student-checkbox w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary focus:ring-2 dark:ring-offset-gray-800 focus:ring-offset-2 dark:bg-slate-700 dark:border-slate-600"
+                                               @(Model.SelectedStudentIds != null && Model.SelectedStudentIds.Contains(student.UserId) ? "checked" : "") />
+                                        <label for="student_@student.UserId" class="ml-3 text-sm font-medium text-slate-900 dark:text-white cursor-pointer flex-1">
+                                            <div class="student-name font-bold">@student.FullName</div>
+                                            <div class="student-email text-xs text-gray-400">@student.Email</div>
+                                        </label>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <p class="text-sm text-gray-500 p-4 text-center">Không tìm thấy học viên nào.</p>
+                            }
                         </div>
                     </div>
 
@@ -249,5 +291,69 @@
         }
 
         document.getElementById('courseTypeSelect').addEventListener('change', toggleDateFields);
+
+        // Student Selection toggle functionality
+        const statusSelect = document.getElementById('statusSelect');
+        const studentSection = document.getElementById('studentSelectionSection');
+        
+        function toggleStudentSelection() {
+            const val = statusSelect.value;
+            if (val === 'Private' || val === '@((int)Online_Course.Models.CourseStatus.Private)' || val === '1') {
+                studentSection.classList.remove('hidden');
+            } else {
+                studentSection.classList.add('hidden');
+            }
+        }
+
+        if (statusSelect) {
+            statusSelect.addEventListener('change', toggleStudentSelection);
+        }
+
+        // Student Search functionality
+        const studentSearchInput = document.getElementById('studentSearch');
+        const studentItems = document.querySelectorAll('.student-item');
+
+        function removeVietnameseTones(str) {
+            str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g,"a"); 
+            str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g,"e"); 
+            str = str.replace(/ì|í|ị|ỉ|ĩ/g,"i"); 
+            str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g,"o"); 
+            str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g,"u"); 
+            str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g,"y"); 
+            str = str.replace(/đ/g,"d");
+            str = str.replace(/À|À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g,"A");
+            str = str.replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/g,"E");
+            str = str.replace(/Ì|Í|Ị|Ỉ|Ĩ/g,"I");
+            str = str.replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ/g,"O");
+            str = str.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g,"U");
+            str = str.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g,"Y");
+            str = str.replace(/Đ/g,"D");
+            str = str.replace(/\u0300|\u0301|\u0303|\u0309|\u0323/g, ""); 
+            str = str.replace(/\u02C6|\u0306|\u031B/g, ""); 
+            return str;
+        }
+
+        if (studentSearchInput) {
+            studentSearchInput.addEventListener('input', function() {
+                const query = removeVietnameseTones(this.value.toLowerCase().trim());
+                studentItems.forEach(item => {
+                    const name = removeVietnameseTones(item.querySelector('.student-name').textContent.toLowerCase());
+                    const email = removeVietnameseTones(item.querySelector('.student-email').textContent.toLowerCase());
+                    
+                    if (name.includes(query) || email.includes(query)) {
+                        item.classList.remove('hidden');
+                        item.classList.add('flex');
+                    } else {
+                        item.classList.add('hidden');
+                        item.classList.remove('flex');
+                    }
+                });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            toggleDateFields();
+            toggleStudentSelection();
+        });
     </script>
 }

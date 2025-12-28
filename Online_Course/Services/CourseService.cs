@@ -120,6 +120,11 @@ public class CourseService : ICourseService
         return await _context.Courses.CountAsync(c => c.CourseStatus == CourseStatus.Public);
     }
 
+    public async Task<int> GetDraftCoursesCountAsync()
+    {
+        return await _context.Courses.CountAsync(c => c.CourseStatus == CourseStatus.Draft);
+    }
+
     public async Task<IEnumerable<Category>> GetAllCategoriesAsync()
     {
         return await _context.Categories
