@@ -15,4 +15,5 @@ public interface IUserService
     Task<int> GetTotalUsersCountAsync();
     Task<int> GetUserCountByRoleAsync(string roleName);
     Task<IEnumerable<Course>> GetCoursesByUserAsync(int userId);
+    Task<IEnumerable<Enrollment>> GetStudentEnrollmentsAsync(int studentId);
 }

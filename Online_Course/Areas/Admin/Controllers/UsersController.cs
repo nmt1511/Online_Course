@@ -12,15 +12,20 @@ namespace Online_Course.Areas.Admin.Controllers;
 public class UsersController : Controller
 {
     private readonly IUserService _userService;
+    private readonly IProgressService _progressService;
 
-    public UsersController(IUserService userService)
+    public UsersController(IUserService userService, IProgressService progressService)
     {
         _userService = userService;
+        _progressService = progressService;
     }
 
     // GET: Admin/Users
-    public async Task<IActionResult> Index(string? search, string? role)
+    public async Task<IActionResult> Index(string? search, string? role, int page = 1)
     {
+        // Pagination settings / Cấu hình phân trang
+        const int pageSize = 10;
+        
         var users = await _userService.GetAllUsersAsync();
         var totalUsers = await _userService.GetTotalUsersCountAsync();
         var instructorCount = await _userService.GetUserCountByRoleAsync("Instructor");
@@ -36,14 +41,29 @@ public class UsersController : Controller
         }
 
         // Filter by role
-        if (!string.IsNullOrWhiteSpace(role))
+        // Prevent filtering by Admin role to hide Admin users from search results
+        // Ngăn lọc theo vai trò Admin để ẩn các Admin khỏi kết quả tìm kiếm
+        if (!string.IsNullOrWhiteSpace(role) && role != "Admin")
         {
             users = users.Where(u => u.UserRoles.Any(ur => ur.Role?.Name == role));
         }
 
+        // Calculate pagination / Tính toán phân trang
+        var totalFilteredUsers = users.Count();
+        var totalPages = (int)Math.Ceiling(totalFilteredUsers / (double)pageSize);
+        
+        // Validate page number / Kiểm tra số trang hợp lệ
+        if (page < 1) page = 1;
+        if (page > totalPages && totalPages > 0) page = totalPages;
+        
+        // Apply pagination / Áp dụng phân trang
+        var paginatedUsers = users
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize);
+
         var viewModel = new UserIndexViewModel
         {
-            Users = users.Select(u => new UserListViewModel
+            Users = paginatedUsers.Select(u => new UserListViewModel
             {
                 UserId = u.UserId,
                 FullName = u.FullName,
@@ -56,7 +76,10 @@ public class UsersController : Controller
             InstructorCount = instructorCount,
             StudentCount = studentCount,
             SearchQuery = search,
-            SelectedRole = role
+            SelectedRole = role,
+            CurrentPage = page,
+            PageSize = pageSize,
+            TotalPages = totalPages
         };
 
         return View(viewModel);
@@ -128,9 +151,7 @@ public class UsersController : Controller
             return NotFound();
         }
 
-        var courses = await _userService.GetCoursesByUserAsync(id);
         var roleName = user.UserRoles.FirstOrDefault()?.Role?.Name ?? "No Role";
-
         var viewModel = new UserDetailsViewModel
         {
             UserId = user.UserId,
@@ -138,20 +159,61 @@ public class UsersController : Controller
             Email = user.Email,
             RoleName = roleName,
             IsActive = user.IsActive,
-            CreatedAt = user.CreatedAt,
-            Courses = courses.Select(c => new UserCourseViewModel
-            {
-                CourseId = c.CourseId,
-                Title = c.Title,
-                CategoryId = c.CategoryId,
-                CategoryName = c.CategoryEntity?.Name ?? "Chưa phân loại",
-                Status = c.CourseStatus,
-                EnrollmentCount = c.Enrollments?.Count ?? 0,
-                LessonCount = c.Lessons?.Count ?? 0
-            }).ToList(),
-            TotalStudents = courses.Sum(c => c.Enrollments?.Count ?? 0),
-            TotalLessons = courses.Sum(c => c.Lessons?.Count ?? 0)
+            CreatedAt = user.CreatedAt
         };
+
+        if (roleName == "Instructor")
+        {
+            // Logic cho Giảng viên: Lấy các khóa học đã tạo
+            var courses = await _userService.GetCoursesByUserAsync(id);
+
+            var userCourseViewModels = new List<UserCourseViewModel>();
+
+            foreach (var c in courses)
+            {
+                userCourseViewModels.Add(new UserCourseViewModel
+                {
+                    CourseId = c.CourseId,
+                    Title = c.Title,
+                    CategoryId = c.CategoryId,
+                    CategoryName = c.CategoryEntity?.Name ?? "Chưa phân loại",
+                    Status = c.CourseStatus,
+                    EnrollmentCount = c.Enrollments?.Count ?? 0,
+                    LessonCount = c.Lessons?.Count ?? 0
+                });
+            }
+
+            viewModel.Courses = userCourseViewModels;
+            
+            viewModel.TotalStudents = viewModel.Courses.Sum(c => c.EnrollmentCount);
+            viewModel.TotalLessons = viewModel.Courses.Sum(c => c.LessonCount);
+        }
+        else if (roleName == "Student")
+        {
+            // Logic cho Học viên: Lấy các khóa học đã đăng ký
+            var enrollments = await _userService.GetStudentEnrollmentsAsync(id);
+            var enrollmentViewModels = new List<UserEnrollmentViewModel>();
+
+            foreach (var enrollment in enrollments)
+            {
+                var completedLessons = await _progressService.GetCompletedLessonsCountAsync(id, enrollment.CourseId);
+                
+                enrollmentViewModels.Add(new UserEnrollmentViewModel
+                {
+                    CourseId = enrollment.CourseId,
+                    Title = enrollment.Course.Title,
+                    CategoryName = enrollment.Course.CategoryEntity?.Name ?? "Chưa phân loại",
+                    ThumbnailUrl = enrollment.Course.ThumbnailUrl,
+                    EnrolledAt = enrollment.EnrolledAt,
+                    LearningStatus = enrollment.LearningStatus,
+                    ProgressPercent = enrollment.ProgressPercent,
+                    CompletedLessons = completedLessons,
+                    TotalLessons = enrollment.Course.Lessons.Count
+                });
+            }
+            
+            viewModel.Enrollments = enrollmentViewModels;
+        }
 
         return View(viewModel);
     }
@@ -227,7 +289,7 @@ public class UsersController : Controller
             await _userService.UpdateUserAsync(user);
             await _userService.AssignRoleAsync(id, model.RoleId);
 
-            TempData["SuccessMessage"] = "Cập nhật người dùng thành công!";
+            TempData["SuccessMessage"] = "Cập nhật thông tin người dùng thành công!";
             return RedirectToAction(nameof(Index));
         }
 
@@ -244,7 +306,7 @@ public class UsersController : Controller
     public async Task<IActionResult> Delete(int id)
     {
         await _userService.DeleteUserAsync(id);
-        TempData["SuccessMessage"] = "User deleted successfully!";
+        TempData["SuccessMessage"] = "Xóa người dùng thành công!";
         return RedirectToAction(nameof(Index));
     }
 }

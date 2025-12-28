@@ -64,6 +64,15 @@ public class UserIndexViewModel
     public int StudentCount { get; set; }
     public string? SearchQuery { get; set; }
     public string? SelectedRole { get; set; }
+    
+    // Pagination properties / Thuộc tính phân trang
+    public int CurrentPage { get; set; } = 1;
+    public int PageSize { get; set; } = 10;
+    public int TotalPages { get; set; }
+    
+    // Computed properties for pagination navigation / Thuộc tính tính toán cho điều hướng phân trang
+    public bool HasPreviousPage => CurrentPage > 1;
+    public bool HasNextPage => CurrentPage < TotalPages;
 }
 
 
@@ -76,9 +85,19 @@ public class UserDetailsViewModel
     public string RoleName { get; set; } = string.Empty;
     public bool IsActive { get; set; }
     public DateTime CreatedAt { get; set; }
+    
+    // Danh sách khóa học cho Instructor
     public List<UserCourseViewModel> Courses { get; set; } = new();
     public int TotalStudents { get; set; }
     public int TotalLessons { get; set; }
+    
+    // Danh sách khóa học đã đăng ký cho Student
+    public List<UserEnrollmentViewModel> Enrollments { get; set; } = new();
+    
+    // Các thuộc tính tính toán cho Student
+    public int TotalEnrolledCourses => Enrollments.Count;
+    public int CompletedCoursesCount => Enrollments.Count(e => e.LearningStatus == Online_Course.Models.LearningStatus.COMPLETED);
+    public double AverageProgress => Enrollments.Any() ? Enrollments.Average(e => e.ProgressPercent) : 0;
 }
 
 public class UserCourseViewModel
@@ -97,6 +116,32 @@ public class UserCourseViewModel
         Online_Course.Models.CourseStatus.Private => "Riêng tư",
         _ => "Nháp"
     };
+}
+
+// ViewModel for Student Enrollments
+public class UserEnrollmentViewModel
+{
+    public int CourseId { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public string CategoryName { get; set; } = string.Empty;
+    public string ThumbnailUrl { get; set; } = string.Empty;
+    public DateTime EnrolledAt { get; set; }
+    public Online_Course.Models.LearningStatus LearningStatus { get; set; }
+    public float ProgressPercent { get; set; }
+    public int CompletedLessons { get; set; }
+    public int TotalLessons { get; set; }
+    
+    // Thuộc tính hiển thị trạng thái học tập
+    public string StatusText => LearningStatus switch
+    {
+        Online_Course.Models.LearningStatus.NOT_STARTED => "Chưa học",
+        Online_Course.Models.LearningStatus.IN_PROGRESS => "Đang học",
+        Online_Course.Models.LearningStatus.COMPLETED => "Hoàn thành",
+        _ => "Không xác định"
+    };
+    
+    // Thuộc tính định dạng % tiến độ
+    public string ProgressText => $"{ProgressPercent:F1}%";
 }
 
 // ViewModels for Forgot Password
