@@ -1,0 +1,187 @@
+@model Online_Course.ViewModels.InstructorActivityReportViewModel
+@{
+    ViewData["Title"] = "Báo cáo Hoạt động Giảng viên";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="flex items-center justify-between">
+        <div>
+            <nav class="flex mb-2" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                    <li class="inline-flex items-center">
+                        <a asp-action="Index" class="text-gray-500 hover:text-primary dark:text-[#9dabb9] dark:hover:text-white text-sm">Báo cáo</a>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <span class="material-symbols-outlined text-gray-400 text-sm">chevron_right</span>
+                            <span class="ml-1 text-sm font-medium text-gray-700 dark:text-gray-300">Hoạt động Giảng viên</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+            <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Hoạt động Giảng viên tháng @Model.MonthName</h1>
+        </div>
+    </div>
+
+    <!-- Filter Form -->
+    <div class="bg-white dark:bg-[#182430] p-4 rounded-xl border border-gray-200 dark:border-gray-800">
+        <form method="get" class="flex flex-wrap items-end gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tháng</label>
+                <select name="month" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-32 p-2.5 dark:bg-[#111418] dark:border-gray-700 dark:placeholder-gray-400 dark:text-white">
+                    @for (int i = 1; i <= 12; i++)
+                    {
+                        @if (i == Model.Month)
+                        {
+                            <option value="@i" selected>Tháng @i</option>
+                        }
+                        else
+                        {
+                            <option value="@i">Tháng @i</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Năm</label>
+                <select name="year" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-32 p-2.5 dark:bg-[#111418] dark:border-gray-700 dark:placeholder-gray-400 dark:text-white">
+                    @for (int y = DateTime.UtcNow.Year; y >= DateTime.UtcNow.Year - 5; y--)
+                    {
+                        @if (y == Model.Year)
+                        {
+                            <option value="@y" selected>@y</option>
+                        }
+                        else
+                        {
+                            <option value="@y">@y</option>
+                        }
+                    }
+                </select>
+            </div>
+            <button type="submit" class="bg-primary hover:bg-primary/90 text-white font-medium rounded-lg text-sm px-5 py-2.5 transition-colors flex items-center gap-2">
+                <span class="material-symbols-outlined text-sm">filter_list</span>
+                Lọc báo cáo
+            </button>
+        </form>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Chart Section -->
+        <div class="bg-white dark:bg-[#182430] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+            <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-6">Biểu đồ số lượng khóa học đã mở</h3>
+            @if (Model.InstructorData.Any())
+            {
+                <div class="relative h-[400px]">
+                    <canvas id="instructorChart"></canvas>
+                </div>
+            }
+            else
+            {
+                <div class="h-[400px] flex items-center justify-center text-gray-500 dark:text-[#9dabb9]">
+                    <p>Không có dữ liệu hiển thị biểu đồ</p>
+                </div>
+            }
+        </div>
+
+        <!-- Table Section -->
+        <div class="bg-white dark:bg-[#182430] rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+            <div class="p-6 border-b border-gray-200 dark:border-gray-800">
+                <h3 class="text-lg font-semibold text-slate-900 dark:text-white">Chi tiết giảng viên</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50 dark:bg-[#111418]">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-[#9dabb9] uppercase tracking-wider">Giảng viên</th>
+                            <th class="px-6 py-4 text-center text-xs font-semibold text-gray-500 dark:text-[#9dabb9] uppercase tracking-wider">Số khóa học đã mở</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
+                        @if (Model.InstructorData.Any())
+                        {
+                            foreach (var item in Model.InstructorData)
+                            {
+                                <tr class="hover:bg-gray-50 dark:hover:bg-[#1c2832] transition-colors">
+                                    <td class="px-6 py-4">
+                                        <p class="text-slate-900 dark:text-white font-medium">@item.InstructorName</p>
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        <span class="px-3 py-1 rounded-full text-sm font-bold bg-primary/10 text-primary">
+                                            @item.CourseCount
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="2" class="px-6 py-12 text-center text-gray-500 dark:text-[#9dabb9]">
+                                    Không có giảng viên nào mở khóa học trong tháng này
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const ctx = document.getElementById('instructorChart');
+            if (ctx) {
+                const data = @Html.Raw(Json.Serialize(Model.InstructorData));
+                
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.map(d => d.instructorName),
+                        datasets: [{
+                            label: 'Số lượng khóa học',
+                            data: data.map(d => d.courseCount),
+                            backgroundColor: 'rgba(56, 189, 248, 0.6)',
+                            borderColor: 'rgb(56, 189, 248)',
+                            borderWidth: 1,
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1,
+                                    color: '#9dabb9'
+                                },
+                                grid: {
+                                    color: 'rgba(157, 171, 185, 0.1)'
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    color: '#9dabb9'
+                                },
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+}
