@@ -38,6 +38,16 @@ public interface IReportService
     /// Gets course publication trends for the last N months
     /// </summary>
     Task<IEnumerable<MonthlyTrend>> GetCoursePublicationTrendsAsync(int months = 6);
+
+    /// <summary>
+    /// Gets specific courses published in a month
+    /// </summary>
+    Task<IEnumerable<Course>> GetPublishedCoursesReportAsync(int year, int month);
+
+    /// <summary>
+    /// Gets instructor activity (course counts) for a specific month
+    /// </summary>
+    Task<IEnumerable<InstructorActivityReportData>> GetInstructorActivityReportAsync(int year, int month);
 }
 
 /// <summary>
@@ -75,4 +85,13 @@ public class MonthlyTrend
     public int Month { get; set; }
     public string MonthName { get; set; } = string.Empty;
     public int Count { get; set; }
+}
+
+/// <summary>
+/// Instructor activity data for reports
+/// </summary>
+public class InstructorActivityReportData
+{
+    public string InstructorName { get; set; } = string.Empty;
+    public int CourseCount { get; set; }
 }

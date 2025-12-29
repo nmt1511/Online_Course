@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Online_Course.Helper;
 using Online_Course.Services;
 using Online_Course.ViewModels;
 
@@ -28,7 +29,7 @@ public class ReportsController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var currentDate = DateTime.UtcNow;
+        var currentDate = DateTimeHelper.GetVietnamTimeNow();
         var year = currentDate.Year;
         var month = currentDate.Month;
 
@@ -103,5 +104,43 @@ public class ReportsController : Controller
     {
         var trends = await _reportService.GetEnrollmentTrendsAsync(months);
         return Json(trends);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> PublishedCourses(int? year, int? month)
+    {
+        var targetYear = year ?? DateTime.UtcNow.Year;
+        var targetMonth = month ?? DateTime.UtcNow.Month;
+        
+        var courses = await _reportService.GetPublishedCoursesReportAsync(targetYear, targetMonth);
+        
+        var viewModel = new PublishedCoursesReportViewModel
+        {
+            Year = targetYear,
+            Month = targetMonth,
+            MonthName = new DateTime(targetYear, targetMonth, 1).ToString("MM/yyyy"),
+            Courses = courses.ToList()
+        };
+        
+        return View(viewModel);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> InstructorActivity(int? year, int? month)
+    {
+        var targetYear = year ?? DateTime.UtcNow.Year;
+        var targetMonth = month ?? DateTime.UtcNow.Month;
+        
+        var data = await _reportService.GetInstructorActivityReportAsync(targetYear, targetMonth);
+        
+        var viewModel = new InstructorActivityReportViewModel
+        {
+            Year = targetYear,
+            Month = targetMonth,
+            MonthName = new DateTime(targetYear, targetMonth, 1).ToString("MM/yyyy"),
+            InstructorData = data.ToList()
+        };
+        
+        return View(viewModel);
     }
 }

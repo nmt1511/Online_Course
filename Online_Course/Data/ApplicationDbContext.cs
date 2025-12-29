@@ -80,6 +80,7 @@ public class ApplicationDbContext : DbContext
             entity.Property(c => c.Description).HasColumnName("description").HasMaxLength(2000);
             entity.Property(c => c.ThumbnailUrl).HasColumnName("thumbnail_url").HasMaxLength(500);
             entity.Property(c => c.CreatedBy).HasColumnName("created_by");
+            entity.Property(c => c.CreatedAt).HasColumnName("created_at");
             entity.Property(c => c.CourseStatus).HasColumnName("course_status");
             entity.Property(c => c.CourseType).HasColumnName("course_type");
             entity.Property(c => c.StartDate).HasColumnName("start_date");

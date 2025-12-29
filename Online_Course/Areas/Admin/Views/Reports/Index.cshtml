@@ -26,11 +26,12 @@
                     <span class="material-symbols-outlined text-primary">school</span>
                 </div>
             </div>
-            <div class="mt-3 flex items-center text-sm">
+            <div class="mt-3 flex items-center justify-between text-sm">
                 <span class="text-green-400 flex items-center">
-                    <span class="material-symbols-outlined text-sm">trending_up</span>
-                    @Model.MonthlyStatistics.PublishedCourses đã xuất bản
+                    <span class="material-symbols-outlined text-sm text-green-400">trending_up</span>
+                    @Model.MonthlyStatistics.PublishedCourses đã mở
                 </span>
+                <a asp-action="PublishedCourses" class="text-primary hover:underline">Xem chi tiết</a>
             </div>
         </div>
 
@@ -79,8 +80,9 @@
                     <span class="material-symbols-outlined text-orange-400">person</span>
                 </div>
             </div>
-            <div class="mt-3 flex items-center text-sm">
+            <div class="mt-3 flex items-center justify-between text-sm">
                 <span class="text-gray-500 dark:text-[#9dabb9]">Có khóa học đã xuất bản</span>
+                <a asp-action="InstructorActivity" class="text-primary hover:underline">Xem chi tiết</a>
             </div>
         </div>
     </div>

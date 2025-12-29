@@ -22,6 +22,7 @@ public class Course
     public int CreatedBy { get; set; }
     public CourseStatus CourseStatus { get; set; } = CourseStatus.Draft;
     public CourseType CourseType { get; set; } = CourseType.Open_Always;
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? StartDate { get; set; }
     public DateTime? EndDate { get; set; }
     public DateTime? RegistrationStartDate { get; set; }
