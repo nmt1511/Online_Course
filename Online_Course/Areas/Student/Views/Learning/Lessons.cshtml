@@ -128,6 +128,18 @@
             <div class="flex items-center justify-between px-2">
                 <h3 class="text-slate-900 dark:text-white text-xl font-bold leading-tight">Nội dung khóa học</h3>
             </div>
+
+            @* Hiển thị thông báo nếu khóa học đã đóng | Show warning if course is closed *@
+            @if (Model.IsCourseClosed)
+            {
+                <div class="flex items-start gap-4 p-4 rounded-xl border bg-amber-50 border-amber-200 text-amber-800 dark:bg-amber-900/20 dark:border-amber-900/30 dark:text-amber-300 mb-2">
+                    <span class="material-symbols-outlined mt-0.5">lock_clock</span>
+                    <div class="flex flex-col gap-1">
+                        <span class="font-bold caps text-xs tracking-wider uppercase">Khóa học đã đóng</span>
+                        <p class="text-sm">Khóa học này đã kết thúc thời gian học. Bạn chỉ có thể xem lại những bài học mà bạn đã hoàn thành trước đó.</p>
+                    </div>
+                </div>
+            }
             <div class="flex flex-col gap-3">
                 @foreach (var lesson in Model.Lessons.OrderBy(l => l.OrderIndex))
                 {

@@ -21,6 +21,7 @@ public class InstructorCourseListViewModel
     {
         CourseStatus.Public => "Công khai",
         CourseStatus.Private => "Riêng tư",
+        CourseStatus.Closed => "Đã đóng",
         _ => "Nháp"
     };
     
@@ -28,6 +29,7 @@ public class InstructorCourseListViewModel
     {
         CourseStatus.Public => "bg-green-500/80",
         CourseStatus.Private => "bg-yellow-500/80",
+        CourseStatus.Closed => "bg-red-500/80",
         _ => "bg-slate-700/80"
     };
 

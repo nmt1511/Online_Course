@@ -156,6 +156,7 @@
                         <option value="@Online_Course.Models.CourseStatus.Draft">Nháp - Chưa công khai</option>
                         <option value="@Online_Course.Models.CourseStatus.Private">Riêng tư - Chỉ học viên được mời</option>
                         <option value="@Online_Course.Models.CourseStatus.Public">Công khai - Mọi người có thể xem</option>
+                        <option value="@Online_Course.Models.CourseStatus.Closed">Đã đóng - Khóa học kết thúc</option>
                     </select>
                     <p class="text-gray-500 dark:text-slate-400 text-sm">Chọn trạng thái hiển thị của khóa học.</p>
                 </div>
@@ -318,6 +319,10 @@
                                 else if (Model.Status == Online_Course.Models.CourseStatus.Private)
                                 {
                                     <p class="text-sm text-gray-500 dark:text-slate-400 leading-snug">Khóa học này đang ở trạng thái <strong class="text-yellow-500">Riêng tư</strong>.</p>
+                                }
+                                else if (Model.Status == Online_Course.Models.CourseStatus.Closed)
+                                {
+                                    <p class="text-sm text-gray-500 dark:text-slate-400 leading-snug">Khóa học này đang ở trạng thái <strong class="text-secondary">Đã đóng</strong>. Học viên chỉ có thể xem lại bài học đã hoàn thành.</p>
                                 }
                                 else
                                 {

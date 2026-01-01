@@ -452,6 +452,14 @@ public class CoursesController : Controller
             return Forbid();
         }
 
+        // Kiểm tra xem khóa học có học viên nào đang đăng ký hay không
+        var enrollmentCount = course.Enrollments?.Count ?? 0;
+        if (enrollmentCount > 0)
+        {
+            TempData["ErrorMessage"] = "Không thể xóa khóa học đã có học viên đăng ký.";
+            return RedirectToAction(nameof(Index));
+        }
+
         await _courseService.DeleteCourseAsync(id);
 
         TempData["SuccessMessage"] = "Xóa khóa học thành công!";

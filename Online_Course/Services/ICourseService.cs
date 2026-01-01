@@ -1,10 +1,12 @@
-using Online_Course.Models;
+﻿using Online_Course.Models;
 
 namespace Online_Course.Services;
 
 public interface ICourseService
 {
     Task<IEnumerable<Course>> GetAllCoursesAsync();
+    //lấy danh sách khóa học công khai cho học viên
+    Task<IEnumerable<Course>> GetAllCoursesPublicAsync();
     Task<IEnumerable<Course>> GetCoursesByInstructorAsync(int instructorId);
     Task<IEnumerable<Course>> GetCoursesByCategoryAsync(int categoryId);
     Task<Course?> GetCourseByIdAsync(int id);

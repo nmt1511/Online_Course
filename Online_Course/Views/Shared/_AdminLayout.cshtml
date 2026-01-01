@@ -52,9 +52,14 @@
         ::-webkit-scrollbar-thumb:hover { background: #3e5066; }
         
         /* Sidebar collapse styles */
-        .sidebar-expanded { width: 16rem; }
-        .sidebar-collapsed { width: 4.5rem; }
-        .sidebar-collapsed .sidebar-text { display: none; }
+        #sidebar { width: 16rem; transition: width 0.3s ease; }
+        #sidebar.collapsed { width: 4.5rem; }
+        #sidebar.collapsed .sidebar-text { display: none; }
+        #sidebar.collapsed .sidebar-padding { padding-left: 0.75rem; padding-right: 0.75rem; }
+        #sidebar.collapsed nav { padding-left: 0.5rem; padding-right: 0.5rem; }
+        #sidebar.collapsed nav a { justify-content: center; padding-left: 0; padding-right: 0; gap: 0; }
+        #sidebar.collapsed .user-profile-box { padding-left: 0.5rem; padding-right: 0.5rem; justify-content: center; }
+        #sidebar.collapsed .user-profile-box .material-symbols-outlined { margin: 0; }
         /* Hide sidebar initially to prevent flash */
         .sidebar-loading { visibility: hidden; }
     </style>
@@ -74,7 +79,9 @@
         // Apply sidebar state immediately to prevent flash
         (function() {
             var isCollapsed = localStorage.getItem('adminSidebarCollapsed') === 'true';
-            document.write('<style>#sidebar{width:' + (isCollapsed ? '4.5rem' : '16rem') + ';}#sidebar .sidebar-text{display:' + (isCollapsed ? 'none' : 'block') + ';}</style>');
+            if (isCollapsed) {
+                document.write('<style>#sidebar{width:4.5rem;}#sidebar .sidebar-text{display:none;}</style>');
+            }
         })();
     </script>
     
@@ -84,7 +91,7 @@
 
     <!-- Sidebar -->
     <aside id="sidebar" class="flex-shrink-0 flex flex-col border-r border-gray-200 dark:border-gray-800 bg-surface-light dark:bg-[#111418] h-full transition-all duration-300">
-        <div class="flex items-center gap-3 p-4 h-16 border-b border-gray-200 dark:border-gray-800">
+        <div class="flex items-center gap-3 p-4 h-16 border-b border-gray-200 dark:border-gray-800 sidebar-padding">
             <button id="sidebarToggle" class="size-10 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white font-bold text-xl flex-shrink-0 hover:opacity-90 transition-opacity cursor-pointer" title="Thu gọn/Mở rộng menu">
                 <span class="material-symbols-outlined text-[20px] transition-transform duration-300" id="toggleIcon">menu</span>
             </button>
@@ -93,7 +100,7 @@
                 <p class="text-gray-500 dark:text-[#9dabb9] text-xs font-normal whitespace-nowrap">Portal v2.0</p>
             </div>
         </div>
-        <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+        <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1 sidebar-nav">
             @{
                 var controller = ViewContext.RouteData.Values["controller"]?.ToString();
             }
@@ -137,8 +144,8 @@
                 <span class="text-sm font-medium sidebar-text whitespace-nowrap">Đăng xuất</span>
             </a>
         </nav>
-        <div class="p-3 border-t border-gray-200 dark:border-gray-800">
-            <a asp-area="Admin" asp-controller="Profile" asp-action="Index" class="flex items-center gap-3 hover:bg-gray-100 dark:hover:bg-[#283039]/50 p-2 rounded-lg transition-colors">
+        <div class="p-3 border-t border-gray-200 dark:border-gray-800 user-profile-container">
+            <a asp-area="Admin" asp-controller="Profile" asp-action="Index" class="flex items-center gap-3 hover:bg-gray-100 dark:hover:bg-[#283039]/50 p-2 rounded-lg transition-colors user-profile-box">
                 <div class="size-10 rounded-full bg-primary/20 flex items-center justify-center ring-2 ring-primary/20 flex-shrink-0">
                     <span class="material-symbols-outlined text-primary">person</span>
                 </div>
@@ -199,13 +206,17 @@
         
         function updateSidebar(collapsed) {
             if (collapsed) {
-                sidebar.style.width = '4.5rem';
-                sidebar.querySelectorAll('.sidebar-text').forEach(el => el.style.display = 'none');
+                sidebar.classList.add('collapsed');
             } else {
-                sidebar.style.width = '16rem';
-                sidebar.querySelectorAll('.sidebar-text').forEach(el => el.style.display = 'block');
+                sidebar.classList.remove('collapsed');
             }
         }
+
+        // Initialize sidebar state on load
+        (function() {
+            const isCollapsed = localStorage.getItem('adminSidebarCollapsed') === 'true';
+            updateSidebar(isCollapsed);
+        })();
         
         sidebarToggle?.addEventListener('click', function() {
             const isCurrentlyCollapsed = localStorage.getItem('adminSidebarCollapsed') === 'true';
