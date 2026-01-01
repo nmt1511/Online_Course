@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Online_Course.Helper;
 using Online_Course.Models;
 using Online_Course.Services;
 using Online_Course.ViewModels;
@@ -50,11 +51,38 @@ public class CoursesController : Controller
             return RedirectToAction(nameof(Details), new { id = courseId });
         }
 
-        // Create enrollment
+        // Kiểm tra nếu khóa học là loại 'Fixed_Time', cần kiểm tra thời gian đăng ký
+        if (course.CourseType == CourseType.Fixed_Time)
+        {
+            var today = DateTimeHelper.GetVietnamTimeNow().Date;
+
+            // Kiểm tra nếu ngày bắt đầu hoặc ngày kết thúc đăng ký bị trống
+            if (!course.RegistrationStartDate.HasValue || !course.RegistrationEndDate.HasValue)
+            {
+                TempData["Error"] = "Khóa học này chưa được thiết lập thời gian đăng ký.";
+                return RedirectToAction(nameof(Details), new { id = courseId });
+            }
+
+            // Kiểm tra nếu chưa đến ngày bắt đầu đăng ký
+            if (today < course.RegistrationStartDate.Value.Date)
+            {
+                TempData["Error"] = $"Khóa học chưa mở đăng ký. Thời gian đăng ký từ: {course.RegistrationStartDate.Value:dd/MM/yyyy}.";
+                return RedirectToAction(nameof(Details), new { id = courseId });
+            }
+
+            // Kiểm tra nếu đã hết hạn đăng ký
+            if (today > course.RegistrationEndDate.Value.Date)
+            {
+                TempData["Error"] = $"Thời gian đăng ký khóa học này đã kết thúc vào ngày {course.RegistrationEndDate.Value:dd/MM/yyyy}.";
+                return RedirectToAction(nameof(Details), new { id = courseId });
+            }
+        }
+
+        // Tạo bản ghi đăng ký khóa học
         await _enrollmentService.EnrollAsync(userId, courseId);
         TempData["Success"] = "Đăng ký khóa học thành công!";
 
-        // Redirect to lesson list (Learning area)
+        // Chuyển hướng đến danh sách bài học
         return RedirectToAction("Lessons", "Learning", new { area = "Student", courseId = courseId });
     }
 
@@ -62,7 +90,7 @@ public class CoursesController : Controller
     public async Task<IActionResult> Index(int? categoryId, CourseType? type)
     {
         var courses = !categoryId.HasValue
-            ? await _courseService.GetAllCoursesAsync()
+            ? await _courseService.GetAllCoursesPublicAsync()
             : await _courseService.GetCoursesByCategoryAsync(categoryId.Value);
 
         // Filter by CourseType if provided
@@ -71,14 +99,12 @@ public class CoursesController : Controller
             courses = courses.Where(c => c.CourseType == type.Value);
         }
 
-        // Only show published courses to students
-        var publishedCourses = courses.Where(c => c.CourseStatus == CourseStatus.Public).ToList();
 
         var categories = await _categoryService.GetAllCategoriesAsync();
 
         var viewModel = new StudentCourseIndexViewModel
         {
-            Courses = publishedCourses.Select(c => new StudentCourseListViewModel
+            Courses = courses.Select(c => new StudentCourseListViewModel
             {
                 CourseId = c.CourseId,
                 Title = c.Title,

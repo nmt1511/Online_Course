@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Online_Course.Models;
 using Online_Course.Services;
 using Online_Course.ViewModels;
 
@@ -67,6 +68,15 @@ public class LearningController : Controller
         {
             var isCompleted = await _progressService.IsLessonCompletedAsync(userId.Value, lesson.LessonId);
             
+            // Logic khóa bài học: Bài học bị khóa nếu:
+            // 1. Bài học trước chưa hoàn thành (logic cũ)
+            // 2. HOẶC Khóa học đã đóng và bài này chưa hoàn thành (logic mới)
+            bool isLocked = !previousLessonCompleted;
+            if (course.CourseStatus == CourseStatus.Closed && !isCompleted)
+            {
+                isLocked = true;
+            }
+
             lessonViewModels.Add(new LearningLessonViewModel
             {
                 LessonId = lesson.LessonId,
@@ -76,7 +86,7 @@ public class LearningController : Controller
                 LessonType = lesson.LessonType,
                 OrderIndex = lesson.OrderIndex,
                 IsCompleted = isCompleted,
-                IsLocked = !previousLessonCompleted // Khóa nếu bài trước chưa xong | Lock if previous not completed
+                IsLocked = isLocked 
             });
 
             previousLessonCompleted = isCompleted;
@@ -91,7 +101,8 @@ public class LearningController : Controller
             TotalLessons = lessons.Count(),
             CompletedLessons = completedLessonsCount,
             ProgressPercentage = progressPercentage,
-            CourseStatus = enrollment.LearningStatus, // Gán trạng thái khóa học | Assign course status
+            CourseStatus = enrollment.LearningStatus, // Trạng thái học tập của học viên
+            IsCourseClosed = course.CourseStatus == CourseStatus.Closed, // Trạng thái đóng/mở của khóa học
             Lessons = lessonViewModels
         };
 
@@ -117,6 +128,16 @@ public class LearningController : Controller
             return RedirectToAction("Details", "Courses", new { area = "Student", id = lesson.CourseId });
         }
 
+        // Kiểm tra nếu khóa học đã đóng và bài học này chưa hoàn thành
+        var course = await _courseService.GetCourseByIdAsync(lesson.CourseId);
+        var isCompleted = await _progressService.IsLessonCompletedAsync(userId.Value, lessonId);
+
+        if (course != null && course.CourseStatus == CourseStatus.Closed && !isCompleted)
+        {
+            TempData["Error"] = "Khóa học đã đóng, bạn chỉ có thể xem lại những bài học đã hoàn thành.";
+            return RedirectToAction(nameof(Lessons), new { courseId = lesson.CourseId });
+        }
+
         // Kiểm tra logic khóa bài học (Bảo mật) | Check lesson locking logic (Security)
         var allLessons = (await _lessonService.GetLessonsByCourseAsync(lesson.CourseId)).OrderBy(l => l.OrderIndex).ToList();
         //index bài học vừa chọn
@@ -134,8 +155,6 @@ public class LearningController : Controller
             }
         }
 
-        var course = await _courseService.GetCourseByIdAsync(lesson.CourseId);
-        var isCompleted = await _progressService.IsLessonCompletedAsync(userId.Value, lessonId);
         var progressPercentage = await _progressService.CalculateProgressPercentageAsync(userId.Value, lesson.CourseId);
         var completedCount = await _progressService.GetCompletedLessonsCountAsync(userId.Value, lesson.CourseId);
 
@@ -184,6 +203,7 @@ public class LearningController : Controller
             TotalLessons = allLessons.Count,
             CompletedLessons = completedCount,
             ProgressPercentage = progressPercentage,
+            IsCourseClosed = course != null && course.CourseStatus == CourseStatus.Closed, // Trạng thái đóng/mở của khóa học
             PreviousLessonId = previousLesson?.LessonId,
             NextLessonId = nextLesson?.LessonId,
             AllLessons = sidebarLessons,

@@ -23,7 +23,8 @@ public class LearningLessonsViewModel
     public int TotalLessons { get; set; }
     public int CompletedLessons { get; set; }
     public double ProgressPercentage { get; set; }
-    public LearningStatus CourseStatus { get; set; } // Trạng thái học tập của khóa học
+    public LearningStatus CourseStatus { get; set; } // Trạng thái học tập của học viên đối với khóa học này
+    public bool IsCourseClosed { get; set; } // Trạng thái đóng/mở của chính khóa học
     public IList<LearningLessonViewModel> Lessons { get; set; } = new List<LearningLessonViewModel>();
 }
 
@@ -46,6 +47,7 @@ public class LearningContentViewModel
     public int TotalLessons { get; set; }
     public int CompletedLessons { get; set; }
     public double ProgressPercentage { get; set; }
+    public bool IsCourseClosed { get; set; } // Trạng thái đóng/mở của chính khóa học
     
     public int? CurrentTimeSeconds { get; set; }
     public int? CurrentPage { get; set; }

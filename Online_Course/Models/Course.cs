@@ -4,7 +4,8 @@ public enum CourseStatus
 {
     Draft,      // Nháp
     Private,    // Riêng tư
-    Public      // Công khai
+    Public,     // Công khai
+    Closed      // Đã đóng
 }
 
 public enum CourseType

@@ -24,6 +24,18 @@ public class CourseService : ICourseService
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<Course>> GetAllCoursesPublicAsync()
+    {
+        return await _context.Courses
+            .Where(c => c.CourseStatus == CourseStatus.Public)
+            .Include(c => c.Instructor)
+            .Include(c => c.Enrollments)
+            .Include(c => c.CategoryEntity)
+            .Include(c => c.Lessons)
+            .OrderByDescending(c => c.CourseId)
+            .ToListAsync();
+    }
+
     public async Task<IEnumerable<Course>> GetCoursesByInstructorAsync(int instructorId)
     {
         return await _context.Courses
@@ -49,12 +61,25 @@ public class CourseService : ICourseService
 
     public async Task<Course?> GetCourseByIdAsync(int id)
     {
-        return await _context.Courses
+        var course = await _context.Courses
             .Include(c => c.Instructor)
             .Include(c => c.Lessons)
             .Include(c => c.Enrollments)
             .Include(c => c.CategoryEntity)
             .FirstOrDefaultAsync(c => c.CourseId == id);
+
+        // Logic tự động đóng khóa học nếu là loại 'Fixed_Time' và đã hết thời gian học
+        if (course != null && course.CourseType == CourseType.Fixed_Time && course.EndDate.HasValue)
+        {
+            // So sánh ngày kết thúc với ngày hiện tại (theo giờ VN)
+            if (DateTime.Now.Date > course.EndDate.Value.Date && course.CourseStatus != CourseStatus.Closed)
+            {
+                course.CourseStatus = CourseStatus.Closed;
+                await _context.SaveChangesAsync(); // Cập nhật trạng thái mới vào cơ sở dữ liệu
+            }
+        }
+
+        return course;
     }
 
 
@@ -77,6 +102,13 @@ public class CourseService : ICourseService
         existingCourse.CreatedBy = course.CreatedBy;
         existingCourse.CourseStatus = course.CourseStatus;
         existingCourse.CategoryId = course.CategoryId;
+        
+        // Cập nhật thêm các trường về loại và thời gian khóa học
+        existingCourse.CourseType = course.CourseType;
+        existingCourse.RegistrationStartDate = course.RegistrationStartDate;
+        existingCourse.RegistrationEndDate = course.RegistrationEndDate;
+        existingCourse.StartDate = course.StartDate;
+        existingCourse.EndDate = course.EndDate;
 
         await _context.SaveChangesAsync();
     }
@@ -90,7 +122,13 @@ public class CourseService : ICourseService
             
         if (course != null)
         {
-            // Delete all progress records for lessons in this course
+            // Kiểm tra bảo mật tầng Service: Không cho xóa nếu có học viên
+            if (course.Enrollments.Any())
+            {
+                throw new InvalidOperationException("Không thể xóa khóa học đã có học viên đăng ký.");
+            }
+
+            // Xóa tất cả tiến độ học tập liên quan
             var lessonIds = course.Lessons.Select(l => l.LessonId).ToList();
             var progressRecords = await _context.Progresses
                 .Where(p => lessonIds.Contains(p.LessonId))

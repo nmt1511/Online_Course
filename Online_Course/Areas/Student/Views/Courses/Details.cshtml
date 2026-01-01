@@ -1,7 +1,37 @@
 @model Online_Course.ViewModels.StudentCourseDetailsViewModel
+@using Online_Course.Models
+@using Online_Course.Helper
 @{
     ViewData["Title"] = Model.Title;
     Layout = "~/Views/Shared/_StudentLayout.cshtml";
+
+    // Xử lý logic kiểm tra thời điểm đăng ký cho khóa học Fixed_Time
+    bool isRegistrationOpen = true;
+    string registrationMessage = "";
+    string alertClass = "";
+    var today = DateTimeHelper.GetVietnamTimeNow().Date; // Sử dụng Helper để lấy giờ Việt Nam
+
+    if (Model.CourseType == CourseType.Fixed_Time)
+    {
+        if (!Model.RegistrationStartDate.HasValue || !Model.RegistrationEndDate.HasValue)
+        {
+            isRegistrationOpen = false;
+            registrationMessage = "Khóa học này chưa được thiết lập thời gian đăng ký.";
+            alertClass = "bg-amber-50 border-amber-200 text-amber-800 dark:bg-amber-900/20 dark:border-amber-900/30 dark:text-amber-300";
+        }
+        else if (today < Model.RegistrationStartDate.Value.Date)
+        {
+            isRegistrationOpen = false;
+            registrationMessage = $"Khóa học sẽ bắt đầu mở đăng ký từ ngày {Model.RegistrationStartDate.Value:dd/MM/yyyy}.";
+            alertClass = "bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/20 dark:border-blue-900/30 dark:text-blue-300";
+        }
+        else if (today > Model.RegistrationEndDate.Value.Date)
+        {
+            isRegistrationOpen = false;
+            registrationMessage = $"Thời gian đăng ký khóa học này đã kết thúc vào ngày {Model.RegistrationEndDate.Value:dd/MM/yyyy}.";
+            alertClass = "bg-red-50 border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-900/30 dark:text-red-300";
+        }
+    }
 }
 
 <main class="flex-grow flex flex-col items-center py-5 px-4 md:px-10 lg:px-20">
@@ -50,6 +80,18 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Thông báo về thời gian đăng ký (chỉ hiển thị nếu không cho phép đăng ký) -->
+                @if (!Model.IsEnrolled && !isRegistrationOpen)
+                {
+                    <div class="flex items-start gap-4 p-4 rounded-xl border @alertClass">
+                        <span class="material-symbols-outlined mt-0.5">info</span>
+                        <div class="flex flex-col gap-1">
+                            <span class="font-bold">Thông báo đăng ký</span>
+                            <p class="text-sm opacity-90">@registrationMessage</p>
+                        </div>
+                    </div>
+                }
 
                 <!-- Course Curriculum -->
                 <div class="flex flex-col gap-4">
@@ -138,10 +180,20 @@
                                         <form asp-area="Student" asp-controller="Courses" asp-action="Enroll" method="post">
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="courseId" value="@Model.CourseId" />
-                                            <button type="submit" class="w-full bg-primary hover:bg-blue-600 text-white font-bold h-12 rounded-lg transition-colors flex items-center justify-center gap-2 text-lg shadow-lg shadow-primary/25">
-                                                <span class="material-symbols-outlined">school</span>
-                                                Đăng ký ngay
-                                            </button>
+                                            @if (isRegistrationOpen)
+                                            {
+                                                <button type="submit" class="w-full bg-primary hover:bg-blue-600 text-white font-bold h-12 rounded-lg transition-colors flex items-center justify-center gap-2 text-lg shadow-lg shadow-primary/25">
+                                                    <span class="material-symbols-outlined">school</span>
+                                                    Đăng ký ngay
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button type="button" disabled class="w-full bg-gray-200 dark:bg-gray-800 text-gray-500 dark:text-gray-400 font-bold h-12 rounded-lg cursor-not-allowed flex items-center justify-center gap-2 text-lg border border-gray-300 dark:border-gray-700">
+                                                    <span class="material-symbols-outlined">block</span>
+                                                    Chưa thể đăng ký
+                                                </button>
+                                            }
                                         </form>
                                     }
                                     else
