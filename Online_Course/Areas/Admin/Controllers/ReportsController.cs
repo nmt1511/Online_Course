@@ -71,6 +71,7 @@ public class ReportsController : Controller
         var count = await _reportService.GetMonthlyPublishedCoursesCountAsync(targetYear, targetMonth);
 
         // Trả về kết quả dưới dạng JSON phục vụ hiển thị trên giao diện hoặc gọi từ API client
+        return Json(new { year = targetYear, month = targetMonth, count });
     }
 
     [HttpGet]
