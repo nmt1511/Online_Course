@@ -140,4 +140,6 @@ public class CourseIndexViewModel
     public int TotalPages { get; set; }
     public bool HasPreviousPage => CurrentPage > 1;
     public bool HasNextPage => CurrentPage < TotalPages;
+
+    public string? SearchQuery { get; internal set; }
 }

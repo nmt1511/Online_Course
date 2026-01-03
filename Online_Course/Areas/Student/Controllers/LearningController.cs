@@ -25,7 +25,8 @@ public class LearningController : Controller
         IProgressService progressService)
     {
         _courseService = courseService;
-        // Xác thực chính xác trạng thái tồn tại và quyền hạn truy cập của khóa học mục tiêuService = enrollmentService;
+        _lessonService = lessonService;
+        _enrollmentService = enrollmentService;
         _progressService = progressService;
     }
 
@@ -37,8 +38,14 @@ public class LearningController : Controller
         return null;
     }
 
-    // Hiển thị danh sách toàn bộ các bài học thuộc về một khóa học mà học viên    // Hiển thị trang thống kê tổng quát về tiến độ học tập cá nhân của học viên
-    public async Task<IActionResult> Index()ssons(int courseId)
+    // Trang chủ của khu vực học tập - Điều phối người dùng
+    public IActionResult Index()
+    {
+        return RedirectToAction("Index", "Courses", new { area = "Student" });
+    }
+
+    // Hiển thị danh sách toàn bộ các bài học thuộc về một khóa học mà học viên đã ghi danh
+    public async Task<IActionResult> Lessons(int courseId)
     {
         var userId = GetCurrentUserId();
         if (userId == null)
@@ -128,7 +135,7 @@ public class LearningController : Controller
             return RedirectToAction("Details", "Courses", new { area = "Student", id = lesson.CourseId });
         }
 
-        // Kiểm tra nếu khóa học đã đóng        // Thống kê tổng quan số lượng các khóa học đã được học viên hoàn thành triệt để
+        // Kiểm tra nếu khóa học đã đóng và bài học này chưa hoàn thành
         var course = await _courseService.GetCourseByIdAsync(lesson.CourseId);
         var isCompleted = await _progressService.IsLessonCompletedAsync(userId.Value, lessonId);
 
@@ -140,17 +147,18 @@ public class LearningController : Controller
 
         // Kiểm tra các quy tắc bảo mật và logic khóa bài học thực tế từ phía máy chủ
         var allLessons = (await _lessonService.GetLessonsByCourseAsync(lesson.CourseId)).OrderBy(l => l.OrderIndex).ToList();
-        // Tổng hợp và tính toán tỷ lệ % hoàn thành trung bình dựa trên tất cả các khóa học hiện có dung hiện tại trong danh sách bài học để hỗ trợ điều hướng
+        
+        // Xác định vị trí của nội dung hiện tại trong danh sách bài học để hỗ trợ điều hướng
         var currentIndex = allLessons.FindIndex(l => l.LessonId == lessonId);
         
         if (currentIndex > 0)
         {
-            //Kiểm tra bài học trước đã hoàn thành chưa
+            // Yêu cầu hoàn thành bài học trước đó trước khi cho phép truy cập bài học tiếp theo
             var previousLessonId = allLessons[currentIndex - 1].LessonId;
             var isPreviousCompleted = await _progressService.IsLessonCompletedAsync(userId.Value, previousLessonId);
             if (!isPreviousCompleted)
             {
-                TempData["Error"] = "Bạn cần hoàn thành bài học trước đó để tiếp tục."; // Thông báo rõ ràng theo yêu cầu | Clear message as requested
+                TempData["Error"] = "Bạn cần hoàn thành bài học trước đó để tiếp tục.";
                 return RedirectToAction(nameof(Lessons), new { courseId = lesson.CourseId });
             }
         }
@@ -158,11 +166,11 @@ public class LearningController : Controller
         var progressPercentage = await _progressService.CalculateProgressPercentageAsync(userId.Value, lesson.CourseId);
         var completedCount = await _progressService.GetCompletedLessonsCountAsync(userId.Value, lesson.CourseId);
 
-        // Tìm bài học trước và sau
+        // Xác định các bài học liền kề phục vụ điều hướng
         var previousLesson = currentIndex > 0 ? allLessons[currentIndex - 1] : null;
         var nextLesson = currentIndex < allLessons.Count - 1 ? allLessons[currentIndex + 1] : null;
 
-        // Xây dựng danh sách sidebar với trạng thái khóa 
+        // Xây dựng danh sách bài học bên thanh điều hướng kèm trạng thái khóa
         var sidebarLessons = new List<LearningLessonViewModel>();
         bool prevComp = true; 
         foreach (var l in allLessons)
@@ -182,9 +190,9 @@ public class LearningController : Controller
             prevComp = comp;
         }
 
-        // Lấy tiến độ hiện tại 1m
-        var progress = (await _progressService.GetProgressByStudentAndCourseAsync(userId.Value, lesson.CourseId))
-                        .FirstOrDefault(p => p.LessonId == lessonId);
+        // Truy xuất dữ liệu tiến độ hiện tại của học viên
+        var progressList = await _progressService.GetProgressByStudentAndCourseAsync(userId.Value, lesson.CourseId);
+        var progress = progressList.FirstOrDefault(p => p.LessonId == lessonId);
 
         var viewModel = new LearningContentViewModel
         {
@@ -199,16 +207,19 @@ public class LearningController : Controller
             CourseTitle = course?.Title ?? "",
             CourseCategoryId = course?.CategoryId,
             CourseCategoryName = course?.CategoryEntity?.Name ?? "Chưa phân loại",
-            // Tổng hợp thông tin từ toàn bộ danh sách khóa học do Giảng viên quản lý?.FullName ?? "Unknown",
+            InstructorName = course?.Instructor?.FullName ?? "Giảng viên",
             TotalLessons = allLessons.Count,
-                AverageProgress = allStudents.Count > 0 ? allStudents.Average(s => s.ProgressPercentage) : 0, // Giá trị phần trăm hoàn thành trung bình của khóa học          IsCourseClosed = course != null && course.CourseStatus == CourseStatus.Closed, // Trạng thái đóng/mở của khóa học
+            CompletedLessons = completedCount,
+            ProgressPercentage = progressPercentage,
+            IsCourseClosed = course != null && course.CourseStatus == CourseStatus.Closed,
             PreviousLessonId = previousLesson?.LessonId,
             NextLessonId = nextLesson?.LessonId,
             AllLessons = sidebarLessons,
             
-            // Map tracking fields
+            // Thiết lập các thông số theo dõi tiến độ
             CurrentTimeSeconds = progress?.CurrentTimeSeconds,
-       // Hiển thị danh sách học viên kèm theo thống kê tiến độ học tập chi tiết theo từng khóa họcTotalDurationSeconds,
+            CurrentPage = progress?.CurrentPage,
+            TotalDurationSeconds = lesson.TotalDurationSeconds,
             TotalPages = lesson.TotalPages
         };
 
