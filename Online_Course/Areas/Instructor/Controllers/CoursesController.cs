@@ -2,7 +2,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Online_Course.Helper;
 using Online_Course.Models;
-using Online_Course.Services;
+using Online_Course.Services.CategoryService;
+using Online_Course.Services.CourseService;
+using Online_Course.Services.EnrollmentService;
+using Online_Course.Services.ProgressService;
+using Online_Course.Services.UserService;
 using Online_Course.ViewModels;
 using System.Security.Claims;
 
@@ -35,12 +39,14 @@ public class CoursesController : Controller
         _webHostEnvironment = webHostEnvironment;
     }
 
+    // Truy xuất mã định danh (UserId) của người dùng hiện tại từ Claims định danh
     private int GetCurrentUserId()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
         return userIdClaim != null ? int.Parse(userIdClaim.Value) : 0;
     }
 
+    // Hiển thị danh sách các khóa học do Giảng viên hiện tại quản lý
     public async Task<IActionResult> Index()
     {
         var instructorId = GetCurrentUserId();
@@ -58,7 +64,7 @@ public class CoursesController : Controller
             Type = c.CourseType,
             EnrollmentCount = c.Enrollments?.Count ?? 0,
             LessonCount = c.Lessons?.Count ?? 0,
-            AverageRating = 4.5 // Placeholder - would come from ratings system
+            AverageRating = 4.5 // Giá trị tạm thời - sẽ được cập nhật từ hệ thống đánh giá sau này
         }).ToList();
 
         return View(viewModel);
@@ -79,10 +85,10 @@ public class CoursesController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(InstructorCreateCourseViewModel model, IFormFile? thumbnailFile)
     {
-        // Remove ThumbnailUrl from validation - it's optional
+        // Loại bỏ ThumbnailUrl khỏi kiểm tra tính hợp lệ vì dữ liệu này có thể được truyền qua tệp tin tải lên
         ModelState.Remove("ThumbnailUrl");
 
-        // Validate dates if CourseType is Fixed_Time
+        // Xác thực các mốc thời gian đăng ký và học tập đối với khóa học có thời hạn cố định
         if (model.CourseType == CourseType.Fixed_Time)
         {
             if (!model.RegistrationStartDate.HasValue || !model.RegistrationEndDate.HasValue ||
@@ -119,10 +125,10 @@ public class CoursesController : Controller
         var instructorId = GetCurrentUserId();
         string thumbnailUrl;
 
-        // Handle file upload first
+        // Ưu tiên xử lý lưu tệp tin hình ảnh tải lên từ máy tính cá nhân
         if (thumbnailFile != null && thumbnailFile.Length > 0)
         {
-            // Check file size (5MB max)
+            // Kiểm tra sự tồn tại của khóa học và xác thực quyền quản lý của Giảng viên hiện tại hình ảnh (tối đa 5MB)
             if (thumbnailFile.Length > 5 * 1024 * 1024)
             {
                 ModelState.AddModelError("thumbnailFile", "Kích thước file vượt quá 5MB");
@@ -131,12 +137,12 @@ public class CoursesController : Controller
             }
             thumbnailUrl = await SaveImageAsync(thumbnailFile);
         }
-        // Then check URL
+        // Sử dụng đường dẫn URL trực tiếp nếu không có tệp tin tải lên
         else if (!string.IsNullOrWhiteSpace(model.ThumbnailUrl))
         {
             thumbnailUrl = model.ThumbnailUrl;
         }
-        // Use default image if no thumbnail provided
+        // Thiết lập hình ảnh mặc định nếu không có nguồn cung cấp hình ảnh nào khác
         else
         {
             thumbnailUrl = "/images/default-course.png";
@@ -183,14 +189,14 @@ public class CoursesController : Controller
 
     private async Task<string> SaveImageAsync(IFormFile file)
     {
-        // Create images folder if not exists
+        // Khởi tạo thư mục đích lưu trữ hình ảnh nếu chưa tồn tại trên máy chủ
         var imagesFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images", "courses");
         if (!Directory.Exists(imagesFolder))
         {
             Directory.CreateDirectory(imagesFolder);
         }
 
-        // Generate unique filename
+        // Khởi tạo tên tệp tin duy nhất nhằm tránh trùng lặp dữ liệu lưu trữ
         var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
         var filePath = Path.Combine(imagesFolder, fileName);
 
@@ -200,7 +206,7 @@ public class CoursesController : Controller
             await file.CopyToAsync(stream);
         }
 
-        // Return relative URL
+        // Trả về đường dẫn tương đối phục vụ việc lưu trữ vào cơ sở dữ liệu
         return $"/images/courses/{fileName}";
     }
 
@@ -215,7 +221,7 @@ public class CoursesController : Controller
             return NotFound();
         }
 
-        // Verify the course belongs to this instructor
+        // Xác thực quyền sở hữu: Đảm bảo Giảng viên chỉ có quyền truy cập vào khóa học do mình tạo ra
         if (course.CreatedBy != instructorId)
         {
             return Forbid();
@@ -224,7 +230,7 @@ public class CoursesController : Controller
         // Get enrollments for this course
         var enrollments = await _enrollmentService.GetEnrollmentsByCourseAsync(id);
 
-        // Build student list with completion percentage
+        // Xây dựng danh sách học viên kèm theo tiến độ hoàn thành các bài học
         var students = new List<StudentEnrollmentViewModel>();
         foreach (var enrollment in enrollments)
         {
@@ -253,6 +259,7 @@ public class CoursesController : Controller
             RegistrationEndDate = course.RegistrationEndDate,
             StartDate = course.StartDate,
             EndDate = course.EndDate,
+            // Xử lý yêu cầu cập nhật thông tin bài học sau khi xác thực quyền hạn và dữ liệu đầu vào
             ShowInstructor = false, // Instructor doesn't need to see their own name
             TotalLessons = course.Lessons?.Count ?? 0,
             TotalStudents = enrollments.Count(),
@@ -261,6 +268,7 @@ public class CoursesController : Controller
                 LessonId = l.LessonId,
                 Title = l.Title,
                 Description = l.Description,
+                // Thiết lập thứ tự hiển thị tự động (OrderIndex) dựa trên số lượng bài hiện có (Tổng số + 1)
                 OrderIndex = l.OrderIndex,
                 ContentUrl = l.ContentUrl,
                 LessonType = l.LessonType,
@@ -283,7 +291,7 @@ public class CoursesController : Controller
             return NotFound();
         }
 
-        // Verify the course belongs to this instructor
+        // Đảm bảo Giảng viên chỉ được phép chỉnh sửa khóa học thuộc quyền quản lý của mình
         if (course.CreatedBy != instructorId)
         {
             return Forbid();
@@ -305,7 +313,7 @@ public class CoursesController : Controller
             InstructorName = course.Instructor?.FullName ?? "",
             EnrollmentCount = course.Enrollments?.Count ?? 0,
             LessonCount = course.Lessons?.Count ?? 0,
-            // Lấy danh sách ID học viên đã được ghi danh bắt buộc
+            // Truy xuất danh sách mã định danh của các học viên đã được ghi danh bắt buộc vào khóa học riêng tư
             SelectedStudentIds = course.Enrollments?.Where(e => e.IsMandatory).Select(e => e.StudentId).ToList() ?? new List<int>()
         };
 
@@ -334,13 +342,13 @@ public class CoursesController : Controller
             return NotFound();
         }
 
-        // Verify the course belongs to this instructor
+        // Kiểm tra quyền hạn sửa đổi khóa học của Giảng viên hiện tại
         if (existingCourse.CreatedBy != instructorId)
         {
             return Forbid();
         }
 
-        // Validate dates if CourseType is Fixed_Time
+        // Thực hiện các quy tắc xác thực dữ liệu đầu vào dựa trên loại bài học cụ thể
         if (model.CourseType == CourseType.Fixed_Time)
         {
             if (!model.RegistrationStartDate.HasValue || !model.RegistrationEndDate.HasValue ||
@@ -446,7 +454,7 @@ public class CoursesController : Controller
             return NotFound();
         }
 
-        // Verify the course belongs to this instructor
+        // Controller quản lý các bài học thuộc về Giảng viên
         if (course.CreatedBy != instructorId)
         {
             return Forbid();

@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Online_Course.Services;
+using Online_Course.Services.CourseService;
+using Online_Course.Services.EnrollmentService;
+using Online_Course.Services.ProgressService;
 using Online_Course.ViewModels;
 using System.Security.Claims;
 
@@ -24,13 +26,14 @@ public class StudentsController : Controller
         _progressService = progressService;
     }
 
+    // Hiển thị danh sách học viên kèm theo thống kê tiến độ học tập chi tiết theo từng khóa học
     public async Task<IActionResult> Index(int? courseId = null)
     {
         var instructorId = int.Parse(User.FindFirstValue("UserId") ?? "0");
         
         if (!courseId.HasValue)
         {
-            // Show all students across all instructor's courses
+            // Tổng hợp thông tin học viên từ tất cả các khóa học do Giảng viên quản lý
             var courses = await _courseService.GetCoursesByInstructorAsync(instructorId);
             var allStudents = new List<StudentProgressViewModel>();
             
@@ -67,7 +70,7 @@ public class StudentsController : Controller
                 CourseId = 0,
                 CourseTitle = "Tất cả khóa học",
                 TotalStudents = allStudents.Select(s => s.StudentId).Distinct().Count(),
-                AverageProgress = allStudents.Count > 0 ? allStudents.Average(s => s.ProgressPercentage) : 0,
+                AverageProgress = allStudents.Count > 0 ? allStudents.Average(s => s.ProgressPercentage) : 0, // Giá trị phần trăm hoàn thành trung bình (Dữ liệu mẫu)
                 CompletedCount = allStudents.Count(s => s.ProgressPercentage >= 100),
                 Students = allStudents.OrderByDescending(s => s.EnrolledAt).ToList()
             };

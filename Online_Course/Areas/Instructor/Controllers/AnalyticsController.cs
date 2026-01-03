@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Online_Course.Services;
+using Online_Course.Services.CourseService;
+using Online_Course.Services.EnrollmentService;
+using Online_Course.Services.ProgressService;
 using System.Security.Claims;
 
 namespace Online_Course.Areas.Instructor.Controllers;
@@ -23,6 +25,7 @@ public class AnalyticsController : Controller
         _progressService = progressService;
     }
 
+    // Hiển thị trang báo cáo phân tích hiệu quả giảng dạy và học tập
     public async Task<IActionResult> Index()
     {
         var instructorId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");

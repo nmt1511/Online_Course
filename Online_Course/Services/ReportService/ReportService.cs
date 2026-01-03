@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Online_Course.Data;
 using Online_Course.Models;
 
-namespace Online_Course.Services;
+namespace Online_Course.Services.ReportService;
 
 public class ReportService : IReportService
 {
@@ -13,12 +13,10 @@ public class ReportService : IReportService
         _context = context;
     }
 
-    /// <summary>
-    /// Đếm số lượng khóa học đã mở (publish & private) trong một tháng cụ thể
-    /// </summary>
-    /// <param name="year">Năm cần thống kê</param>
-    /// <param name="month">Tháng cần thống kê</param>
-    /// <returns>Số lượng khóa học</returns>
+    // Đếm số lượng khóa học đã mở (Công khai hoặc Riêng tư) trong một tháng cụ thể
+    // year: Năm cần thống kê
+    // month: Tháng cần thống kê
+    // Trả về số lượng khóa học tìm thấy
     public async Task<int> GetMonthlyPublishedCoursesCountAsync(int year, int month)
     {
         // Xác định ngày bắt đầu và ngày kết thúc của tháng cần thống kê
@@ -32,11 +30,9 @@ public class ReportService : IReportService
             .CountAsync();
     }
 
-    /// <summary>
-    /// Lấy danh sách các khóa học phổ biến nhất dựa trên số lượng học viên đăng ký
-    /// </summary>
-    /// <param name="topCount">Số lượng khóa học tối đa muốn lấy (mặc định 10)</param>
-    /// <returns>Danh sách báo cáo độ phổ biến của khóa học</returns>
+    // Lấy danh sách các khóa học phổ biến nhất dựa trên số lượng học viên đăng ký
+    // topCount: Số lượng khóa học tối đa muốn lấy (mặc định là 10)
+    // Trả về danh sách báo cáo độ phổ biến của khóa học
     public async Task<IEnumerable<CoursePopularityReport>> GetPopularCoursesAsync(int topCount = 10)
     {
         return await _context.Courses
@@ -55,12 +51,10 @@ public class ReportService : IReportService
             .ToListAsync();
     }
 
-    /// <summary>
-    /// Đếm tổng số lượt đăng ký học trong một tháng cụ thể
-    /// </summary>
-    /// <param name="year">Năm cần thống kê</param>
-    /// <param name="month">Tháng cần thống kê</param>
-    /// <returns>Số lượng lượt đăng ký</returns>
+    // Đếm tổng số lượt đăng ký học trong một tháng cụ thể.
+    // year: Năm cần thống kê.
+    // month: Tháng cần thống kê.
+    // Trả về tổng số lượt đăng ký mới.
     public async Task<int> GetMonthlyEnrollmentsCountAsync(int year, int month)
     {
         // Tính toán khoảng thời gian trong tháng
@@ -74,12 +68,10 @@ public class ReportService : IReportService
     }
 
 
-    /// <summary>
-    /// Đếm số lượng giảng viên có hoạt động (có xuất bản ít nhất 1 khóa học) trong tháng
-    /// </summary>
-    /// <param name="year">Năm cần thống kê</param>
-    /// <param name="month">Tháng cần thống kê</param>
-    /// <returns>Số lượng giảng viên</returns>
+    // Đếm số lượng giảng viên có hoạt động (đã xuất bản ít nhất 1 khóa học) trong tháng.
+    // year: Năm cần thống kê.
+    // month: Tháng cần thống kê.
+    // Trả về số lượng giảng viên có hoạt động.
     public async Task<int> GetMonthlyActiveInstructorsCountAsync(int year, int month)
     {
         // Giảng viên hoạt động là những người có ít nhất một khóa học đã xuất bản
@@ -90,12 +82,10 @@ public class ReportService : IReportService
             .CountAsync();
     }
 
-    /// <summary>
-    /// Lấy tổng hợp các số liệu thống kê trong một tháng (Khóa học mới, Lượt đăng ký, Giảng viên, Học viên mới)
-    /// </summary>
-    /// <param name="year">Năm cần thống kê</param>
-    /// <param name="month">Tháng cần thống kê</param>
-    /// <returns>Đối tượng chứa các số liệu thống kê tháng</returns>
+    // Lấy tổng hợp các số liệu thống kê trong tháng (khóa học mới, lượt đăng ký, giảng viên, học viên mới).
+    // year: Năm cần thống kê.
+    // month: Tháng cần thống kê.
+    // Trả về đối tượng chứa dữ liệu thống kê tháng.
     public async Task<MonthlyStatistics> GetMonthlyStatisticsAsync(int year, int month)
     {
         var startDate = new DateTime(year, month, 1);
@@ -104,7 +94,7 @@ public class ReportService : IReportService
         // Thống kê khóa học mới mở trong tháng
         var publishedCourses = await _context.Courses
             .Where(c => c.CourseStatus != CourseStatus.Draft)
-            .Where(c => (c.CreatedAt >= startDate && c.CreatedAt < endDate))
+            .Where(c => c.CreatedAt >= startDate && c.CreatedAt < endDate)
             .CountAsync();
 
         // Thống kê tổng số lượt đăng ký mới trong tháng
@@ -115,7 +105,7 @@ public class ReportService : IReportService
         // Thống kê số giảng viên có khóa học mới trong tháng
         var activeInstructors = await _context.Courses
             .Where(c => c.CourseStatus != CourseStatus.Draft)
-            .Where(c => (c.CreatedAt >= startDate && c.CreatedAt < endDate))
+            .Where(c => c.CreatedAt >= startDate && c.CreatedAt < endDate)
             .Select(c => c.CreatedBy)
             .Distinct()
             .CountAsync();
@@ -137,11 +127,9 @@ public class ReportService : IReportService
         };
     }
 
-    /// <summary>
-    /// Lấy xu hướng đăng ký học trong các tháng gần đây (để vẽ biểu đồ)
-    /// </summary>
-    /// <param name="months">Số lượng tháng quay ngược về trước (mặc định 6 tháng)</param>
-    /// <returns>Danh sách dữ liệu xu hướng theo từng tháng</returns>
+    // Lấy xu hướng đăng ký học trong các tháng gần đây nhằm phục vụ việc vẽ biểu đồ.
+    // months: Số lượng tháng quay ngược về trước kể từ thời điểm hiện tại (mặc định 6 tháng).
+    // Trả về danh sách dữ liệu xu hướng theo từng tháng.
     public async Task<IEnumerable<MonthlyTrend>> GetEnrollmentTrendsAsync(int months = 6)
     {
         var trends = new List<MonthlyTrend>();
@@ -173,11 +161,9 @@ public class ReportService : IReportService
         return trends;
     }
 
-    /// <summary>
-    /// Lấy xu hướng xuất bản khóa học trong các tháng gần đây
-    /// </summary>
-    /// <param name="months">Số lượng tháng quay ngược về trước</param>
-    /// <returns>Danh sách dữ liệu xu hướng xuất bản</returns>
+    // Lấy xu hướng xuất bản khóa học trong các tháng gần đây.
+    // months: Số lượng tháng quay ngược về trước.
+    // Trả về danh sách thống kê số lượng khóa học được xuất bản.
     public async Task<IEnumerable<MonthlyTrend>> GetCoursePublicationTrendsAsync(int months = 6)
     {
         var trends = new List<MonthlyTrend>();
@@ -205,12 +191,10 @@ public class ReportService : IReportService
         return trends;
     }
 
-    /// <summary>
-    /// Lấy danh sách chi tiết các khóa học được xuất bản trong một tháng cụ thể
-    /// </summary>
-    /// <param name="year">Năm cần xem báo cáo</param>
-    /// <param name="month">Tháng cần xem báo cáo</param>
-    /// <returns>Danh sách đối tượng Course kèm thông tin Giảng viên và Danh mục</returns>
+    // Lấy danh sách chi tiết các khóa học được xuất bản trong một tháng cụ thể
+    // year: Năm cần xem báo cáo
+    // month: Tháng cần xem báo cáo
+    // Trả về danh sách khóa học kèm thông tin giảng viên và danh mục tương ứng
     public async Task<IEnumerable<Course>> GetPublishedCoursesReportAsync(int year, int month)
     {
         var startDate = new DateTime(year, month, 1);
@@ -226,12 +210,10 @@ public class ReportService : IReportService
             .ToListAsync();
     }
 
-    /// <summary>
-    /// Thống kê số lượng khóa học đã mở của từng giảng viên trong một tháng cụ thể
-    /// </summary>
-    /// <param name="year">Năm cần xem báo cáo</param>
-    /// <param name="month">Tháng cần xem báo cáo</param>
-    /// <returns>Danh sách thông tin hoạt động của giảng viên (Tên, Số lượng khóa học)</returns>
+    // Thống kê số lượng khóa học đã mở của từng giảng viên trong một tháng cụ thể
+    // year: Năm cần xem báo cáo
+    // month: Tháng cần xem báo cáo
+    // Trả về danh sách thông tin hoạt động của giảng viên (Tên, Số lượng khóa học)
     public async Task<IEnumerable<InstructorActivityReportData>> GetInstructorActivityReportAsync(int year, int month)
     {
         var startDate = new DateTime(year, month, 1);

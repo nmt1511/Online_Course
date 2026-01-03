@@ -33,21 +33,21 @@ public class CourseListViewModel
 
 public class CreateCourseViewModel
 {
-    [Required(ErrorMessage = "Title is required")]
-    [StringLength(200, ErrorMessage = "Title cannot exceed 200 characters")]
+    [Required(ErrorMessage = "Tiêu đề khóa học là thông tin bắt buộc")]
+    [StringLength(200, ErrorMessage = "Tiêu đề không được phép vượt quá 200 ký tự")]
     public string Title { get; set; } = string.Empty;
 
-    [StringLength(2000, ErrorMessage = "Description cannot exceed 2000 characters")]
+    [StringLength(2000, ErrorMessage = "Mô tả khóa học không được vượt quá 2000 ký tự")]
     public string Description { get; set; } = string.Empty;
 
     [Display(Name = "Danh mục")]
     public int? CategoryId { get; set; }
 
-    [StringLength(500, ErrorMessage = "Thumbnail URL cannot exceed 500 characters")]
+    [StringLength(500, ErrorMessage = "Đường dẫn Thumbnail không được vượt quá 500 ký tự")]
     [Display(Name = "Thumbnail URL")]
     public string ThumbnailUrl { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Instructor is required")]
+    [Required(ErrorMessage = "Thông tin Giảng viên là bắt buộc")]
     [Display(Name = "Instructor")]
     public int InstructorId { get; set; }
 
@@ -81,21 +81,21 @@ public class EditCourseViewModel
 {
     public int CourseId { get; set; }
 
-    [Required(ErrorMessage = "Title is required")]
-    [StringLength(200, ErrorMessage = "Title cannot exceed 200 characters")]
+    [Required(ErrorMessage = "Tiêu đề khóa học là thông tin bắt buộc")]
+    [StringLength(200, ErrorMessage = "Tiêu đề không được vượt quá 200 ký tự")]
     public string Title { get; set; } = string.Empty;
 
-    [StringLength(2000, ErrorMessage = "Description cannot exceed 2000 characters")]
+    [StringLength(2000, ErrorMessage = "Mô tả khóa học không được vượt quá 2000 ký tự")]
     public string Description { get; set; } = string.Empty;
 
     [Display(Name = "Danh mục")]
     public int? CategoryId { get; set; }
 
-    [StringLength(500, ErrorMessage = "Thumbnail URL cannot exceed 500 characters")]
+    [StringLength(500, ErrorMessage = "Đường dẫn Thumbnail không được vượt quá 500 ký tự")]
     [Display(Name = "Thumbnail URL")]
     public string ThumbnailUrl { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Instructor is required")]
+    [Required(ErrorMessage = "Thông tin Giảng viên là bắt buộc")]
     [Display(Name = "Instructor")]
     public int InstructorId { get; set; }
 
@@ -127,15 +127,15 @@ public class EditCourseViewModel
 
 public class CourseIndexViewModel
 {
+    // Cấu trúc dữ liệu phục vụ trang Theo dõi tiến độ học tập của học viên (Student Progress Tracking)
     public IEnumerable<CourseListViewModel> Courses { get; set; } = new List<CourseListViewModel>();
     public int TotalCourses { get; set; }
     public int PublishedCourses { get; set; }
     public int DraftCourses { get; set; }
     public int? CategoryFilter { get; set; }
     public string? StatusFilter { get; set; }
-    public string? SearchQuery { get; set; }
 
-    // Pagination properties
+    // Các thuộc tính hỗ trợ phân trang dữ liệu (Pagination)
     public int CurrentPage { get; set; }
     public int TotalPages { get; set; }
     public bool HasPreviousPage => CurrentPage > 1;

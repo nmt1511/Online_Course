@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Online_Course.Models;
-using Online_Course.Services;
+using Online_Course.Services.CategoryService;
 using Online_Course.ViewModels;
 
 namespace Online_Course.Areas.Admin.Controllers;
@@ -17,7 +17,7 @@ public class CategoriesController : Controller
         _categoryService = categoryService;
     }
 
-    // GET: Admin/Categories
+    // Displays a list of course categories with search filters and quick statistics.
     public async Task<IActionResult> Index(string? search)
     {
         var categories = await _categoryService.GetAllCategoriesAsync();
@@ -25,7 +25,7 @@ public class CategoriesController : Controller
         var activeCategories = await _categoryService.GetActiveCategoriesCountAsync();
         var emptyCategories = await _categoryService.GetEmptyCategoriesCountAsync();
 
-        // Apply search filter
+        // Thực hiện lọc danh sách danh mục nếu có từ khóa tìm kiếm
         if (!string.IsNullOrEmpty(search))
         {
             categories = categories.Where(c => 
@@ -61,14 +61,14 @@ public class CategoriesController : Controller
         return View(viewModel);
     }
 
-    // POST: Admin/Categories/Create
+    // Khởi tạo một danh mục khóa học mới vào hệ thống
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateCategoryViewModel model)
     {
         if (ModelState.IsValid)
         {
-            // Check if category already exists
+            // Kiểm tra tính duy nhất của tên danh mục trước khi lưu
             var existingCategory = await _categoryService.GetCategoryByNameAsync(model.Name);
             if (existingCategory != null)
             {
@@ -91,7 +91,7 @@ public class CategoriesController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    // GET: Admin/Categories/Edit/5
+    // Hiển thị form chỉnh sửa thông tin danh mục theo ID
     public async Task<IActionResult> Edit(int id)
     {
         var category = await _categoryService.GetCategoryByIdAsync(id);
@@ -111,7 +111,7 @@ public class CategoriesController : Controller
         return View(viewModel);
     }
 
-    // POST: Admin/Categories/Edit/5
+    // Cập nhật thông tin thay đổi của danh mục vào cơ sở dữ liệu
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, EditCategoryViewModel model)
@@ -131,7 +131,7 @@ public class CategoriesController : Controller
                 return RedirectToAction(nameof(Index));
             }
 
-            // Check if another category with the same name exists
+            // Đảm bảo tên danh mục mới không trùng lặp với các danh mục khác đã có sẵn
             var categoryWithSameName = await _categoryService.GetCategoryByNameAsync(model.Name);
             if (categoryWithSameName != null && categoryWithSameName.CategoryId != id)
             {
@@ -150,7 +150,7 @@ public class CategoriesController : Controller
         return View(model);
     }
 
-    // POST: Admin/Categories/Delete/5
+    // Loại bỏ danh mục khỏi hệ thống sau khi kiểm tra các ràng buộc liên quan
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id)
@@ -162,7 +162,7 @@ public class CategoriesController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        // Check if category has courses
+        // Kiểm tra xem danh mục hiện có đang chứa khóa học nào không (ràng buộc toàn vẹn dữ liệu)
         var courseCount = await _categoryService.GetCourseCountByCategoryAsync(category.CategoryId);
         if (courseCount > 0)
         {

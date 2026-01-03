@@ -14,23 +14,23 @@ public class UserListViewModel
 
 public class CreateUserViewModel
 {
-    [Required(ErrorMessage = "Full name is required")]
-    [StringLength(100, ErrorMessage = "Full name cannot exceed 100 characters")]
-    [Display(Name = "Full Name")]
+    [Required(ErrorMessage = "Họ và tên là bắt buộc")]
+    [StringLength(100, ErrorMessage = "Họ và tên không được vượt quá 100 ký tự")]
+    [Display(Name = "Họ và tên")]
     public string FullName { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Email is required")]
-    [EmailAddress(ErrorMessage = "Invalid email format")]
-    [StringLength(256, ErrorMessage = "Email cannot exceed 256 characters")]
+    [Required(ErrorMessage = "Email là bắt buộc")]
+    [EmailAddress(ErrorMessage = "Định dạng Email không hợp lệ")]
+    [StringLength(256, ErrorMessage = "Email không được vượt quá 256 ký tự")]
     public string Email { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Password is required")]
-    [StringLength(100, MinimumLength = 6, ErrorMessage = "Password must be at least 6 characters")]
+    [Required(ErrorMessage = "Mật khẩu là bắt buộc")]
+    [StringLength(100, MinimumLength = 6, ErrorMessage = "Mật khẩu phải có ít nhất 6 ký tự")]
     [DataType(DataType.Password)]
     public string Password { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Role is required")]
-    [Display(Name = "Role")]
+    [Required(ErrorMessage = "Vai trò người dùng là bắt buộc")]
+    [Display(Name = "Vai trò")]
     public int RoleId { get; set; }
 }
 
@@ -38,21 +38,21 @@ public class EditUserViewModel
 {
     public int UserId { get; set; }
 
-    [Required(ErrorMessage = "Full name is required")]
-    [StringLength(100, ErrorMessage = "Full name cannot exceed 100 characters")]
-    [Display(Name = "Full Name")]
+    [Required(ErrorMessage = "Họ và tên là bắt buộc")]
+    [StringLength(100, ErrorMessage = "Họ và tên không được vượt quá 100 ký tự")]
+    [Display(Name = "Họ và tên")]
     public string FullName { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Email is required")]
-    [EmailAddress(ErrorMessage = "Invalid email format")]
-    [StringLength(256, ErrorMessage = "Email cannot exceed 256 characters")]
+    [Required(ErrorMessage = "Email là bắt buộc")]
+    [EmailAddress(ErrorMessage = "Định dạng Email không hợp lệ")]
+    [StringLength(256, ErrorMessage = "Email không được vượt quá 256 ký tự")]
     public string Email { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Role is required")]
-    [Display(Name = "Role")]
+    [Required(ErrorMessage = "Vai trò người dùng là bắt buộc")]
+    [Display(Name = "Vai trò")]
     public int RoleId { get; set; }
 
-    [Display(Name = "Active")]
+    [Display(Name = "Trạng thái hoạt động")]
     public bool IsActive { get; set; }
 }
 

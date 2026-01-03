@@ -20,6 +20,7 @@ public class ProfileController : Controller
     }
 
     [HttpGet]
+    // Hiển thị trang thông tin cá nhân của người dùng hiện tại
     public async Task<IActionResult> Index()
     {
         var userId = GetCurrentUserId();
@@ -53,6 +54,7 @@ public class ProfileController : Controller
 
 
     [HttpGet]
+    // Hiển thị trang chỉnh sửa thông tin cá nhân
     public async Task<IActionResult> Edit()
     {
         var userId = GetCurrentUserId();
@@ -86,6 +88,7 @@ public class ProfileController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    // Xử lý cập nhật thông tin cá nhân (chỉ cho phép đổi họ tên)
     public async Task<IActionResult> Edit(ProfileViewModel model)
     {
         var userId = GetCurrentUserId();
@@ -108,9 +111,8 @@ public class ProfileController : Controller
             return NotFound();
         }
 
-        // Only update FullName, email cannot be changed
+        // Chỉ thực hiện cập nhật Họ tên, địa chỉ Email được giữ nguyên theo định danh tài khoản
         user.FullName = model.FullName;
-        // Keep original email (ignore model.Email)
 
         await _context.SaveChangesAsync();
 
@@ -120,6 +122,7 @@ public class ProfileController : Controller
 
 
     [HttpGet]
+    // Hiển thị giao diện thay đổi mật khẩu
     public IActionResult ChangePassword()
     {
         return View(new ChangePasswordViewModel());
@@ -127,6 +130,7 @@ public class ProfileController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    // Xử lý yêu cầu đổi mật khẩu sau khi xác thực mật khẩu cũ
     public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
     {
         if (!ModelState.IsValid)
@@ -146,14 +150,14 @@ public class ProfileController : Controller
             return NotFound();
         }
 
-        // Verify current password
+        // Xác thực mật khẩu hiện tại của người dùng trước khi cho phép thay đổi
         if (!VerifyPassword(model.CurrentPassword, user.PasswordHash))
         {
             ModelState.AddModelError("CurrentPassword", "Mật khẩu hiện tại không đúng");
             return View(model);
         }
 
-        // Update password
+        // Cập nhật mật khẩu mới đã được băm an toàn vào cơ sở dữ liệu
         user.PasswordHash = HashPassword(model.NewPassword);
         await _context.SaveChangesAsync();
 
@@ -161,6 +165,7 @@ public class ProfileController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    // Lấy mã định danh (ID) của người dùng hiện tại từ Claims
     private int? GetCurrentUserId()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

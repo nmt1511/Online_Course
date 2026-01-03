@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Online_Course.Data;
+using Online_Course.Helper;
 using Online_Course.Models;
 using Online_Course.ViewModels;
 using System.Security.Claims;
@@ -124,7 +125,7 @@ public class AccountController : Controller
             FullName = model.FullName,
             Email = model.Email,
             PasswordHash = HashPassword(model.Password),
-            CreatedAt = DateTime.UtcNow,
+            CreatedAt = DateTimeHelper.GetVietnamTimeNow(),
             IsActive = true
         };
 
@@ -140,7 +141,7 @@ public class AccountController : Controller
         await _context.UserRoles.AddAsync(userRole);
         await _context.SaveChangesAsync();
 
-        // Auto login after registration
+        // Tự động đăng nhập sau khi đăng ký thành công
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
@@ -169,10 +170,10 @@ public class AccountController : Controller
     [HttpGet]
     public IActionResult AccessDenied(string? returnUrl = null)
     {
-        // Nếu user đã đăng nhập, redirect về trang chính đúng role
+        // Chuyển hướng về trang chủ tương ứng với vai trò nếu đã xác thực thành công
         if (User.Identity?.IsAuthenticated == true)
         {
-            // Xác định URL redirect đúng role
+            // Xác định đường dẫn điều hướng dựa trên vai trò người dùng
             string redirectUrl;
             if (User.IsInRole("Admin"))
                 redirectUrl = Url.Action("Index", "Dashboard", new { area = "Admin" }) ?? "/";
@@ -184,7 +185,7 @@ public class AccountController : Controller
             return Redirect(redirectUrl);
         }
         
-        // Nếu chưa đăng nhập, redirect về trang login
+        // Yêu cầu đăng nhập nếu chưa được xác thực
         return RedirectToAction(nameof(Login), new { returnUrl });
     }
 
@@ -206,19 +207,18 @@ public class AccountController : Controller
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Email && u.IsActive);
         if (user == null)
         {
-            // Don't reveal that the user does not exist
+            // Thông báo chung chung để tránh rò rỉ thông tin người dùng tồn tại trong hệ thống
             TempData["Message"] = "Nếu email tồn tại trong hệ thống, bạn sẽ nhận được hướng dẫn đặt lại mật khẩu.";
             return RedirectToAction(nameof(ForgotPasswordConfirmation));
         }
 
-        // Generate reset token (simple implementation - in production use proper token)
+        // Khởi tạo mã đặt lại mật khẩu (Token định danh tạm thời)
         var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
         user.ResetToken = token;
-        user.ResetTokenExpiry = DateTime.UtcNow.AddHours(1);
+        user.ResetTokenExpiry = DateTimeHelper.GetVietnamTimeNow().AddHours(1);
         await _context.SaveChangesAsync();
 
-        // In production, send email with reset link
-        // For demo, we'll show the token directly
+        // Hiển thị mã trực tiếp trong bản demo để thuận tiện cho việc kiểm thử (không khuyến nghị trong thực tế)
         TempData["ResetToken"] = token;
         TempData["ResetEmail"] = model.Email;
 

@@ -1,17 +1,19 @@
+using Online_Course.Helper;
+
 namespace Online_Course.Models;
 
 public enum CourseStatus
 {
-    Draft,      // Nháp
-    Private,    // Riêng tư
-    Public,     // Công khai
-    Closed      // Đã đóng
+    Draft,      // Trạng thái nháp
+    Private,    // Trạng thái riêng tư
+    Public,     // Trạng thái công khai
+    Closed      // Trạng thái đã đóng
 }
 
 public enum CourseType
 {
-    Fixed_Time, //thời gian cố định
-    Open_Always //mở xuyên suốt
+    Fixed_Time, // Khóa học có thời hạn cố định
+    Open_Always // Khóa học mở xuyên suốt thời gian
 }
 
 public class Course
@@ -23,7 +25,7 @@ public class Course
     public int CreatedBy { get; set; }
     public CourseStatus CourseStatus { get; set; } = CourseStatus.Draft;
     public CourseType CourseType { get; set; } = CourseType.Open_Always;
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; set; } = DateTimeHelper.GetVietnamTimeNow();
     public DateTime? StartDate { get; set; }
     public DateTime? EndDate { get; set; }
     public DateTime? RegistrationStartDate { get; set; }

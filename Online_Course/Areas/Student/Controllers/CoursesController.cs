@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Online_Course.Helper;
 using Online_Course.Models;
-using Online_Course.Services;
+using Online_Course.Services.CategoryService;
+using Online_Course.Services.CourseService;
+using Online_Course.Services.EnrollmentService;
 using Online_Course.ViewModels;
 
 namespace Online_Course.Areas.Student.Controllers;
@@ -27,6 +29,7 @@ public class CoursesController : Controller
     [HttpPost]
     [Authorize(Roles = "Student")]
     [ValidateAntiForgeryToken]
+    // Xử lý yêu cầu ghi danh của học viên vào một khóa học công khai cụ thể
     public async Task<IActionResult> Enroll(int courseId)
     {
         var userIdClaim = User.FindFirst("UserId")?.Value;
@@ -35,7 +38,7 @@ public class CoursesController : Controller
             return RedirectToAction("Login", "Account", new { area = "" });
         }
 
-        // Check if course exists and is published
+        // Xác thực sự tồn tại và trạng thái hiển thị công khai của khóa học trước khi tiến hành ghi danh
         var course = await _courseService.GetCourseByIdAsync(courseId);
         if (course == null || course.CourseStatus != CourseStatus.Public)
         {
@@ -43,34 +46,34 @@ public class CoursesController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        // Check if already enrolled
+        // Đảm bảo không ghi danh trùng lặp cho các khóa học mà học viên đã tham gia
         var isEnrolled = await _enrollmentService.IsEnrolledAsync(userId, courseId);
         if (isEnrolled)
         {
-            TempData["Info"] = "Bạn đã đăng ký khóa học này rồi.";
+            TempData["Info"] = "Đã thực hiện đăng ký khóa học này từ trước.";
             return RedirectToAction(nameof(Details), new { id = courseId });
         }
 
-        // Kiểm tra nếu khóa học là loại 'Fixed_Time', cần kiểm tra thời gian đăng ký
+        // Nếu khóa học là 'Thời gian cố định', hãy kiểm tra ngày đăng ký.
         if (course.CourseType == CourseType.Fixed_Time)
         {
             var today = DateTimeHelper.GetVietnamTimeNow().Date;
 
-            // Kiểm tra nếu ngày bắt đầu hoặc ngày kết thúc đăng ký bị trống
+            // Kiểm tra xem ngày bắt đầu hoặc ngày kết thúc đăng ký có bị thiếu không.
             if (!course.RegistrationStartDate.HasValue || !course.RegistrationEndDate.HasValue)
             {
                 TempData["Error"] = "Khóa học này chưa được thiết lập thời gian đăng ký.";
                 return RedirectToAction(nameof(Details), new { id = courseId });
             }
 
-            // Kiểm tra nếu chưa đến ngày bắt đầu đăng ký
+            // Hãy kiểm tra xem ngày bắt đầu đăng ký đã đến chưa.
             if (today < course.RegistrationStartDate.Value.Date)
             {
                 TempData["Error"] = $"Khóa học chưa mở đăng ký. Thời gian đăng ký từ: {course.RegistrationStartDate.Value:dd/MM/yyyy}.";
                 return RedirectToAction(nameof(Details), new { id = courseId });
             }
 
-            // Kiểm tra nếu đã hết hạn đăng ký
+            // Hãy kiểm tra xem ngày kết thúc đăng ký đã hết chưa.
             if (today > course.RegistrationEndDate.Value.Date)
             {
                 TempData["Error"] = $"Thời gian đăng ký khóa học này đã kết thúc vào ngày {course.RegistrationEndDate.Value:dd/MM/yyyy}.";
@@ -78,11 +81,10 @@ public class CoursesController : Controller
             }
         }
 
-        // Tạo bản ghi đăng ký khóa học
+        // tạo bản ghi đăng ký khóa học
         await _enrollmentService.EnrollAsync(userId, courseId);
         TempData["Success"] = "Đăng ký khóa học thành công!";
 
-        // Chuyển hướng đến danh sách bài học
         return RedirectToAction("Lessons", "Learning", new { area = "Student", courseId = courseId });
     }
 
@@ -93,7 +95,7 @@ public class CoursesController : Controller
             ? await _courseService.GetAllCoursesPublicAsync()
             : await _courseService.GetCoursesByCategoryAsync(categoryId.Value);
 
-        // Filter by CourseType if provided
+        // Lọc danh sách theo loại khóa học nếu được yêu cầu.
         if (type.HasValue)
         {
             courses = courses.Where(c => c.CourseType == type.Value);
@@ -126,6 +128,7 @@ public class CoursesController : Controller
     }
 
     [AllowAnonymous]
+    // Hiển thị chi tiết thông tin và danh mục bài học của khóa học (phục vụ mục đích xem trước)
     public async Task<IActionResult> Details(int id)
     {
         var course = await _courseService.GetCourseByIdAsync(id);
@@ -176,6 +179,7 @@ public class CoursesController : Controller
     [HttpPost]
     [Authorize(Roles = "Student")]
     [ValidateAntiForgeryToken]
+    // Xử lý yêu cầu hủy đăng ký khóa học của học viên
     public async Task<IActionResult> Unenroll(int courseId)
     {
         var userIdClaim = User.FindFirst("UserId")?.Value;
@@ -184,7 +188,7 @@ public class CoursesController : Controller
             return RedirectToAction("Login", "Account", new { area = "" });
         }
 
-        // Check if enrolled
+        // Kiểm tra xác thực trạng thái đăng ký trước khi thực hiện hủy
         var isEnrolled = await _enrollmentService.IsEnrolledAsync(userId, courseId);
         if (!isEnrolled)
         {
@@ -192,7 +196,7 @@ public class CoursesController : Controller
             return RedirectToAction("Index", "Progress", new { area = "Student" });
         }
 
-        // Unenroll
+        // Thực hiện logic hủy ghi danh học viên khỏi khóa học
         var result = await _enrollmentService.UnenrollAsync(userId, courseId);
         if (result)
         {

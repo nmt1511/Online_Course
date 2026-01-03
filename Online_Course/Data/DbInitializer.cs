@@ -5,37 +5,36 @@ using System.Text;
 
 namespace Online_Course.Data;
 
-// Using CourseStatus enum from Models
+// Sử dụng định nghĩa trạng thái khóa học (CourseStatus) từ Models
 
 public static class DbInitializer
 {
     public static async Task InitializeAsync(ApplicationDbContext context)
     {
-        // Ensure database is created
-        await context.Database.EnsureCreatedAsync();
+        // Đảm bảo cơ sở dữ liệu đã được khởi tạo và tồn tại
 
-        // Seed Roles
+        // Khởi tạo dữ liệu mẫu cho các Vai trò hệ thống
         await SeedRolesAsync(context);
 
-        // Seed Categories
+        // Khởi tạo dữ liệu mẫu cho các Danh mục khóa học
         await SeedCategoriesAsync(context);
 
-        // Seed Users
+        // Khởi tạo dữ liệu mẫu cho Người dùng (Quản trị viên, Giảng viên, Học viên)
         await SeedUsersAsync(context);
 
-        // Seed Courses
+        // Khởi tạo dữ liệu mẫu cho các Khóa học
         await SeedCoursesAsync(context);
 
-        // Seed Lessons
+        // Khởi tạo dữ liệu mẫu cho các Bài học thuộc khóa học
         await SeedLessonsAsync(context);
 
-        // Seed Enrollments and Progress
+        // Khởi tạo dữ liệu mẫu cho việc Ghi danh và Tiến độ học tập của học viên
         await SeedEnrollmentsAndProgressAsync(context);
     }
 
     private static async Task SeedRolesAsync(ApplicationDbContext context)
     {
-        // Add roles if they don't exist
+        // Bổ sung các vai trò mới nếu chưa tồn tại trong hệ thống
         var existingRoles = await context.Roles.Select(r => r.Name).ToListAsync();
         var rolesToAdd = new[] { "Admin", "Instructor", "Student" }
             .Where(r => !existingRoles.Contains(r))
@@ -51,7 +50,7 @@ public static class DbInitializer
 
     private static async Task SeedCategoriesAsync(ApplicationDbContext context)
     {
-        // Add categories if they don't exist
+        // Bổ sung các danh mục mới nếu chưa tồn tại trong hệ thống
         var existingCategories = await context.Categories.Select(c => c.Name).ToListAsync();
         var categoriesToAdd = new[]
         {
@@ -85,7 +84,7 @@ public static class DbInitializer
         
         if (adminRole == null || instructorRole == null || studentRole == null) return;
 
-        // Admin user
+        // Thiết lập tài khoản Quản trị viên mặc định (Admin)
         if (!await context.Users.AnyAsync(u => u.Email == "admin@onlinecourse.com"))
         {
             var admin = new User
@@ -101,7 +100,7 @@ public static class DbInitializer
             await context.UserRoles.AddAsync(new UserRole { UserId = admin.UserId, RoleId = adminRole.RoleId });
         }
 
-        // Instructors
+        // Khởi tạo danh sách Giảng viên (Instructors)
         var instructors = new[]
         {
             new { FullName = "Nguyễn Văn Hùng", Email = "hung.nguyen@onlinecourse.com" },
@@ -129,7 +128,7 @@ public static class DbInitializer
             }
         }
 
-        // Students
+        // Khởi tạo danh sách Học viên (Students)
         var students = new[]
         {
             new { FullName = "Hoàng Văn An", Email = "an.hoang@gmail.com" },
@@ -174,13 +173,13 @@ public static class DbInitializer
 
         if (!instructors.Any()) return;
         
-        // Get existing course titles to avoid duplicates
+        // Truy xuất tiêu đề các khóa học hiện hữu để tránh trùng lặp dư liệu
         var existingTitles = await context.Courses.Select(c => c.Title).ToListAsync();
         
-        // Get categories for linking
+        // Truy xuất danh mục để thiết lập liên kết khóa học
         var categories = await context.Categories.ToListAsync();
 
-        // Courses based on Kho Khóa Học data
+        // Dữ liệu khóa học dựa trên nguồn Kho Khóa Học
         var coursesData = new[]
         {
             // Marketing courses
@@ -276,7 +275,7 @@ public static class DbInitializer
         var coursesToAdd = new List<Course>();
         foreach (var courseData in coursesData)
         {
-            // Skip if course already exists
+            // Bỏ qua nếu khóa học đã tồn tại trong hệ thống
             if (existingTitles.Contains(courseData.Title)) continue;
             
             var instructor = instructors[courseData.InstructorIndex % instructors.Count];
@@ -306,7 +305,7 @@ public static class DbInitializer
         //Nếu đã có bất kỳ bài học nào trong DB thì dừng lại
         if (await context.Lessons.AnyAsync()) return;
 
-        // Get courses that don't have lessons yet
+        // Truy xuất các khóa học chưa có bài học để tiến hành khởi tạo
         var coursesWithLessons = await context.Lessons.Select(l => l.CourseId).Distinct().ToListAsync();
         var courses = await context.Courses.Where(c => !coursesWithLessons.Contains(c.CourseId)).ToListAsync();
         if (!courses.Any()) return;
@@ -445,7 +444,7 @@ public static class DbInitializer
             }
         };
 
-        // Load categories for mapping
+        // Nạp danh sách danh mục phục vụ việc ánh xạ dữ liệu bài học
         var categoriesDict = await context.Categories.ToDictionaryAsync(c => c.CategoryId, c => c.Name);
         
         foreach (var course in courses)
@@ -486,7 +485,7 @@ public static class DbInitializer
         
         if (!students.Any()) return;
         
-        // Get existing enrollments
+        // Truy xuất thông tin ghi danh hiện tại
         var existingEnrollments = await context.Enrollments
             .Select(e => new { e.StudentId, e.CourseId })
             .ToListAsync();
@@ -502,13 +501,13 @@ public static class DbInitializer
 
         foreach (var student in students)
         {
-            // Each student enrolls in 3-6 random courses
+            // Mỗi học viên được ghi danh ngẫu nhiên vào từ 3 đến 6 khóa học
             var enrollCount = random.Next(3, 7);
             var selectedCourses = courses.OrderBy(_ => random.Next()).Take(enrollCount).ToList();
 
             foreach (var course in selectedCourses)
             {
-                // Skip if already enrolled
+                // Bỏ qua nếu học viên đã được ghi danh từ trước
                 if (existingEnrollments.Any(e => e.StudentId == student.UserId && e.CourseId == course.CourseId))
                     continue;
                     
@@ -521,13 +520,13 @@ public static class DbInitializer
                 await context.Enrollments.AddAsync(enrollment);
                 await context.SaveChangesAsync();
 
-                // Create progress for some lessons (0-100% completion)
+                // Khởi tạo tiến độ hoàn thành cho một số bài học (Tỷ lệ từ 0-100%)
                 var completionRate = random.NextDouble();
                 var lessonsToComplete = (int)(course.Lessons.Count * completionRate);
 
                 foreach (var lesson in course.Lessons.OrderBy(l => l.OrderIndex).Take(lessonsToComplete))
                 {
-                    // Check if progress already exists
+                    // Kiểm tra sự tồn tại của dữ liệu tiến độ trước khi khởi tạo mới
                     var progressExists = await context.Progresses
                         .AnyAsync(p => p.LessonId == lesson.LessonId && p.StudentId == student.UserId);
                     if (progressExists) continue;

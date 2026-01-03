@@ -2,7 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Online_Course.Models;
-using Online_Course.Services;
+using Online_Course.Services.ProgressService;
+using Online_Course.Services.UserService;
 using Online_Course.ViewModels;
 
 namespace Online_Course.Areas.Admin.Controllers;
@@ -20,10 +21,10 @@ public class UsersController : Controller
         _progressService = progressService;
     }
 
-    // GET: Admin/Users
+    // Displays the user management list with search, role filtering, and pagination functions.
     public async Task<IActionResult> Index(string? search, string? role, int page = 1)
     {
-        // Pagination settings / Cấu hình phân trang
+        // Pagination settings
         const int pageSize = 10;
         
         var users = await _userService.GetAllUsersAsync();
@@ -31,7 +32,7 @@ public class UsersController : Controller
         var instructorCount = await _userService.GetUserCountByRoleAsync("Instructor");
         var studentCount = await _userService.GetUserCountByRoleAsync("Student");
 
-        // Filter by search query
+        // Filters the user list based on search keywords (Full Name or Email).
         if (!string.IsNullOrWhiteSpace(search))
         {
             search = search.ToLower();
@@ -40,23 +41,21 @@ public class UsersController : Controller
                 u.Email.ToLower().Contains(search));
         }
 
-        // Filter by role
-        // Prevent filtering by Admin role to hide Admin users from search results
-        // Ngăn lọc theo vai trò Admin để ẩn các Admin khỏi kết quả tìm kiếm
+        // Filters the list by user role (excluding the Administrator role).
         if (!string.IsNullOrWhiteSpace(role) && role != "Admin")
         {
             users = users.Where(u => u.UserRoles.Any(ur => ur.Role?.Name == role));
         }
 
-        // Calculate pagination / Tính toán phân trang
+        // Calculate pagination
         var totalFilteredUsers = users.Count();
         var totalPages = (int)Math.Ceiling(totalFilteredUsers / (double)pageSize);
         
-        // Validate page number / Kiểm tra số trang hợp lệ
+        // Validate page number
         if (page < 1) page = 1;
         if (page > totalPages && totalPages > 0) page = totalPages;
         
-        // Apply pagination / Áp dụng phân trang
+        // Apply pagination
         var paginatedUsers = users
             .Skip((page - 1) * pageSize)
             .Take(pageSize);
@@ -85,25 +84,25 @@ public class UsersController : Controller
         return View(viewModel);
     }
 
-    // GET: Admin/Users/Create
+    // Displays the interface for creating a new user account.
     public async Task<IActionResult> Create()
     {
         var roles = await _userService.GetAllRolesAsync();
-        // Exclude Admin role from selection
+        // Excludes the Administrator role from the selection list when creating a new user.
         var filteredRoles = roles.Where(r => r.Name != "Admin");
         ViewBag.Roles = new SelectList(filteredRoles, "RoleId", "Name");
         return View();
     }
 
 
-    // POST: Admin/Users/Create
+    // Xử lý logic tạo mới tài khoản sau khi xác thực dữ liệu đầu vào
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateUserViewModel model)
     {
         if (ModelState.IsValid)
         {
-            // Prevent creating Admin users
+            // Đảm bảo không cho phép tạo tài khoản có vai trò Quản trị viên từ giao diện này
             var allRoles = await _userService.GetAllRolesAsync();
             var adminRole = allRoles.FirstOrDefault(r => r.Name == "Admin");
             if (adminRole != null && model.RoleId == adminRole.RoleId)
@@ -114,7 +113,7 @@ public class UsersController : Controller
                 return View(model);
             }
             
-            // Check if email already exists
+            // Xác thực xem địa chỉ Email đã tồn tại trong hệ thống hay chưa
             var existingUser = await _userService.GetUserByEmailAsync(model.Email);
             if (existingUser != null)
             {
@@ -142,7 +141,7 @@ public class UsersController : Controller
         return View(model);
     }
 
-    // GET: Admin/Users/Details/5
+    // Hiển thị thông tin chi tiết của người dùng kèm theo danh sách khóa học liên quan (nếu là Giảng viên hoặc Học viên)
     public async Task<IActionResult> Details(int id)
     {
         var user = await _userService.GetUserByIdAsync(id);
@@ -218,7 +217,7 @@ public class UsersController : Controller
         return View(viewModel);
     }
 
-    // GET: Admin/Users/Edit/5
+    // Hiển thị giao diện điều chỉnh thông tin tài khoản người dùng hiện có
     public async Task<IActionResult> Edit(int id)
     {
         var user = await _userService.GetUserByIdAsync(id);
@@ -243,7 +242,7 @@ public class UsersController : Controller
         return View(viewModel);
     }
 
-    // POST: Admin/Users/Edit/5
+    // Xử lý cập nhật thông tin thay đổi của người dùng và gán lại vai trò tương ứng (nếu có)
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, EditUserViewModel model)
@@ -261,7 +260,7 @@ public class UsersController : Controller
                 return NotFound();
             }
 
-            // Prevent assigning Admin role
+            // Ngăn chặn việc gán vai trò Quản trị viên cho các tài khoản thông thường
             var allRoles = await _userService.GetAllRolesAsync();
             var adminRole = allRoles.FirstOrDefault(r => r.Name == "Admin");
             if (adminRole != null && model.RoleId == adminRole.RoleId)
@@ -272,7 +271,7 @@ public class UsersController : Controller
                 return View(model);
             }
 
-            // Check if email is taken by another user
+            // Kiểm tra xem địa chỉ Email mới có bị trùng lặp với người dùng khác hay không
             var existingUser = await _userService.GetUserByEmailAsync(model.Email);
             if (existingUser != null && existingUser.UserId != id)
             {
@@ -300,7 +299,7 @@ public class UsersController : Controller
         return View(model);
     }
 
-    // POST: Admin/Users/Delete/5
+    // Loại bỏ tài khoản người dùng khỏi hệ thống dữ liệu của ứng dụng
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id)

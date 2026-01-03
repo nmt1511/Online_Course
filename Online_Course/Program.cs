@@ -1,15 +1,23 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Online_Course.Data;
-using Online_Course.Services;
+using Online_Course.Services.CategoryService;
+using Online_Course.Services.CourseService;
+using Online_Course.Services.EnrollmentService;
+using Online_Course.Services.LessonService;
+using Online_Course.Services.PdfService;
+using Online_Course.Services.ProgressService;
+using Online_Course.Services.ReportService;
+using Online_Course.Services.UserService;
+using Online_Course.Services.YoutubeApiService;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Đăng ký các dịch vụ hệ thống vào Container của ứng dụng
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Register application services
+// Đăng ký các dịch vụ nghiệp vụ (Application Services)
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
@@ -18,11 +26,11 @@ builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
 builder.Services.AddScoped<IProgressService, ProgressService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 
-// Register PDF and YouTube services for lesson creation
+// Cấu hình các dịch vụ xử lý PDF và YouTube phục vụ tạo bài học
 builder.Services.AddScoped<IPdfService, PdfService>();
 builder.Services.AddHttpClient<IYouTubeApiService, YouTubeApiService>();
 
-// Configure Cookie Authentication
+// Thiết lập cơ chế xác thực dựa trên Cookie (Cookie Authentication)
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -35,7 +43,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
     });
 
-// Configure Authorization Policies
+// Thiết lập các chính sách phân quyền (Authorization Policies)
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
@@ -60,7 +68,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Initialize database with seed data
+// Khởi tạo cơ sở dữ liệu và nạp dữ liệu mẫu (Seed Data)
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -68,12 +76,12 @@ using (var scope = app.Services.CreateScope())
     await DbInitializer.InitializeAsync(context);
 }
 
-// Configure the HTTP request pipeline.
+// Cấu hình quy trình xử lý yêu cầu HTTP (Middleware Pipeline)
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
 }
-// Cấu hình Static Files cho phép CORS | Configure Static Files to allow CORS
+// Thiết lập quyền truy cập tệp tin tĩnh và cấu hình CORS
 app.UseStaticFiles(new StaticFileOptions
 {
     OnPrepareResponse = ctx =>

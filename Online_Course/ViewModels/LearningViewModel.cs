@@ -11,7 +11,7 @@ public class LearningLessonViewModel
     public LessonType LessonType { get; set; }
     public int OrderIndex { get; set; }
     public bool IsCompleted { get; set; }
-    public bool IsLocked { get; set; } // Trạng thái khóa bài học
+    public bool IsLocked { get; set; } // Trạng thái giới hạn quyền truy cập bài học (Khóa bài học)
 }
 
 public class LearningLessonsViewModel
@@ -23,8 +23,8 @@ public class LearningLessonsViewModel
     public int TotalLessons { get; set; }
     public int CompletedLessons { get; set; }
     public double ProgressPercentage { get; set; }
-    public LearningStatus CourseStatus { get; set; } // Trạng thái học tập của học viên đối với khóa học này
-    public bool IsCourseClosed { get; set; } // Trạng thái đóng/mở của chính khóa học
+    public LearningStatus CourseStatus { get; set; } // Ghi nhận trạng thái tiến trình học tập của học viên đối với khóa học này
+    public bool IsCourseClosed { get; set; } // Trạng thái vận hành hiện tại của khóa học (Đóng hoặc Mở)
     public IList<LearningLessonViewModel> Lessons { get; set; } = new List<LearningLessonViewModel>();
 }
 
@@ -47,7 +47,7 @@ public class LearningContentViewModel
     public int TotalLessons { get; set; }
     public int CompletedLessons { get; set; }
     public double ProgressPercentage { get; set; }
-    public bool IsCourseClosed { get; set; } // Trạng thái đóng/mở của chính khóa học
+    public bool IsCourseClosed { get; set; } // Trạng thái quản lý vận hành của khóa học (Đóng hoặc Mở)
     
     public int? CurrentTimeSeconds { get; set; }
     public int? CurrentPage { get; set; }

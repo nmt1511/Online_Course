@@ -1,7 +1,8 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Online_Course.Models;
-using Online_Course.Services;
+using Online_Course.Services.CategoryService;
+using Online_Course.Services.CourseService;
 using Online_Course.ViewModels;
 
 namespace Online_Course.Controllers
@@ -19,6 +20,7 @@ namespace Online_Course.Controllers
             _categoryService = categoryService;
         }
 
+        // Hiển thị trang chủ với danh sách 8 khóa học mới nhất và các danh mục hoạt động
         public async Task<IActionResult> Index()
         {
             var courses = await _courseService.GetAllCoursesAsync();
@@ -49,12 +51,14 @@ namespace Online_Course.Controllers
             return View(viewModel);
         }
 
+        // Hiển thị trang thông tin về chính sách bảo mật
         public IActionResult Privacy()
         {
             return View();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        // Xử lý và hiển thị thông tin lỗi chi tiết
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
