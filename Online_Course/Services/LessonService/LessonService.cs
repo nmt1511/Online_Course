@@ -3,7 +3,7 @@ using Online_Course.Data;
 using Online_Course.Helper;
 using Online_Course.Models;
 
-namespace Online_Course.Services;
+namespace Online_Course.Services.LessonService;
 
 public class LessonService : ILessonService
 {
@@ -31,7 +31,7 @@ public class LessonService : ILessonService
 
     public async Task<Lesson> CreateLessonAsync(Lesson lesson)
     {
-        // Tự động tính OrderIndex nếu chưa được set
+        // Tự động tính chỉ mục sắp xếp (OrderIndex) nếu chưa được thiết lập
         if (lesson.OrderIndex == 0)
         {
             lesson.OrderIndex = await GetNextOrderIndexAsync(lesson.CourseId);
@@ -51,7 +51,7 @@ public class LessonService : ILessonService
         if (existingLesson == null)
             throw new ArgumentException("Lesson not found");
 
-        // Cập nhật các trường cơ bản
+        // Cập nhật các thông tin cơ bản của bài học
         existingLesson.Title = lesson.Title;
         existingLesson.Description = lesson.Description;
         existingLesson.ContentUrl = lesson.ContentUrl;

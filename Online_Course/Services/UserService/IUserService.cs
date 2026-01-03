@@ -1,6 +1,6 @@
 using Online_Course.Models;
 
-namespace Online_Course.Services;
+namespace Online_Course.Services.UserService;
 
 public interface IUserService
 {

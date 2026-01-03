@@ -3,10 +3,8 @@ using Online_Course.Models;
 
 namespace Online_Course.ViewModels;
 
-/// <summary>
-/// ViewModel cho tạo/chỉnh sửa bài học
-/// Hỗ trợ 2 loại: PDF và Video
-/// </summary>
+    // Cấu trúc dữ liệu phục vụ việc khởi tạo hoặc cập nhật thông tin bài học
+    // Hỗ trợ hai loại hình nội dung chính: Tài liệu PDF và Nội dung Video
 public class LessonViewModel
 {
     public int LessonId { get; set; }
@@ -19,30 +17,30 @@ public class LessonViewModel
     
     public string? Description { get; set; }
     
-    // URL của video (dùng khi LessonType = Video)
-    // Hỗ trợ YouTube và các nền tảng video khác
+    // Đường dẫn liên kết nội dung Video (Áp dụng khi loại bài học là Video)
+    // Hệ thống tương thích với nền tảng YouTube và các nguồn phát trực tuyến khác
     [StringLength(500, ErrorMessage = "URL không được vượt quá 500 ký tự")]
     public string? VideoUrl { get; set; }
     
     // Loại bài học: PDF hoặc Video
     public LessonType LessonType { get; set; } = LessonType.Video;
     
-    //Tổng số trang (chỉ dùng cho PDF)
-    // Tự động đếm khi upload file
+    // Tổng hợp số lượng trang tài liệu (Chỉ áp dụng đối với định dạng PDF)
+    // Hệ thống tự động phân tích và trích xuất số trang trong quá trình tải tệp tin
     public int? TotalPages { get; set; }
     
-    //Tổng thời lượng video tính bằng giây (chỉ dùng cho Video)
-    //Tự động lấy từ YouTube API nếu có API key
+    // Tổng thời lượng nội dung video tính theo đơn vị giây (Chỉ áp dụng cho Video)
+    // Dữ liệu được truy xuất tự động thông qua YouTube API nếu có khóa ứng dụng hợp lệ
     public int? TotalDurationSeconds { get; set; }
     
-    //Thứ tự bài học trong khóa học
-    //Tự động tính = số bài học hiện có + 1
+    // Thứ tự sắp xếp của bài học trong cấu trúc khóa học
+    // Giá trị được mặc định bằng tổng số bài học hiện hữu cộng thêm một đơn vị
     public int OrderIndex { get; set; }
     
     // For display purposes
     public string? CourseTitle { get; set; }
     
-    //Đường dẫn đến file PDF (để hiển thị khi edit)
+    // Đường dẫn truy cập tệp tin PDF (Sử dụng cho mục đích hiển thị trong giao diện chỉnh sửa)
     public string? PdfUrl { get; set; }
 }
 

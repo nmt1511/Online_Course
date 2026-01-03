@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Online_Course.Services;
+using Online_Course.Services.CourseService;
+using Online_Course.Services.EnrollmentService;
+using Online_Course.Services.UserService;
 using Online_Course.ViewModels;
 using System.Security.Claims;
 
@@ -30,6 +32,7 @@ public class DashboardController : Controller
         return userIdClaim != null ? int.Parse(userIdClaim.Value) : 0;
     }
 
+    // Hiển thị bảng điều khiển tổng quan với các số liệu thống kê nhanh của Giảng viên
     public async Task<IActionResult> Index()
     {
         var instructorId = GetCurrentUserId();
@@ -46,7 +49,7 @@ public class DashboardController : Controller
             TotalStudents = totalStudents,
             ActiveCourses = activeCourses,
             DraftCourses = draftCourses,
-            AverageCompletion = 76, // Placeholder
+            AverageCompletion = 76, // Tỷ lệ hoàn thành trung bình ước tính (Dữ liệu mẫu)
             Courses = courses.Select(c => new InstructorCourseListViewModel
             {
                 CourseId = c.CourseId,

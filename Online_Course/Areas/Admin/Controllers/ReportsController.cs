@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Online_Course.Helper;
-using Online_Course.Services;
+using Online_Course.Services.CourseService;
+using Online_Course.Services.EnrollmentService;
+using Online_Course.Services.ReportService;
+using Online_Course.Services.UserService;
 using Online_Course.ViewModels;
 
 namespace Online_Course.Areas.Admin.Controllers;
@@ -37,7 +40,7 @@ public class ReportsController : Controller
         var popularCourses = await _reportService.GetPopularCoursesAsync(5);
         var enrollmentTrends = await _reportService.GetEnrollmentTrendsAsync(6);
 
-        // Get overall statistics
+        // Truy xuất các số liệu thống kê tổng quan của toàn bộ hệ thống
         var totalCourses = await _courseService.GetTotalCoursesCountAsync();
         var totalUsers = await _userService.GetTotalUsersCountAsync();
         var totalStudents = await _userService.GetUserCountByRoleAsync("Student");
@@ -67,7 +70,7 @@ public class ReportsController : Controller
 
         var count = await _reportService.GetMonthlyPublishedCoursesCountAsync(targetYear, targetMonth);
 
-        return Json(new { year = targetYear, month = targetMonth, count });
+        // Trả về kết quả dưới dạng JSON phục vụ hiển thị trên giao diện hoặc gọi từ API client
     }
 
     [HttpGet]

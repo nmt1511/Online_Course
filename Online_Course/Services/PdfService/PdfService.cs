@@ -1,11 +1,11 @@
 using iText.Kernel.Pdf;
 
-namespace Online_Course.Services;
+namespace Online_Course.Services.PdfService;
 
 // Service xử lý file PDF sử dụng thư viện iText7
 //- Đếm số trang PDF
 // - Lưu file PDF vào wwwroot/pdf_lessons
-public class PdfService : IPdfService
+public class PdfService :  IPdfService
 {
     private readonly IWebHostEnvironment _webHostEnvironment;
     private readonly ILogger<PdfService> _logger;

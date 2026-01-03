@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Online_Course.Data;
 using Online_Course.Models;
 
-namespace Online_Course.Services;
+namespace Online_Course.Services.EnrollmentService;
 
 public class EnrollmentService : IEnrollmentService
 {
@@ -13,12 +13,14 @@ public class EnrollmentService : IEnrollmentService
         _context = context;
     }
 
+    // Kiểm tra xem sinh viên đã đăng ký khóa học này chưa
     public async Task<bool> IsEnrolledAsync(int studentId, int courseId)
     {
         return await _context.Enrollments
             .AnyAsync(e => e.StudentId == studentId && e.CourseId == courseId);
     }
 
+    // Đăng ký khóa học mới cho sinh viên
     public async Task<Enrollment> EnrollAsync(int studentId, int courseId)
     {
         var enrollment = new Enrollment
@@ -33,6 +35,7 @@ public class EnrollmentService : IEnrollmentService
         return enrollment;
     }
 
+    // Hủy đăng ký khóa học và xóa toàn bộ tiến độ học tập liên quan
     public async Task<bool> UnenrollAsync(int studentId, int courseId)
     {
         var enrollment = await _context.Enrollments
@@ -43,7 +46,7 @@ public class EnrollmentService : IEnrollmentService
             return false;
         }
 
-        // Also remove related progress records
+        // Đồng thời xóa toàn bộ bản ghi tiến độ học tập liên quan
         var progressRecords = await _context.Progresses
             .Where(p => p.StudentId == studentId && p.Lesson.CourseId == courseId)
             .ToListAsync();
@@ -54,6 +57,7 @@ public class EnrollmentService : IEnrollmentService
         return true;
     }
 
+    // Lấy danh sách các khóa học mà sinh viên đã đăng ký
     public async Task<IEnumerable<Enrollment>> GetEnrollmentsByStudentAsync(int studentId)
     {
         return await _context.Enrollments
@@ -67,6 +71,7 @@ public class EnrollmentService : IEnrollmentService
             .ToListAsync();
     }
 
+    // Lấy danh sách sinh viên đã đăng ký một khóa học cụ thể
     public async Task<IEnumerable<Enrollment>> GetEnrollmentsByCourseAsync(int courseId)
     {
         return await _context.Enrollments
@@ -78,12 +83,14 @@ public class EnrollmentService : IEnrollmentService
             .ToListAsync();
     }
 
+    // Đếm tổng số học viên của một khóa học
     public async Task<int> GetEnrollmentCountByCourseAsync(int courseId)
     {
         return await _context.Enrollments
             .CountAsync(e => e.CourseId == courseId);
     }
 
+    // Lưu thông tin đăng ký của học viên vào cơ sở dữ liệu
     public async Task EnrollStudentAsync(Enrollment enrollment)
     {
         _context.Enrollments.Add(enrollment);

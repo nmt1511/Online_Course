@@ -2,12 +2,10 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Web;
 
-namespace Online_Course.Services;
+namespace Online_Course.Services.YoutubeApiService;
 
-/// <summary>
-/// Service để lấy thông tin video từ YouTube Data API v3
-/// Chi phí: 1 unit/request, Quota miễn phí: 10,000 units/ngày
-/// </summary>
+// Service lấy thông tin video từ YouTube Data API v3
+// Chi phí: 1 unit/request, Quota miễn phí: 10,000 units/ngày
 public class YouTubeApiService : IYouTubeApiService
 {
     private readonly HttpClient _httpClient;
@@ -106,14 +104,12 @@ public class YouTubeApiService : IYouTubeApiService
                url.Contains("youtu.be", StringComparison.OrdinalIgnoreCase);
     }
 
-    /// <summary>
-    /// Extract video ID từ YouTube URL
-    /// Hỗ trợ các format:
-    /// - https://www.youtube.com/watch?v=VIDEO_ID
-    /// - https://youtu.be/VIDEO_ID
-    /// - https://www.youtube.com/embed/VIDEO_ID
-    /// - https://www.youtube.com/v/VIDEO_ID
-    /// </summary>
+    // Trích xuất mã định danh video (Video ID) từ URL YouTube
+    // Hỗ trợ các định dạng URL:
+    // - https://www.youtube.com/watch?v=VIDEO_ID
+    // - https://youtu.be/VIDEO_ID
+    // - https://www.youtube.com/embed/VIDEO_ID
+    // - https://www.youtube.com/v/VIDEO_ID
     private string? ExtractVideoId(string url)
     {
         if (string.IsNullOrWhiteSpace(url)) return null;
@@ -146,10 +142,8 @@ public class YouTubeApiService : IYouTubeApiService
         return null;
     }
 
-    /// <summary>
-    /// Parse ISO 8601 duration format thành số giây
-    /// Ví dụ: PT1H2M30S -> 3750 giây
-    /// </summary>
+    // Chuyển đổi định dạng thời lượng ISO 8601 sang số giây thực tế
+    // Ví dụ: PT1H2M30S chuyển thành 3750 giây
     private int ParseIsoDuration(string? isoDuration)
     {
         if (string.IsNullOrEmpty(isoDuration)) return 0;

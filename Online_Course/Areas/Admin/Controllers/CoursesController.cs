@@ -3,7 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Online_Course.Helper;
 using Online_Course.Models;
-using Online_Course.Services;
+using Online_Course.Services.CourseService;
+using Online_Course.Services.EnrollmentService;
+using Online_Course.Services.ProgressService;
+using Online_Course.Services.UserService;
 using Online_Course.ViewModels;
 
 namespace Online_Course.Areas.Admin.Controllers;
@@ -32,12 +35,12 @@ public class CoursesController : Controller
         _webHostEnvironment = webHostEnvironment;
     }
 
-    // GET: Admin/Courses
+    // Hiển thị danh sách tất cả các khóa học kèm theo bộ lọc thông tin và phân trang
     public async Task<IActionResult> Index(int? category, string? status, string? search, int page = 1)
     {
         var courses = await _courseService.GetAllCoursesAsync();
         
-        // Apply filters
+        // Thực hiện áp dụng các tiêu chí lọc dữ liệu
         if (category.HasValue)
         {
             courses = courses.Where(c => c.CategoryId == category.Value);
@@ -60,12 +63,12 @@ public class CoursesController : Controller
                 c.Description.Contains(search, StringComparison.OrdinalIgnoreCase));
         }
 
-        // Pagination logic
+        // Thiết lập các thông số phân trang cho danh sách khóa học
         int pageSize = 10;
         int totalItems = courses.Count();
         int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
         
-        // Ensure page is within valid range
+        // Đảm bảo chỉ số trang nằm trong phạm vi hợp lệ
         page = Math.Max(1, Math.Min(page, totalPages > 0 ? totalPages : 1));
 
         var pagedCourses = courses
@@ -102,14 +105,14 @@ public class CoursesController : Controller
             TotalPages = totalPages
         };
 
-        // Get categories for filter dropdown
+        // Truy xuất danh sách danh mục để phục vụ bộ lọc tìm kiếm trên giao diện
         var categories = await _courseService.GetAllCategoriesAsync();
         ViewBag.Categories = categories;
 
         return View(viewModel);
     }
 
-    // GET: Admin/Courses/Details/5
+    // Hiển thị chi tiết thông tin khóa học, danh sách bài học và danh sách học viên đăng ký
     [HttpGet]
     public async Task<IActionResult> Details(int id)
     {
@@ -120,10 +123,10 @@ public class CoursesController : Controller
             return NotFound();
         }
 
-        // Get enrollments for this course
+        // Truy xuất danh sách học viên đã đăng ký khóa học này
         var enrollments = await _enrollmentService.GetEnrollmentsByCourseAsync(id);
 
-        // Build student list with completion percentage
+        // Xây dựng danh sách học viên kèm theo tỷ lệ phần trăm hoàn thành bài học
         var students = new List<StudentEnrollmentViewModel>();
         foreach (var enrollment in enrollments)
         {
@@ -172,7 +175,7 @@ public class CoursesController : Controller
         return View(viewModel);
     }
 
-    // GET: Admin/Courses/Create
+    // Hiển thị giao diện khởi tạo khóa học mới
     public async Task<IActionResult> Create()
     {
         await PopulateInstructorsDropdown();
@@ -181,15 +184,15 @@ public class CoursesController : Controller
         return View(new CreateCourseViewModel());
     }
 
-    // POST: Admin/Courses/Create
+    // Xử lý logic khởi tạo khóa học mới kèm theo tệp tin hình ảnh thu nhỏ
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateCourseViewModel model, IFormFile? thumbnailFile)
     {
-        // Remove ThumbnailUrl from validation - it's optional
+        // Loại bỏ ThumbnailUrl khỏi kiểm tra ModelState vì dữ liệu này có thể được truyền qua tệp tin tải lên
         ModelState.Remove("ThumbnailUrl");
 
-        // Validate dates if CourseType is Fixed_Time
+        // Kiểm tra tính hợp lệ của các mốc thời gian nếu khóa học có định dạng thời gian cố định
         if (model.CourseType == CourseType.Fixed_Time)
         {
             if (!model.RegistrationStartDate.HasValue || !model.RegistrationEndDate.HasValue ||
@@ -218,10 +221,10 @@ public class CoursesController : Controller
         {
             string thumbnailUrl;
 
-            // Handle file upload first
+            // Ưu tiên xử lý lưu tệp tin hình ảnh tải lên từ máy tính
             if (thumbnailFile != null && thumbnailFile.Length > 0)
             {
-                // Check file size (5MB max)
+                // Giới hạn kích thước tệp tin hình ảnh tải lên (tối đa 5MB)
                 if (thumbnailFile.Length > 5 * 1024 * 1024)
                 {
                     ModelState.AddModelError("thumbnailFile", "Kích thước file vượt quá 5MB");
@@ -231,12 +234,12 @@ public class CoursesController : Controller
                 }
                 thumbnailUrl = await SaveImageAsync(thumbnailFile);
             }
-            // Then check URL
+            // Sử dụng đường dẫn URL nếu không có tệp tin tải lên trực tiếp
             else if (!string.IsNullOrWhiteSpace(model.ThumbnailUrl))
             {
                 thumbnailUrl = model.ThumbnailUrl;
             }
-            // Use default image if no thumbnail provided
+            // Sử dụng hình ảnh mặc định nếu không có bất kỳ nguồn hình ảnh nào được chỉ định
             else
             {
                 thumbnailUrl = "/images/default-course.png";
@@ -259,7 +262,7 @@ public class CoursesController : Controller
 
             await _courseService.CreateCourseAsync(course);
 
-            // Process mandatory enrollments for private courses
+            // Tự động ghi danh sinh viên nếu khóa học được thiết lập ở trạng thái Riêng tư
             if (course.CourseStatus == CourseStatus.Private && model.SelectedStudentIds != null && model.SelectedStudentIds.Any())
             {
                 foreach (var studentId in model.SelectedStudentIds)
@@ -287,7 +290,7 @@ public class CoursesController : Controller
     }
 
 
-    // GET: Admin/Courses/Edit/5
+    // Hiển thị giao diện cập nhật thông tin khóa học hiện có
     public async Task<IActionResult> Edit(int id)
     {
         var course = await _courseService.GetCourseByIdAsync(id);
@@ -319,7 +322,7 @@ public class CoursesController : Controller
         return View(viewModel);
     }
 
-    // POST: Admin/Courses/Edit/5
+    // Xử lý cập nhật thông tin thay đổi của khóa học
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, EditCourseViewModel model, IFormFile? thumbnailFile)
@@ -373,7 +376,7 @@ public class CoursesController : Controller
             course.StartDate = model.CourseType == CourseType.Fixed_Time ? model.StartDate : null;
             course.EndDate = model.CourseType == CourseType.Fixed_Time ? model.EndDate : null;
 
-            // Handle file upload
+            // Xử lý tệp tin hình ảnh thu nhỏ mới nếu có tải lên thay thế
             if (thumbnailFile != null && thumbnailFile.Length > 0)
             {
                 course.ThumbnailUrl = await SaveImageAsync(thumbnailFile);
@@ -385,13 +388,13 @@ public class CoursesController : Controller
 
             await _courseService.UpdateCourseAsync(course);
 
-            // Process mandatory enrollments for private courses
+            // Cập nhật lại danh sách sinh viên ghi danh bắt buộc đối với các khóa học riêng tư
             if (course.CourseStatus == CourseStatus.Private)
             {
                 var currentEnrollments = await _enrollmentService.GetEnrollmentsByCourseAsync(id);
                 var selectedIds = model.SelectedStudentIds ?? new List<int>();
 
-                // Add new enrollments
+                // Bổ sung các sinh viên mới vào danh sách ghi danh
                 foreach (var studentId in selectedIds)
                 {
                     if (!currentEnrollments.Any(e => e.StudentId == studentId))
@@ -408,7 +411,7 @@ public class CoursesController : Controller
                     }
                 }
 
-                // Remove unselected mandatory enrollments
+                // Loại bỏ các sinh viên không còn nằm trong danh sách ghi danh bắt buộc
                 var enrollmentsToRemove = currentEnrollments
                     .Where(e => e.IsMandatory && !selectedIds.Contains(e.StudentId))
                     .ToList();
@@ -431,14 +434,14 @@ public class CoursesController : Controller
 
     private async Task<string> SaveImageAsync(IFormFile file)
     {
-        // Create images folder if not exists
+        // Khởi tạo thư mục lưu trữ hình ảnh nếu chưa tồn tại trong hệ thống
         var imagesFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images", "courses");
         if (!Directory.Exists(imagesFolder))
         {
             Directory.CreateDirectory(imagesFolder);
         }
 
-        // Generate unique filename
+        // Khởi tạo tên tệp tin duy nhất nhằm tránh xung đột dữ liệu trên máy chủ
         var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
         var filePath = Path.Combine(imagesFolder, fileName);
 
@@ -448,11 +451,11 @@ public class CoursesController : Controller
             await file.CopyToAsync(stream);
         }
 
-        // Return relative URL
+        // Trả về đường dẫn tương đối của hình ảnh để lưu trữ vào cơ sở dữ liệu
         return $"/images/courses/{fileName}";
     }
 
-    // POST: Admin/Courses/Delete/5
+    // Loại bỏ hoàn toàn khóa học khỏi hệ thống sau khi xác thực các điều kiện xóa
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id)

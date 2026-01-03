@@ -1,16 +1,17 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Online_Course.Models;
-using Online_Course.Services;
+using Online_Course.Services.CourseService;
+using Online_Course.Services.LessonService;
+using Online_Course.Services.PdfService;
+using Online_Course.Services.YoutubeApiService;
 using Online_Course.ViewModels;
 using System.Security.Claims;
 
 namespace Online_Course.Areas.Instructor.Controllers;
 
-/// <summary>
-/// Controller quản lý bài học cho Instructor
-/// Hỗ trợ 2 loại bài học: PDF và Video
-/// </summary>
+    // Controller quản lý bài học dành cho Giảng viên
+    // Hỗ trợ xử lý hai loại nội dung chính: Video và PDF
 [Area("Instructor")]
 [Authorize(Policy = "InstructorOnly")]
 public class LessonsController : Controller
@@ -38,23 +39,21 @@ public class LessonsController : Controller
         _logger = logger;
     }
 
-    /// <summary>
-    /// Lấy ID của user hiện tại từ claims
-    /// </summary>
+    // Lấy mã định danh (UserId) của người dùng hiện tại từ Claims định danh
     private int GetCurrentUserId()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
         return userIdClaim != null ? int.Parse(userIdClaim.Value) : 0;
     }
 
-    // GET: Instructor/Lessons - Hiển thị danh sách bài học theo khóa học
+    // Hiển thị danh sách các bài học thuộc một khóa học cụ thể của Giảng viên
     public async Task<IActionResult> Index(int? courseId = null)
     {
         var instructorId = GetCurrentUserId();
 
         if (courseId.HasValue)
         {
-            // Kiểm tra khóa học tồn tại và thuộc về instructor này
+            // Xác thực sự tồn tại của khóa học và quyền quản lý của Giảng viên hiện tại
             var course = await _courseService.GetCourseByIdAsync(courseId.Value);
             if (course == null)
                 return NotFound();
@@ -94,8 +93,7 @@ public class LessonsController : Controller
     }
 
 
-    // GET: Instructor/Lessons/Create/{courseId}
-    //Hiển thị form tạo bài học mới
+    // Hiển thị giao diện khởi tạo bài học mới cho một khóa học cụ thể
     public async Task<IActionResult> Create(int courseId)
     {
         var course = await _courseService.GetCourseByIdAsync(courseId);
@@ -105,7 +103,7 @@ public class LessonsController : Controller
         if (course.CreatedBy != GetCurrentUserId())
             return Forbid();
 
-        // Tạo ViewModel với OrderIndex tự động (số bài học + 1)
+        // Thiết lập thứ tự hiển thị tự động (mặc định là bài học cuối cùng + 1)
         var nextOrderIndex = await _lessonService.GetNextOrderIndexAsync(courseId);
         
         var viewModel = new LessonViewModel
@@ -122,8 +120,7 @@ public class LessonsController : Controller
         return View(viewModel);
     }
 
-    //POST: Instructor/Lessons/Create
-    //Xử lý tạo bài học mới (PDF hoặc Video)
+    // Xử lý yêu cầu lưu trữ bài học mới (bao gồm cả nội dung Video và PDF)
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(LessonViewModel model, IFormFile? pdfFile)
@@ -139,7 +136,7 @@ public class LessonsController : Controller
         if (course.CreatedBy != GetCurrentUserId())
             return Forbid();
 
-        // Validate theo loại bài học
+        // Thực hiện các quy tắc xác thực dữ liệu đầu vào tùy theo loại nội dung bài học
         if (model.LessonType == LessonType.Pdf)
         {
             // PDF: Phải có file upload
@@ -175,7 +172,7 @@ public class LessonsController : Controller
             Title = model.Title,
             Description = model.Description ?? string.Empty,
             LessonType = model.LessonType,
-            // OrderIndex sẽ tự động tính trong LessonService
+            // Thứ tự hiển thị (OrderIndex) sẽ được hệ thống tự động xác định trong tầng xử lý nghiệp vụ (LessonService)
         };
 
         try
@@ -189,7 +186,7 @@ public class LessonsController : Controller
                 var pdfPath = await _pdfService.SavePdfAsync(pdfFile);
                 lesson.ContentUrl = pdfPath;
 
-                // 2. Đếm số trang PDF
+                // Thực hiện phân tích nội dung PDF để xác định số lượng trang tự động
                 var absolutePath = Path.Combine(_webHostEnvironment.WebRootPath, pdfPath.TrimStart('/'));
                 lesson.TotalPages = _pdfService.CountPages(absolutePath);
 
@@ -201,7 +198,7 @@ public class LessonsController : Controller
                 // === XỬ LÝ VIDEO ===
                 lesson.ContentUrl = model.VideoUrl!;
 
-                // Thử lấy duration từ YouTube API (nếu là YouTube URL và có API key)
+                // Tự động trích xuất thời lượng nội dung nếu tệp tin được cung cấp từ nền tảng YouTube
                 if (_youTubeApiService.IsYouTubeUrl(model.VideoUrl!))
                 {
                     _logger.LogInformation("[LessonsController.Create POST] Đang lấy duration từ YouTube API cho: {Url}", model.VideoUrl);
@@ -242,8 +239,7 @@ public class LessonsController : Controller
         }
     }
 
-    //Edit - Chỉnh sửa bài học
-    // GET: Instructor/Lessons/Edit/{id}
+    // Hiển thị giao diện chỉnh sửa thông tin bài học theo mã định danh (ID)
     public async Task<IActionResult> Edit(int id)
     {
         _logger.LogInformation("[LessonsController.Edit GET] LessonId: {LessonId}", id);
@@ -300,7 +296,7 @@ public class LessonsController : Controller
         if (course == null || course.CreatedBy != GetCurrentUserId())
             return Forbid();
 
-        // Validate theo loại bài học
+        // Thực hiện các quy tắc kiểm tra tính hợp lệ của dữ liệu đầu vào dựa trên loại nội dung bài học hiện tại
         if (model.LessonType == LessonType.Pdf)
         {
             // PDF: Có thể giữ file cũ hoặc upload file mới
@@ -330,7 +326,7 @@ public class LessonsController : Controller
                 Title = model.Title,
                 Description = model.Description ?? string.Empty,
                 LessonType = model.LessonType,
-                OrderIndex = existingLesson.OrderIndex // Giữ nguyên OrderIndex
+                OrderIndex = existingLesson.OrderIndex // Duy trì thứ tự hiển thị hiện có của bài học trong khóa học
             };
 
             if (model.LessonType == LessonType.Pdf)

@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Online_Course.Data;
 using Online_Course.Models;
 
-namespace Online_Course.Services;
+namespace Online_Course.Services.CourseService;
 
 public class CourseService : ICourseService
 {
@@ -135,13 +135,13 @@ public class CourseService : ICourseService
                 .ToListAsync();
             _context.Progresses.RemoveRange(progressRecords);
 
-            // Delete all enrollments for this course
+            // Xóa tất cả bản ghi đăng ký của khóa học
             _context.Enrollments.RemoveRange(course.Enrollments);
 
-            // Delete all lessons
+            // Xóa tất cả bài học thuộc khóa học
             _context.Lessons.RemoveRange(course.Lessons);
 
-            // Delete the course
+            // Xóa thông tin khóa học
             _context.Courses.Remove(course);
             
             await _context.SaveChangesAsync();

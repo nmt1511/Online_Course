@@ -4,11 +4,9 @@
     {
         private static readonly TimeZoneInfo VietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
 
-        /// <summary>
-        /// Chuyển đổi thời gian UTC sang múi giờ Việt Nam (UTC+07:00).
-        /// </summary>
-        /// <param name="utcDateTime">Thời gian UTC cần chuyển đổi.</param>
-        /// <returns>Thời gian trong múi giờ Việt Nam.</returns>
+        // Chuyển đổi thời gian UTC sang múi giờ Việt Nam (UTC+07:00)
+        // utcDateTime: Thời gian UTC cần xử lý chuyển đổi
+        // Trả về: Giá trị thời gian tương ứng trong múi giờ Việt Nam
         public static DateTime ToVietnamTime(DateTime utcDateTime)
         {
             if (utcDateTime.Kind != DateTimeKind.Utc)
@@ -18,7 +16,7 @@
             return TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, VietnamTimeZone);
         }
 
-        //Lấy thời gian hiện tại theo múi giờ Việt Nam.
+        // Truy xuất thời gian hiện tại theo múi giờ chuẩn Việt Nam
         public static DateTime GetVietnamTimeNow()
         {
             return ToVietnamTime(DateTime.UtcNow);

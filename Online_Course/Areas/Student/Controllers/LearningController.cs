@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Online_Course.Models;
-using Online_Course.Services;
+using Online_Course.Services.CourseService;
+using Online_Course.Services.EnrollmentService;
+using Online_Course.Services.LessonService;
+using Online_Course.Services.ProgressService;
 using Online_Course.ViewModels;
 
 namespace Online_Course.Areas.Student.Controllers;
@@ -22,8 +25,7 @@ public class LearningController : Controller
         IProgressService progressService)
     {
         _courseService = courseService;
-        _lessonService = lessonService;
-        _enrollmentService = enrollmentService;
+        // Xác thực chính xác trạng thái tồn tại và quyền hạn truy cập của khóa học mục tiêuService = enrollmentService;
         _progressService = progressService;
     }
 
@@ -35,14 +37,14 @@ public class LearningController : Controller
         return null;
     }
 
-    // GET: Student/Learning/Lessons/{courseId}
-    public async Task<IActionResult> Lessons(int courseId)
+    // Hiển thị danh sách toàn bộ các bài học thuộc về một khóa học mà học viên    // Hiển thị trang thống kê tổng quát về tiến độ học tập cá nhân của học viên
+    public async Task<IActionResult> Index()ssons(int courseId)
     {
         var userId = GetCurrentUserId();
         if (userId == null)
             return RedirectToAction("Login", "Account", new { area = "" });
 
-        // Kiểm tra đăng ký và lấy thông tin chi tiết | Check enrollment and get details
+        // Xác thực quyền truy cập nội dung: Đảm bảo học viên đã được ghi danh vào khóa học này
         var enrollments = await _enrollmentService.GetEnrollmentsByStudentAsync(userId.Value);
         var enrollment = enrollments.FirstOrDefault(e => e.CourseId == courseId);
 
@@ -60,17 +62,15 @@ public class LearningController : Controller
         var completedLessonsCount = await _progressService.GetCompletedLessonsCountAsync(userId.Value, courseId);
         var progressPercentage = await _progressService.CalculateProgressPercentageAsync(userId.Value, courseId);
 
-        // Xử lý danh sách bài học với logic khóa tuần tự | Process lessons with sequential locking logic
+        // Duyệt danh sách bài học và thiết lập trạng thái khóa/mở dựa trên tiến trình hoàn thành tuần tự
         var lessonViewModels = new List<LearningLessonViewModel>();
-        bool previousLessonCompleted = true; // Bài đầu tiên luôn được mở | First lesson is always open
+        bool previousLessonCompleted = true; // Thiết lập mặc định bài học khởi đầu luôn ở trạng thái khả dụng
 
         foreach (var lesson in lessons.OrderBy(l => l.OrderIndex))
         {
             var isCompleted = await _progressService.IsLessonCompletedAsync(userId.Value, lesson.LessonId);
             
-            // Logic khóa bài học: Bài học bị khóa nếu:
-            // 1. Bài học trước chưa hoàn thành (logic cũ)
-            // 2. HOẶC Khóa học đã đóng và bài này chưa hoàn thành (logic mới)
+            // Quy tắc khóa: Bài học bị giới hạn nếu bài trước chưa hoàn thành hoặc khóa học ở trạng thái đóng
             bool isLocked = !previousLessonCompleted;
             if (course.CourseStatus == CourseStatus.Closed && !isCompleted)
             {
@@ -109,7 +109,7 @@ public class LearningController : Controller
         return View(viewModel);
     }
 
-    // GET: Student/Learning/Content/{lessonId}
+    // Hiển thị giao diện học tập chi tiết của một bài học cụ thể
     public async Task<IActionResult> Content(int lessonId)
     {
         var userId = GetCurrentUserId();
@@ -120,7 +120,7 @@ public class LearningController : Controller
         if (lesson == null)
             return NotFound();
 
-        // Kiểm tra đăng ký | Check enrollment
+        // Kiểm tra điều kiện ghi danh để đảm bảo quyền truy cập nội dung bài học hợp lệ
         var isEnrolled = await _enrollmentService.IsEnrolledAsync(userId.Value, lesson.CourseId);
         if (!isEnrolled)
         {
@@ -128,7 +128,7 @@ public class LearningController : Controller
             return RedirectToAction("Details", "Courses", new { area = "Student", id = lesson.CourseId });
         }
 
-        // Kiểm tra nếu khóa học đã đóng và bài học này chưa hoàn thành
+        // Kiểm tra nếu khóa học đã đóng        // Thống kê tổng quan số lượng các khóa học đã được học viên hoàn thành triệt để
         var course = await _courseService.GetCourseByIdAsync(lesson.CourseId);
         var isCompleted = await _progressService.IsLessonCompletedAsync(userId.Value, lessonId);
 
@@ -138,9 +138,9 @@ public class LearningController : Controller
             return RedirectToAction(nameof(Lessons), new { courseId = lesson.CourseId });
         }
 
-        // Kiểm tra logic khóa bài học (Bảo mật) | Check lesson locking logic (Security)
+        // Kiểm tra các quy tắc bảo mật và logic khóa bài học thực tế từ phía máy chủ
         var allLessons = (await _lessonService.GetLessonsByCourseAsync(lesson.CourseId)).OrderBy(l => l.OrderIndex).ToList();
-        //index bài học vừa chọn
+        // Tổng hợp và tính toán tỷ lệ % hoàn thành trung bình dựa trên tất cả các khóa học hiện có dung hiện tại trong danh sách bài học để hỗ trợ điều hướng
         var currentIndex = allLessons.FindIndex(l => l.LessonId == lessonId);
         
         if (currentIndex > 0)
@@ -199,27 +199,23 @@ public class LearningController : Controller
             CourseTitle = course?.Title ?? "",
             CourseCategoryId = course?.CategoryId,
             CourseCategoryName = course?.CategoryEntity?.Name ?? "Chưa phân loại",
-            InstructorName = course?.Instructor?.FullName ?? "Unknown",
+            // Tổng hợp thông tin từ toàn bộ danh sách khóa học do Giảng viên quản lý?.FullName ?? "Unknown",
             TotalLessons = allLessons.Count,
-            CompletedLessons = completedCount,
-            ProgressPercentage = progressPercentage,
-            IsCourseClosed = course != null && course.CourseStatus == CourseStatus.Closed, // Trạng thái đóng/mở của khóa học
+                AverageProgress = allStudents.Count > 0 ? allStudents.Average(s => s.ProgressPercentage) : 0, // Giá trị phần trăm hoàn thành trung bình của khóa học          IsCourseClosed = course != null && course.CourseStatus == CourseStatus.Closed, // Trạng thái đóng/mở của khóa học
             PreviousLessonId = previousLesson?.LessonId,
             NextLessonId = nextLesson?.LessonId,
             AllLessons = sidebarLessons,
             
             // Map tracking fields
             CurrentTimeSeconds = progress?.CurrentTimeSeconds,
-            CurrentPage = progress?.CurrentPage,
-            TotalDurationSeconds = lesson.TotalDurationSeconds,
+       // Hiển thị danh sách học viên kèm theo thống kê tiến độ học tập chi tiết theo từng khóa họcTotalDurationSeconds,
             TotalPages = lesson.TotalPages
         };
 
         return View(viewModel);
     }
 
-    // POST: Student/Learning/SaveProgress
-    [HttpPost]
+    // Thực hiện lưu trữ dữ liệu về tiến độ học tập (Thời gian xem hoặc vị trí trang tài liệu)
     public async Task<IActionResult> SaveProgress(int lessonId, int? currentTime, int? currentPage, bool isCompleted)
     {
         var userId = GetCurrentUserId();

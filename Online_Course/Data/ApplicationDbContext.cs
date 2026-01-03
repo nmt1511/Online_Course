@@ -23,7 +23,7 @@ public class ApplicationDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Role configuration
+        // Cấu hình thực thể Vai trò người dùng (Role configuration)
         modelBuilder.Entity<Role>(entity =>
         {
             entity.ToTable("roles");
@@ -33,7 +33,7 @@ public class ApplicationDbContext : DbContext
             entity.HasIndex(r => r.Name).IsUnique();
         });
 
-        // User configuration
+        // Cấu hình thực thể Người dùng
         modelBuilder.Entity<User>(entity =>
         {
             entity.ToTable("users");
@@ -49,7 +49,7 @@ public class ApplicationDbContext : DbContext
             entity.HasIndex(u => u.Email).IsUnique();
         });
 
-        // UserRole configuration (many-to-many relationship)
+        // Cấu hình liên kết giữa Người dùng và Vai trò (Mối quan hệ nhiều-nhiều)
         modelBuilder.Entity<UserRole>(entity =>
         {
             entity.ToTable("user_roles");
@@ -70,7 +70,7 @@ public class ApplicationDbContext : DbContext
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // Course configuration
+        // Cấu hình thực thể Khóa học
         modelBuilder.Entity<Course>(entity =>
         {
             entity.ToTable("courses");
@@ -104,7 +104,7 @@ public class ApplicationDbContext : DbContext
                 .OnDelete(DeleteBehavior.SetNull);
         });
 
-        // Lesson configuration
+        // Cấu hình thực thể Bài học
         modelBuilder.Entity<Lesson>(entity =>
         {
             entity.ToTable("lessons");
@@ -129,7 +129,7 @@ public class ApplicationDbContext : DbContext
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // Enrollment configuration
+        // Cấu hình thực thể Ghi danh khóa học (Enrollment configuration)
         modelBuilder.Entity<Enrollment>(entity =>
         {
             entity.ToTable("enrollments");
@@ -155,7 +155,7 @@ public class ApplicationDbContext : DbContext
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // Progress configuration
+        // Cấu hình thực thể Tiến độ học tập (Progress configuration)
         modelBuilder.Entity<Progress>(entity =>
         {
             entity.ToTable("progresses");
@@ -181,7 +181,7 @@ public class ApplicationDbContext : DbContext
                 .OnDelete(DeleteBehavior.NoAction);
         });
 
-        // Category configuration
+        // Cấu hình thực thể Danh mục khóa học (Category configuration)
         modelBuilder.Entity<Category>(entity =>
         {
             entity.ToTable("categories");

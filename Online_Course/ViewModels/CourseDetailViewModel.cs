@@ -2,9 +2,7 @@ using Online_Course.Models;
 
 namespace Online_Course.ViewModels;
 
-/// <summary>
-/// ViewModel for course detail page - used by both Admin and Instructor
-/// </summary>
+    // Cấu trúc dữ liệu chi tiết của khóa học - Được sử dụng chung bởi Quản trị viên và Giảng viên
 public class CourseDetailViewModel
 {
     public int CourseId { get; set; }
@@ -16,18 +14,18 @@ public class CourseDetailViewModel
     public CourseStatus Status { get; set; }
     public DateTime CreatedAt { get; set; }
     
-    // Course Type and Date fields
+    // Các trường phản ánh loại hình và thời hạn của khóa học
     public CourseType CourseType { get; set; } = CourseType.Open_Always;
     public DateTime? RegistrationStartDate { get; set; }
     public DateTime? RegistrationEndDate { get; set; }
     public DateTime? StartDate { get; set; }
     public DateTime? EndDate { get; set; }
     
-    // Only Admin can see this
+    // Thông tin Giảng viên (Chỉ khả dụng đối với tài khoản Quản trị viên)
     public string? InstructorName { get; set; }
     public bool ShowInstructor { get; set; }
     
-    // Statistics
+    // Các chỉ số thống kê cơ bản của khóa học
     public int TotalLessons { get; set; }
     public int TotalStudents { get; set; }
     
@@ -73,10 +71,10 @@ public class LessonSummaryViewModel
     public string Description { get; set; } = string.Empty;
     public int OrderIndex { get; set; }
     
-    // Lesson content URL (YouTube video or PDF link)
+    // Liên kết nội dung của bài học (Đường dẫn video YouTube hoặc tệp tin PDF)
     public string ContentUrl { get; set; } = string.Empty;
     
-    // Lesson type: "video" or "pdf"
+    // Phân loại hình thức bài học: "video" hoặc "pdf"
     public LessonType LessonType { get; set; } = LessonType.Video;
     
     public string LessonTypeIcon => LessonType switch
@@ -99,7 +97,7 @@ public class StudentEnrollmentViewModel
     public string Email { get; set; } = string.Empty;
     public DateTime EnrolledAt { get; set; }
     
-    // Completion percentage (0-100)
+    // Tỷ lệ hoàn thành nội dung học tập của học viên (Tính theo thang điểm 0-100)
     public double CompletionPercentage { get; set; }
     
     public string CompletionColor => CompletionPercentage switch

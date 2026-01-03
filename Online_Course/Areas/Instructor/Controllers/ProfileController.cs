@@ -21,6 +21,7 @@ public class ProfileController : Controller
     }
 
     [HttpGet]
+    // Hiển thị trang báo cáo phân tích hiệu quả giảng dạy và tỷ lệ hoàn thành của học viên
     public async Task<IActionResult> Index()
     {
         var userId = GetCurrentUserId();
@@ -46,6 +47,7 @@ public class ProfileController : Controller
     }
 
     [HttpGet]
+    // Hiển thị giao diện điều chỉnh thông tin cá nhân của Giảng viên
     public async Task<IActionResult> Edit()
     {
         var userId = GetCurrentUserId();
@@ -99,6 +101,7 @@ public class ProfileController : Controller
     }
 
     [HttpGet]
+    // Hiển thị giao diện thay đổi mật khẩu hệ thống
     public IActionResult ChangePassword()
     {
         return View(new ChangePasswordViewModel());

@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Online_Course.Services;
+using Online_Course.Services.EnrollmentService;
+using Online_Course.Services.LessonService;
+using Online_Course.Services.ProgressService;
 using Online_Course.ViewModels;
 
 namespace Online_Course.Areas.Student.Controllers;
@@ -31,7 +33,7 @@ public class ProgressController : Controller
         return null;
     }
 
-    // GET: Student/Progress
+    // Hiển thị báo cáo thống kê tổng quát về tiến độ học tập cá nhân của học viên
     public async Task<IActionResult> Index()
     {
         var userId = GetCurrentUserId();
@@ -42,10 +44,10 @@ public class ProgressController : Controller
         
         var courseProgressList = new List<StudentCourseProgressViewModel>();
 
-        //Tổng khóa học hoàn thành
+        // Thống kê tổng số lượng khóa học mà học viên đã hoàn tất 100% nội dung bài học
         int totalCompletedCourses = 0;
 
-        //Tổng % hoàn thành của sinh viên
+        // Tổng hợp và phân tích tỷ lệ học tập trung bình trên toàn bộ danh sách đăng ký
         double overallProgressSum = 0;
 
         // Duyệt qua danh sách đăng ký
